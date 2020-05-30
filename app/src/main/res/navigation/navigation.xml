@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.productscanner.MainFragment"
+        android:label="MainFragment" >
+        <action
+            android:id="@+id/action_mainFragment_to_detailProduct"
+            app:destination="@id/detailProduct"
+            app:enterAnim="@anim/slide_left_in" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailProduct"
+        android:name="com.example.productscanner.DetailProduct"
+        android:label="fragment_detail_product"
+        tools:layout="@layout/fragment_detail_product" >
+        <argument
+            android:name="passingValue"
+            app:argType="integer" />
+    </fragment>
+</navigation>
