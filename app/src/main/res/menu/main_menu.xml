@@ -4,4 +4,7 @@
     <item
         android:id="@+id/detail"
         android:title="@string/scan" />
+    <item
+        android:id="@+id/refresh"
+        android:title="@string/refresh"/>
 </menu>

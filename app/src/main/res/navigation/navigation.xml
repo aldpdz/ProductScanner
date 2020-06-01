@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.productscanner.MainFragment"
+        android:name="com.example.productscanner.view.MainFragment"
         android:label="MainFragment" >
         <action
             android:id="@+id/action_mainFragment_to_detailProduct"
@@ -16,11 +16,14 @@
     </fragment>
     <fragment
         android:id="@+id/detailProduct"
-        android:name="com.example.productscanner.DetailProduct"
+        android:name="com.example.productscanner.view.DetailProduct"
         android:label="fragment_detail_product"
         tools:layout="@layout/fragment_detail_product" >
         <argument
             android:name="passingValue"
             app:argType="integer" />
+        <argument
+            android:name="argProduct"
+            app:argType="com.example.productscanner.model.Product" />
     </fragment>
 </navigation>
