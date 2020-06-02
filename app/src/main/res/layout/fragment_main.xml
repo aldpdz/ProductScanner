@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="com.example.productscanner.viewmodel.MainFragmentViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -17,8 +19,8 @@
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:id="@+id/rv_products"
-            android:visibility="gone"
-            tools:visibility="visible"/>
+            app:productApiStatusRecycler="@{viewModel.status}"
+            tools:visibility="gone"/>
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -30,7 +32,18 @@
             app:layout_constraintEnd_toEndOf="@+id/rv_products"
             app:layout_constraintStart_toStartOf="@+id/rv_products"
             app:layout_constraintTop_toTopOf="@+id/rv_products"
-            android:visibility="gone"
+            app:productApiStatusProgress="@{viewModel.status}"
             tools:visibility="visible"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/rv_products"
+            app:layout_constraintEnd_toEndOf="@id/rv_products"
+            app:layout_constraintStart_toStartOf="@id/rv_products"
+            app:layout_constraintTop_toTopOf="@id/rv_products"
+            app:productApiStatus="@{viewModel.status}"
+            tools:visibility="visible"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

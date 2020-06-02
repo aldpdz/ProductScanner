@@ -1,23 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="com.example.productscanner.model.Product" />
     </data>
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".view.DetailProduct"
-        android:background="@color/design_default_color_primary">
+        tools:context=".view.DetailProduct">
 
-        <!-- TODO: Update blank fragment layout -->
+
+        <ImageView
+            android:id="@+id/product_image_detail"
+            android:layout_width="170dp"
+            android:layout_height="170dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:picture="@{viewModel.picture}"
+            tools:src="@tools:sample/backgrounds/scenic" />
+
         <TextView
-            android:id="@+id/tv"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/hello_blank_fragment" />
+            android:id="@+id/tv_description_detail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.02"
+            app:layout_constraintStart_toStartOf="@+id/product_image_detail"
+            app:layout_constraintTop_toBottomOf="@+id/product_image_detail"
+            android:text="@{viewModel.description}"
+            tools:text="This is the description of the product and contains detail information." />
 
-    </FrameLayout>
+        <TextView
+            android:id="@+id/tv_name_detail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/product_image_detail"
+            app:layout_constraintTop_toTopOf="@+id/product_image_detail"
+            tools:text="Name: Product one"
+            android:text="@{viewModel.name}"/>
+
+        <TextView
+            android:id="@+id/tv_upc_detail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            tools:text="UPC: 123456789123"
+            android:text="@{@string/upc + viewModel.upc}"
+            app:layout_constraintEnd_toEndOf="@+id/tv_name_detail"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tv_name_detail"
+            app:layout_constraintTop_toBottomOf="@+id/tv_name_detail" />
+
+        <TextView
+            android:id="@+id/tv_sku_detail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            tools:text="SKU: 1234-SS-53"
+            android:text="@{@string/sku + viewModel.sku}"
+            app:layout_constraintEnd_toEndOf="@+id/tv_upc_detail"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tv_upc_detail"
+            app:layout_constraintTop_toBottomOf="@+id/tv_upc_detail" />
+
+        <TextView
+            android:id="@+id/tv_quantity_detail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            tools:text="Quantity: 125"
+            android:text="@{@string/quantity + viewModel.quantity}"
+            app:layout_constraintEnd_toEndOf="@+id/tv_sku_detail"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tv_sku_detail"
+            app:layout_constraintTop_toBottomOf="@+id/tv_sku_detail" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

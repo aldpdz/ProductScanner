@@ -31,28 +31,17 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = DataBindingUtil.inflate(inflater,
-            R.layout.fragment_main, container, false)
+        binding = FragmentMainBinding.inflate(inflater)
         viewModel = ViewModelProviders.of(this).get(MainFragmentViewModel::class.java)
+        binding.viewModel = viewModel
 
         adapter = ProductAdapter(OpenProductListener { product ->
-//            findNavController().navigate(MainFragmentDirections.actionMainFragmentToDetailProduct(5))
             viewModel.displayNavigationToDetail(product)
         })
-        binding.rvProducts.adapter = adapter
 
-//        binding.button.setOnClickListener { view: View ->
-////            view.findNavController().navigate(R.id.action_mainFragment_to_detailProduct)
-//            view.findNavController().navigate(
-//                MainFragmentDirections.actionMainFragmentToDetailProduct(
-//                    5
-//                )
-//            )
-//        }
-//
-//        binding.button.setOnClickListener(
-//            Navigation.createNavigateOnClickListener(R.id.action_mainFragment_to_detailProduct)
-//        )
+        binding.rvProducts.adapter = adapter
+        binding.lifecycleOwner = viewLifecycleOwner // necessary to update values with bindingAdapter
+
         setHasOptionsMenu(true)
         setObservers()
 
@@ -69,14 +58,6 @@ class MainFragment : Fragment() {
         viewModel.productsError.observe(viewLifecycleOwner, Observer { error ->
             error?.let{
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-            }
-        })
-        viewModel.loading.observe(viewLifecycleOwner, Observer { isLoading ->
-            isLoading?.let {
-                progressBar.visibility = if(it) View.VISIBLE else View.GONE
-                if(it){
-                    rv_products.visibility = View.GONE
-                }
             }
         })
         viewModel.navigationToDetail.observe(viewLifecycleOwner, Observer {
