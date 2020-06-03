@@ -9,7 +9,7 @@ import com.example.productscanner.model.Product
 import androidx.recyclerview.widget.ListAdapter
 
 class ProductAdapter(val clickListener: OpenProductListener) :
-    ListAdapter<Product, ProductAdapter.ViewHolder>(ProductDiffCallBack()) {
+    ListAdapter<Product, ProductAdapter.ViewHolder>(ProductDiffCallBack()){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent)
@@ -18,6 +18,7 @@ class ProductAdapter(val clickListener: OpenProductListener) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position), clickListener)
     }
+
 
     class ViewHolder private constructor(val binding: ProductListBinding):
             RecyclerView.ViewHolder(binding.root){

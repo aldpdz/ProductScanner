@@ -9,83 +9,153 @@
             type="com.example.productscanner.model.Product" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".view.DetailProduct">
-
-
-        <ImageView
-            android:id="@+id/product_image_detail"
-            android:layout_width="170dp"
-            android:layout_height="170dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:picture="@{viewModel.picture}"
-            tools:src="@tools:sample/backgrounds/scenic" />
-
-        <TextView
-            android:id="@+id/tv_description_detail"
-            android:layout_width="0dp"
+        android:layout_height="match_parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.02"
-            app:layout_constraintStart_toStartOf="@+id/product_image_detail"
-            app:layout_constraintTop_toBottomOf="@+id/product_image_detail"
-            android:text="@{viewModel.description}"
-            tools:text="This is the description of the product and contains detail information." />
+            tools:context=".view.DetailProduct">
 
-        <TextView
-            android:id="@+id/tv_name_detail"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/product_image_detail"
-            app:layout_constraintTop_toTopOf="@+id/product_image_detail"
-            tools:text="Name: Product one"
-            android:text="@{viewModel.name}"/>
 
-        <TextView
-            android:id="@+id/tv_upc_detail"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            tools:text="UPC: 123456789123"
-            android:text="@{@string/upc + viewModel.upc}"
-            app:layout_constraintEnd_toEndOf="@+id/tv_name_detail"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/tv_name_detail"
-            app:layout_constraintTop_toBottomOf="@+id/tv_name_detail" />
+            <ImageView
+                android:id="@+id/product_image_detail"
+                android:layout_width="170dp"
+                android:layout_height="170dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_name_detail"
+                app:picture="@{viewModel.picture}"
+                tools:src="@tools:sample/backgrounds/scenic" />
 
-        <TextView
-            android:id="@+id/tv_sku_detail"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            tools:text="SKU: 1234-SS-53"
-            android:text="@{@string/sku + viewModel.sku}"
-            app:layout_constraintEnd_toEndOf="@+id/tv_upc_detail"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/tv_upc_detail"
-            app:layout_constraintTop_toBottomOf="@+id/tv_upc_detail" />
+            <TextView
+                android:id="@+id/tv_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:text="@{viewModel.description}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/et_price"
+                app:layout_constraintStart_toStartOf="@+id/et_quantity"
+                app:layout_constraintTop_toBottomOf="@+id/btn_update"
+                tools:text="This is the description of the product and contains detail information." />
 
-        <TextView
-            android:id="@+id/tv_quantity_detail"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            tools:text="Quantity: 125"
-            android:text="@{@string/quantity + viewModel.quantity}"
-            app:layout_constraintEnd_toEndOf="@+id/tv_sku_detail"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/tv_sku_detail"
-            app:layout_constraintTop_toBottomOf="@+id/tv_sku_detail" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/tv_name_detail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:fontFamily="@font/roboto"
+                android:text="@{viewModel.name}"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Name: Product one" />
+
+            <TextView
+                android:id="@+id/tv_upc_detail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@{@string/upc + viewModel.upc}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/product_image_detail"
+                tools:text="UPC: 123456789123" />
+
+            <TextView
+                android:id="@+id/tv_sku_detail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                tools:text="SKU: 1234-SS-53"
+                android:text="@{@string/sku + viewModel.sku}"
+                app:layout_constraintEnd_toEndOf="@+id/tv_upc_detail"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/tv_upc_detail"
+                app:layout_constraintTop_toBottomOf="@+id/tv_upc_detail" />
+
+            <TextView
+                android:id="@+id/tv_quantity_detail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/quantity"
+                app:layout_constraintEnd_toStartOf="@+id/guideline4"
+                app:layout_constraintStart_toStartOf="@+id/tv_sku_detail"
+                app:layout_constraintTop_toBottomOf="@+id/tv_sku_detail"
+                tools:text="Quantity:" />
+
+            <TextView
+                android:id="@+id/tv_price_detail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+                android:text="@string/price"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/guideline4"
+                app:layout_constraintTop_toTopOf="@+id/tv_quantity_detail"
+                tools:text="Price:" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline4"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="205dp"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/et_quantity"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ems="10"
+                android:inputType="number"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="@+id/tv_quantity_detail"
+                app:layout_constraintStart_toStartOf="@+id/tv_quantity_detail"
+                app:layout_constraintTop_toBottomOf="@+id/tv_quantity_detail" />
+
+            <TextView
+                android:id="@+id/tv_money"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/money_symbol"
+                app:layout_constraintBottom_toBottomOf="@+id/et_quantity"
+                app:layout_constraintStart_toStartOf="@+id/tv_price_detail"
+                app:layout_constraintTop_toTopOf="@+id/et_quantity" />
+
+            <EditText
+                android:id="@+id/et_price"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:ems="10"
+                android:inputType="numberDecimal"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="@+id/tv_price_detail"
+                app:layout_constraintStart_toStartOf="@+id/tv_price_detail"
+                app:layout_constraintTop_toBottomOf="@+id/tv_quantity_detail" />
+
+            <Button
+                android:id="@+id/btn_update"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/btn_update"
+                app:layout_constraintStart_toStartOf="@+id/et_quantity"
+                app:layout_constraintTop_toBottomOf="@+id/et_quantity" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </layout>

@@ -1,30 +1,27 @@
 package com.example.productscanner.view
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.example.productscanner.R
 import com.example.productscanner.databinding.FragmentMainBinding
-import com.example.productscanner.model.Product
 import com.example.productscanner.viewmodel.MainFragmentViewModel
-import kotlinx.android.synthetic.main.fragment_main.*
+import java.util.*
 
 /**
  * A simple [Fragment] subclass.
  */
-class MainFragment : Fragment() {
+class MainFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var binding : FragmentMainBinding
     private lateinit var adapter: ProductAdapter
     private lateinit var viewModel: MainFragmentViewModel
+    private lateinit var searchView: SearchView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,9 +46,8 @@ class MainFragment : Fragment() {
     }
 
     private fun setObservers() {
-        viewModel.products.observe(viewLifecycleOwner, Observer { productsList ->
+        viewModel.productsFiltered.observe(viewLifecycleOwner, Observer { productsList ->
             productsList?.let {
-                binding.rvProducts.visibility = View.VISIBLE
                 adapter.submitList(productsList)
             }
         })
@@ -71,6 +67,20 @@ class MainFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.main_menu, menu)
+        val searchItem = menu.findItem(R.id.action_search)
+        searchView = searchItem.actionView as SearchView
+//        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+//            override fun onQueryTextSubmit(p0: String?): Boolean {
+//                viewModel.queryProducts(p0?.toLowerCase(Locale.getDefault()))
+//                return false
+//            }
+//
+//            override fun onQueryTextChange(p0: String?): Boolean {
+//                viewModel.queryProducts(p0?.toLowerCase(Locale.getDefault()))
+//                return false
+//            }
+//        })
+        searchView.setOnQueryTextListener(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -83,8 +93,22 @@ class MainFragment : Fragment() {
                 viewModel.refreshData()
                 true
             }
+            R.id.action_search -> {
+                true
+            }
             else -> return super.onOptionsItemSelected(item)
         }
 
     }
+
+    override fun onQueryTextSubmit(p0: String?): Boolean {
+        viewModel.queryProducts(p0?.toLowerCase(Locale.getDefault()))
+        return false
+    }
+
+    override fun onQueryTextChange(p0: String?): Boolean {
+        viewModel.queryProducts(p0?.toLowerCase(Locale.getDefault()))
+        return false
+    }
 }
+
