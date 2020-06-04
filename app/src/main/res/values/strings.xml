@@ -8,7 +8,7 @@
     <string name="sku">SKU:\u0020</string>
     <string name="upc">UPC:\u0020</string>
     <string name="quantity">Quantity:\u0020</string>
-    <string name="price">Price: $</string>
+    <string name="price">Price: \u0020</string>
     <string name="money_symbol">$</string>
     <string name="btn_update">Update</string>
 </resources>
