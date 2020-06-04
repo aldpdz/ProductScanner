@@ -58,7 +58,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
         })
         viewModel.navigationToDetail.observe(viewLifecycleOwner, Observer {
             it?.let {
-                this.findNavController().navigate(MainFragmentDirections.actionMainFragmentToDetailProduct(5, it))
+                this.findNavController().navigate(MainFragmentDirections.actionMainFragmentToDetailProduct(it))
                 viewModel.displayNavigationToDetailComplete()
             }
         })
