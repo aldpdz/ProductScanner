@@ -10,7 +10,9 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.productscanner.R
 import com.example.productscanner.databinding.FragmentMainBinding
+import com.example.productscanner.viewmodel.MainActivityViewModel
 import com.example.productscanner.viewmodel.MainFragmentViewModel
+import com.example.productscanner.viewmodel.ProductApiStatus
 import java.util.*
 
 /**
@@ -22,6 +24,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
     private lateinit var adapter: ProductAdapter
     private lateinit var viewModel: MainFragmentViewModel
     private lateinit var searchView: SearchView
+    private lateinit var viewModelShared: MainActivityViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,7 +32,9 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentMainBinding.inflate(inflater)
+        viewModelShared = (activity as MainActivity).viewModel
         viewModel = ViewModelProviders.of(this).get(MainFragmentViewModel::class.java)
+        viewModel.setResponseData(viewModelShared.productsError, viewModelShared.status, viewModelShared.products)
         binding.viewModel = viewModel
 
         adapter = ProductAdapter(OpenProductListener { product ->
@@ -51,7 +56,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
                 adapter.submitList(productsList)
             }
         })
-        viewModel.productsError.observe(viewLifecycleOwner, Observer { error ->
+        viewModel.productsError?.observe(viewLifecycleOwner, Observer { error ->
             error?.let{
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             }
@@ -60,6 +65,13 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
             it?.let {
                 this.findNavController().navigate(MainFragmentDirections.actionMainFragmentToDetailProduct(it))
                 viewModel.displayNavigationToDetailComplete()
+            }
+        })
+        viewModel.status?.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                if(it == ProductApiStatus.DONE){
+                    viewModel.filterProducts()
+                }
             }
         })
     }
@@ -90,7 +102,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
                 true
             }
             R.id.refresh -> {
-                viewModel.refreshData()
+                viewModelShared.refreshData()
                 true
             }
             R.id.action_search -> {

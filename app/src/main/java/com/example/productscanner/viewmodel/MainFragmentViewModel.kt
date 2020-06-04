@@ -9,47 +9,30 @@ import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-enum class ProductApiStatus {LOADING, ERROR, DONE}
+//enum class ProductApiStatus {LOADING, ERROR, DONE}
 
 class MainFragmentViewModel: ViewModel() {
-    private var job: Job? = null
-    private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
-        onError(throwable.localizedMessage)
-    }
+//    private var job: Job? = null
+//    private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+//        onError(throwable.localizedMessage)
+//    }
 
-    private val _products = MutableLiveData<List<Product>>()
+//    private val _products = MutableLiveData<List<Product>>()
     private val _productsFiltered = MutableLiveData<List<Product>>()
-    private val _productsError = MutableLiveData<String?>()
+//    private val _productsError = MutableLiveData<String?>()
     private val _navigationToDetail = MutableLiveData<Product>()
-    private val _status = MutableLiveData<ProductApiStatus>()
+//    private val _status = MutableLiveData<ProductApiStatus>()
     var _query: String? = null
-
+    private var products: LiveData<List<Product>>? = null
     val productsFiltered: LiveData<List<Product>> get() = _productsFiltered
-    val productsError : LiveData<String?> get() =  _productsError
+    var productsError : LiveData<String?>? = null
     val navigationToDetail: LiveData<Product> get() = _navigationToDetail
-    val status: LiveData<ProductApiStatus> get() = _status
+    var status: LiveData<ProductApiStatus>? = null
 
-    init {
-        getProducts()
-    }
-
-    fun refreshData(){
-        getProducts()
-    }
-
-    private fun getProducts(){
-        job = CoroutineScope(Dispatchers.Main + exceptionHandler).launch {
-            _status.value = ProductApiStatus.LOADING
-            val response = ProductsApi.retrofitService.getProducts()
-            if (response.isSuccessful) {
-                _status.value = ProductApiStatus.DONE
-                _products.value = response.body()
-                _productsError.value = null
-                filterProducts()
-            } else {
-                onError("The products couldn't be loaded")
-            }
-        }
+    fun setResponseData(productsError: LiveData<String?>, status: LiveData<ProductApiStatus>, products: LiveData<List<Product>>){
+        this.productsError = productsError
+        this.status = status
+        this.products = products
     }
 
     fun queryProducts(query: String?){
@@ -57,12 +40,12 @@ class MainFragmentViewModel: ViewModel() {
         filterProducts()
     }
 
-    private fun filterProducts(){
+    fun filterProducts(){
         if (_query.isNullOrEmpty()){
-            _productsFiltered.value = _products.value
+            _productsFiltered.value = products?.value
         }else{
             val filteredProducts = ArrayList<Product>()
-            for(Product in _products.value!!){
+            for(Product in products?.value!!){
                 if(Product.name.toLowerCase(Locale.getDefault()).contains(_query!!)){
                     filteredProducts.add(Product)
                 }
@@ -71,23 +54,11 @@ class MainFragmentViewModel: ViewModel() {
         }
     }
 
-    private fun onError(message: String){
-        _products.value = ArrayList()
-        _productsFiltered.value = ArrayList()
-        _status.value = ProductApiStatus.ERROR
-        _productsError.value = message
-    }
-
     fun displayNavigationToDetail(product: Product){
         _navigationToDetail.value = product
     }
 
     fun displayNavigationToDetailComplete(){
         _navigationToDetail.value = null
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        job?.cancel()
     }
 }

@@ -19,7 +19,7 @@ data class Product(
     @SerializedName("UPC")
     val upc: Long,
     @SerializedName("Quantity")
-    val quantity: Int,
+    var quantity: Int,
     @SerializedName("Price")
     var price: Float
 ) : Parcelable
