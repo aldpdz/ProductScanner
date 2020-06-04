@@ -6,12 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
 import com.example.productscanner.databinding.FragmentDetailProductBinding
+import com.example.productscanner.viewmodel.DetailProductViewModel
 
 /**
  * A simple [Fragment] subclass.
  */
 class DetailProduct : Fragment() {
+
+    private lateinit var viewModel: DetailProductViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -21,10 +25,12 @@ class DetailProduct : Fragment() {
         val binding = FragmentDetailProductBinding.inflate(inflater)
 
         // TODO remove args
-        val args = arguments?.let { DetailProductArgs.fromBundle(it).passingValue }
         var detailProduct = arguments?.let { DetailProductArgs.fromBundle(it).argProduct }
+        viewModel = ViewModelProviders.of(this).get(DetailProductViewModel::class.java)
+        viewModel.setDetailProduct(detailProduct)
 
-        binding.viewModel = detailProduct
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
 
         (activity as AppCompatActivity).supportActionBar?.title = "Producto"
 

@@ -20,9 +20,6 @@
         android:label="fragment_detail_product"
         tools:layout="@layout/fragment_detail_product" >
         <argument
-            android:name="passingValue"
-            app:argType="integer" />
-        <argument
             android:name="argProduct"
             app:argType="com.example.productscanner.model.Product" />
     </fragment>

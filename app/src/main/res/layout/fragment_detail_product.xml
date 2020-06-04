@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.example.productscanner.model.Product" />
+            type="com.example.productscanner.viewmodel.DetailProductViewModel" />
     </data>
 
     <ScrollView
@@ -26,7 +26,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_name_detail"
-                app:picture="@{viewModel.picture}"
+                app:picture="@{viewModel.detailProduct.picture}"
                 tools:src="@tools:sample/backgrounds/scenic" />
 
             <TextView
@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp"
-                android:text="@{viewModel.description}"
+                android:text="@{viewModel.detailProduct.description}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/et_price"
                 app:layout_constraintStart_toStartOf="@+id/et_quantity"
@@ -50,7 +50,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:fontFamily="@font/roboto"
-                android:text="@{viewModel.name}"
+                android:text="@{viewModel.detailProduct.name}"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="@{@string/upc + viewModel.upc}"
+                android:text="@{@string/upc + viewModel.detailProduct.upc}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/product_image_detail"
                 tools:text="UPC: 123456789123" />
@@ -75,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 tools:text="SKU: 1234-SS-53"
-                android:text="@{@string/sku + viewModel.sku}"
+                android:text="@{@string/sku + viewModel.detailProduct.sku}"
                 app:layout_constraintEnd_toEndOf="@+id/tv_upc_detail"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/tv_upc_detail"
@@ -121,6 +121,7 @@
                 android:ems="10"
                 android:inputType="number"
                 android:textSize="14sp"
+                android:text="@{viewModel.quantityString}"
                 app:layout_constraintEnd_toEndOf="@+id/tv_quantity_detail"
                 app:layout_constraintStart_toStartOf="@+id/tv_quantity_detail"
                 app:layout_constraintTop_toBottomOf="@+id/tv_quantity_detail" />
@@ -142,6 +143,7 @@
                 android:layout_marginTop="8dp"
                 android:ems="10"
                 android:inputType="numberDecimal"
+                android:text="@{viewModel.priceString}"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="@+id/tv_price_detail"
                 app:layout_constraintStart_toStartOf="@+id/tv_price_detail"
