@@ -120,8 +120,9 @@
                 android:layout_marginTop="8dp"
                 android:ems="10"
                 android:inputType="number"
-                android:textSize="14sp"
+                android:maxLength="5"
                 android:text="@{viewModel.quantityString}"
+                android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="@+id/tv_quantity_detail"
                 app:layout_constraintStart_toStartOf="@+id/tv_quantity_detail"
                 app:layout_constraintTop_toBottomOf="@+id/tv_quantity_detail" />
@@ -143,6 +144,7 @@
                 android:layout_marginTop="8dp"
                 android:ems="10"
                 android:inputType="numberDecimal"
+                android:maxLength="7"
                 android:text="@{viewModel.priceString}"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="@+id/tv_price_detail"

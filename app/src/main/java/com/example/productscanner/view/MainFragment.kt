@@ -1,5 +1,9 @@
 package com.example.productscanner.view
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -47,6 +51,10 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
         setHasOptionsMenu(true)
         setObservers()
 
+        createChannel(
+            getString(R.string.product_notification_channel_id),
+            getString(R.string.notification_channel_name))
+
         return binding.root
     }
 
@@ -81,17 +89,6 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
         inflater.inflate(R.menu.main_menu, menu)
         val searchItem = menu.findItem(R.id.action_search)
         searchView = searchItem.actionView as SearchView
-//        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
-//            override fun onQueryTextSubmit(p0: String?): Boolean {
-//                viewModel.queryProducts(p0?.toLowerCase(Locale.getDefault()))
-//                return false
-//            }
-//
-//            override fun onQueryTextChange(p0: String?): Boolean {
-//                viewModel.queryProducts(p0?.toLowerCase(Locale.getDefault()))
-//                return false
-//            }
-//        })
         searchView.setOnQueryTextListener(this)
     }
 
@@ -111,6 +108,28 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
             else -> return super.onOptionsItemSelected(item)
         }
 
+    }
+
+    private fun createChannel(channelId: String, channelName: String){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            val notificationChannel = NotificationChannel(
+                channelId,
+                channelName,
+                NotificationManager.IMPORTANCE_LOW)
+                .apply {
+                    setShowBadge(false)
+                }
+
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.RED
+            notificationChannel.enableVibration(true)
+            notificationChannel.description = getString(R.string.notification_channel_description)
+
+            val notificationManager = requireActivity().getSystemService(
+                NotificationManager::class.java
+            )
+            notificationManager?.createNotificationChannel(notificationChannel)
+        }
     }
 
     override fun onQueryTextSubmit(p0: String?): Boolean {

@@ -1,14 +1,29 @@
 <resources>
     <string name="app_name">ProductScanner</string>
 
+<!--    menu bar-->
     <string name="scan">scan</string>
     <string name="refresh">reset</string>
     <string name="search">search</string>
 
+<!--    Products-->
+    <string name="product_detail">Product\'s detail</string>
     <string name="sku">SKU:\u0020</string>
     <string name="upc">UPC:\u0020</string>
     <string name="quantity">Quantity:\u0020</string>
-    <string name="price">Price: \u0020</string>
+    <string name="price">Price:\u0020</string>
     <string name="money_symbol">$</string>
     <string name="btn_update">Update</string>
+    <string name="invalid_input">Use a valid number</string>
+
+<!--    Notifications-->
+    <string name="product_notification_channel_id" translatable="false">product_channel</string>
+    <string name="notification_title">Product updated</string>
+    <string name="messageNotification">The product has been updated.</string>
+    <string name="notification_channel_description">Item Updated</string>
+    <string name="notification_channel_name">Product</string>
+    <string name="price_updated">The price has been updated from: $</string>
+    <string name="price_updated_to">\u0020 to: $</string>
+    <string name="quantity_updated">The quantity has been updated from:\u0020</string>
+    <string name="quantity_update_to">\u0020 to:\u0020</string>
 </resources>
