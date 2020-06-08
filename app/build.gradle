@@ -79,7 +79,8 @@ dependencies {
     api 'com.otaliastudios:cameraview:2.6.2'
 
     // CV ML
-    implementation 'com.google.firebase:firebase-ml-vision:24.0.3'
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:16.0.0'
+    implementation 'com.google.android.gms:play-services-mlkit-barcode-scanning:16.0.0'
 
     // Past the liminations of the DEX bytecode file
     implementation 'com.android.support:multidex:1.0.3'

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.productscanner.model.Product
 
 enum class ScannerStatus {FOUND, NOT_FOUND}
+enum class TypeScanner {UPC, SKU}
 
 class CameraViewModel : ViewModel() {
     private val _scannerStatus = MutableLiveData<ScannerStatus>()
@@ -13,17 +14,28 @@ class CameraViewModel : ViewModel() {
     private var products: LiveData<List<Product>>? = null
     val scannerStatus: LiveData<ScannerStatus> get() = _scannerStatus
     var productByBarCode: Product? = null
+    var typeScanner: TypeScanner? = null
 
     fun setProducts(products: LiveData<List<Product>>){
         this.products = products
     }
 
-    fun getProductByBarCode(upc: String){
+    fun getProduct(code: String){
         var found = false
         for(product in products?.value!!){
-            if(product.upc == upc){
-                productByBarCode = product
-                found = true
+            when(typeScanner){
+                TypeScanner.UPC -> {
+                    if(product.upc == code){
+                        productByBarCode = product
+                        found = true
+                    }
+                }
+                TypeScanner.SKU -> {
+                    if(product.sku == code){
+                        productByBarCode = product
+                        found = true
+                    }
+                }
             }
         }
         if(found){

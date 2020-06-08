@@ -19,10 +19,13 @@ import com.example.productscanner.databinding.CameraFragmentBinding
 import com.example.productscanner.viewmodel.CameraViewModel
 import com.example.productscanner.viewmodel.MainActivityViewModel
 import com.example.productscanner.viewmodel.ScannerStatus
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.example.productscanner.viewmodel.TypeScanner
+import com.google.mlkit.vision.barcode.Barcode
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.Text
+import com.google.mlkit.vision.text.TextRecognition
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.PictureResult
 
@@ -31,6 +34,7 @@ class CameraFragment : Fragment() {
     private lateinit var viewModel: CameraViewModel
     private lateinit var viewModelShared: MainActivityViewModel
     private lateinit var binding: CameraFragmentBinding
+    private val sufix:String = "SKU-"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,8 +54,15 @@ class CameraFragment : Fragment() {
         hidePreview()
 
         binding.btnScanUpc.setOnClickListener {
+            viewModel.typeScanner = TypeScanner.UPC
             binding.cameraView.takePicture()
-            binding.btnScanUpc.visibility = View.GONE
+            hideButtons()
+        }
+
+        binding.btnScanSku.setOnClickListener {
+            viewModel.typeScanner = TypeScanner.SKU
+            binding.cameraView.takePicture()
+            hideButtons()
         }
 
         binding.cameraView.addCameraListener(object: CameraListener(){
@@ -61,7 +72,15 @@ class CameraFragment : Fragment() {
                 val bitmap = BitmapFactory.decodeByteArray(result.data, 0, result.data.size)
                 binding.imagePreview.setImageBitmap(bitmap)
                 showPreview()
-                runBarcodeScanner(bitmap)
+
+                when(viewModel.typeScanner){
+                    TypeScanner.UPC -> {
+                        runBarcodeScanner(bitmap)
+                    }
+                    TypeScanner.SKU -> {
+                        textRecognition(bitmap)
+                    }
+                }
             }
         })
 
@@ -93,42 +112,98 @@ class CameraFragment : Fragment() {
     }
 
     fun runBarcodeScanner(bitmap: Bitmap){
-        // Create a FirebaseVisionImage
-        val image = FirebaseVisionImage.fromBitmap(bitmap)
+        val image = InputImage.fromBitmap(bitmap, 0)
 
-        // Optional: Define what kind of barcodes to scan
-        val options = FirebaseVisionBarcodeDetectorOptions.Builder()
-            .setBarcodeFormats(
-                // Detect all kind of barcodes
-                FirebaseVisionBarcode.FORMAT_ALL_FORMATS
-            ).build()
+        val options = BarcodeScannerOptions.Builder()
+            .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
+            .build()
 
-        // Get access to an instance of FirebaseBarcodeDetector
-        val detector = FirebaseVision.getInstance().getVisionBarcodeDetector(options)
+        val scanner = BarcodeScanning.getClient(options)
 
-        // Use the detector to detect the labels inside the image
-        detector.detectInImage(image)
-            .addOnSuccessListener{
-                // Task completed successfully
-                if(it.isNullOrEmpty()){
-                    // TODO validate when the fragment is null
-                    Toast.makeText(
-                        activity, "Try again", Toast.LENGTH_SHORT
-                    ).show()
-                    hidePreview()
-                }else{
-                    val barCode: String? = it[0].displayValue
-                    barCode?.let {
-                        viewModel.getProductByBarCode(it)
-                    }
-                }
+        scanner.process(image)
+            .addOnSuccessListener {
+                processBarcodes(it)
             }
             .addOnFailureListener {
-                Toast.makeText(context,
-                    "Sorry, something went wrong!",
-                    Toast.LENGTH_LONG).show()
-                hidePreview()
+                onFail()
             }
+    }
+
+    private fun processBarcodes(barcodes: List<Barcode>){
+        if(barcodes.isEmpty()){
+            tryAgain()
+        }else{
+            val barCode: String? = barcodes[0].displayValue
+            barCode?.let {
+                viewModel.getProduct(it)
+            }
+        }
+    }
+
+    fun textRecognition(bitmap: Bitmap){
+        val image = InputImage.fromBitmap(bitmap, 0)
+        val recognizer = TextRecognition.getClient()
+
+        recognizer.process(image)
+            .addOnSuccessListener { texts ->
+                processTextRecognitionResult(texts)
+            }
+            .addOnFailureListener {
+                onFail()
+            }
+    }
+
+    private fun onFail() {
+        Toast.makeText(
+            context,
+            "Sorry, something went wrong!",
+            Toast.LENGTH_LONG
+        ).show()
+        hidePreview()
+    }
+
+    private fun processTextRecognitionResult(texts: Text){
+        val blocks = texts.textBlocks
+        if(blocks.isEmpty()){
+            tryAgain()
+        }else{
+            val skuCode = findSKUCode(texts)
+            if (skuCode == null){
+                tryAgain()
+            }else{
+                viewModel.getProduct(skuCode)
+            }
+        }
+    }
+
+    private fun tryAgain() {
+        Toast.makeText(
+            activity, "Try again", Toast.LENGTH_SHORT
+        ).show()
+        hidePreview()
+    }
+
+    private fun findSKUCode(texts: Text):String?{
+        val lines = texts.text.split("\n")
+        for (line in lines){
+            val words = line.split(" ")
+            for (word in words){
+                if (word.contains(sufix))
+                    return word
+            }
+        }
+        return null
+    }
+
+
+    fun hideButtons(){
+        binding.btnScanSku.visibility = View.GONE
+        binding.btnScanUpc.visibility = View.GONE
+    }
+
+    fun showButtons(){
+        binding.btnScanSku.visibility = View.VISIBLE
+        binding.btnScanUpc.visibility = View.VISIBLE
     }
 
     fun showPreview() {
@@ -139,6 +214,6 @@ class CameraFragment : Fragment() {
     fun hidePreview() {
         binding.imagePreview.visibility = View.GONE
         binding.cameraView.visibility = View.VISIBLE
-        binding.btnScanUpc.visibility = View.VISIBLE
+        showButtons()
     }
 }
