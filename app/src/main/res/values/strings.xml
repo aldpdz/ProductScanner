@@ -5,6 +5,7 @@
     <string name="scan">scan</string>
     <string name="refresh">reset</string>
     <string name="search">search</string>
+    <string name="scanner">Scanner</string>
 
 <!--    Products-->
     <string name="product_detail">Product\'s detail</string>

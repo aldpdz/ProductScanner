@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "330042269452",
+    "firebase_url": "https://ml-kit-scanner-d0382.firebaseio.com",
+    "project_id": "ml-kit-scanner-d0382",
+    "storage_bucket": "ml-kit-scanner-d0382.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:330042269452:android:f34c2129a84df86a5d3329",
+        "android_client_info": {
+          "package_name": "com.example.productscanner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "330042269452-g9lhd40ui58pron86ctj90vicaqmoq5n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrT3RI-63A6_OHNd5AJSR0rOQDArJ9fBk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "330042269452-g9lhd40ui58pron86ctj90vicaqmoq5n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -17,7 +17,7 @@ data class Product(
     @SerializedName("SKU")
     val sku: String,
     @SerializedName("UPC")
-    val upc: Long,
+    val upc: String,
     @SerializedName("Quantity")
     var quantity: Int,
     @SerializedName("Price")

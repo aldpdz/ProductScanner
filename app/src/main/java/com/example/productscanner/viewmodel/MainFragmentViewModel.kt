@@ -7,10 +7,10 @@ import com.example.productscanner.model.Product
 import java.util.*
 import kotlin.collections.ArrayList
 
-
 class MainFragmentViewModel: ViewModel() {
     private val _productsFiltered = MutableLiveData<List<Product>>()
     private val _navigationToDetail = MutableLiveData<Product>()
+
     var _query: String? = null
     private var products: LiveData<List<Product>>? = null
     val productsFiltered: LiveData<List<Product>> get() = _productsFiltered
@@ -34,9 +34,9 @@ class MainFragmentViewModel: ViewModel() {
             _productsFiltered.value = products?.value
         }else{
             val filteredProducts = ArrayList<Product>()
-            for(Product in products?.value!!){
-                if(Product.name.toLowerCase(Locale.getDefault()).contains(_query!!)){
-                    filteredProducts.add(Product)
+            for(product in products?.value!!){
+                if(product.name.toLowerCase(Locale.getDefault()).contains(_query!!)){
+                    filteredProducts.add(product)
                 }
             }
             _productsFiltered.value = filteredProducts

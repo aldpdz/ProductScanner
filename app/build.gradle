@@ -3,6 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'kotlin-kapt' // for annotation
+apply plugin: 'com.google.gms.google-services'
+
 
 android {
     compileSdkVersion 29
@@ -14,6 +16,7 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true // Past the liminations of the DEX bytecode file
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -71,4 +74,15 @@ dependencies {
 
     // Glide
     implementation "com.github.bumptech.glide:glide:4.8.0"
+
+    // Camera
+    api 'com.otaliastudios:cameraview:2.6.2'
+
+    // CV ML
+    implementation 'com.google.firebase:firebase-ml-vision:24.0.3'
+
+    // Past the liminations of the DEX bytecode file
+    implementation 'com.android.support:multidex:1.0.3'
+
 }
+

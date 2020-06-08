@@ -17,7 +17,7 @@ import com.example.productscanner.viewmodel.MainActivityViewModel
 /**
  * A simple [Fragment] subclass.
  */
-class DetailProduct : Fragment() {
+class DetailProductFragment : Fragment() {
 
     private lateinit var viewModel: DetailProductViewModel
     private lateinit var viewModelShared: MainActivityViewModel
@@ -31,7 +31,7 @@ class DetailProduct : Fragment() {
         binding = FragmentDetailProductBinding.inflate(inflater)
 
         // TODO remove args
-        val detailProduct = arguments?.let { DetailProductArgs.fromBundle(it).argProduct }
+        val detailProduct = arguments?.let { DetailProductFragmentArgs.fromBundle(it).argProduct }
         viewModelShared = (activity as (MainActivity)).viewModel
 
         viewModel = ViewModelProviders.of(this).get(DetailProductViewModel::class.java)

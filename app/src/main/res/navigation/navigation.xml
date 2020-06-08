@@ -8,19 +8,38 @@
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.example.productscanner.view.MainFragment"
-        android:label="MainFragment" >
+        android:label="MainFragment"
+        tools:layout="@layout/fragment_main">
         <action
             android:id="@+id/action_mainFragment_to_detailProduct"
             app:destination="@id/detailProduct"
             app:enterAnim="@anim/slide_left_in" />
+        <action
+            android:id="@+id/action_mainFragment_to_camerax"
+            app:destination="@id/camerax" />
     </fragment>
     <fragment
         android:id="@+id/detailProduct"
-        android:name="com.example.productscanner.view.DetailProduct"
+        android:name="com.example.productscanner.view.DetailProductFragment"
         android:label="fragment_detail_product"
         tools:layout="@layout/fragment_detail_product" >
         <argument
             android:name="argProduct"
             app:argType="com.example.productscanner.model.Product" />
     </fragment>
+
+    <fragment
+        android:id="@+id/camerax"
+        android:name="com.example.productscanner.view.CameraFragment"
+        tools:layout="@layout/camera_fragment">
+        <action
+            android:id="@+id/action_camerax_to_detailProduct"
+            app:destination="@id/detailProduct"
+            app:enterAnim="@anim/slide_left_in"
+            app:popUpTo="@id/camerax"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <argument
+        android:name="barCode"
+        android:defaultValue="defaultBarCode" />
 </navigation>

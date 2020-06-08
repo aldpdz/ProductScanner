@@ -17,6 +17,7 @@ import com.example.productscanner.databinding.FragmentMainBinding
 import com.example.productscanner.viewmodel.MainActivityViewModel
 import com.example.productscanner.viewmodel.MainFragmentViewModel
 import com.example.productscanner.viewmodel.ProductApiStatus
+import com.example.productscanner.viewmodel.ScannerStatus
 import java.util.*
 
 /**
@@ -71,7 +72,9 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
         })
         viewModel.navigationToDetail.observe(viewLifecycleOwner, Observer {
             it?.let {
-                this.findNavController().navigate(MainFragmentDirections.actionMainFragmentToDetailProduct(it))
+                this.findNavController()
+                    .navigate(MainFragmentDirections
+                        .actionMainFragmentToDetailProduct(it))
                 viewModel.displayNavigationToDetailComplete()
             }
         })
@@ -95,7 +98,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId){
             R.id.detail -> {
-                Toast.makeText(context, "Scan", Toast.LENGTH_SHORT).show()
+                this.findNavController().navigate(MainFragmentDirections.actionMainFragmentToCamerax())
                 true
             }
             R.id.refresh -> {
