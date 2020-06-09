@@ -30,12 +30,17 @@ class DetailProductFragment : Fragment() {
 
         binding = FragmentDetailProductBinding.inflate(inflater)
 
-        // TODO remove args
         val detailProduct = arguments?.let { DetailProductFragmentArgs.fromBundle(it).argProduct }
         viewModelShared = (activity as (MainActivity)).viewModel
 
         viewModel = ViewModelProviders.of(this).get(DetailProductViewModel::class.java)
         viewModel.setDetailProduct(detailProduct)
+
+        detailProduct?.let {
+            if(!detailProduct.isSaved){
+                viewModelShared.saveIdProduct(activity as MainActivity, it.id)
+            }
+        }
 
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner

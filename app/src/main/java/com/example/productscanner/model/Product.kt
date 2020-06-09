@@ -21,5 +21,6 @@ data class Product(
     @SerializedName("Quantity")
     var quantity: Int,
     @SerializedName("Price")
-    var price: Float
+    var price: Float,
+    var isSaved: Boolean = false
 ) : Parcelable

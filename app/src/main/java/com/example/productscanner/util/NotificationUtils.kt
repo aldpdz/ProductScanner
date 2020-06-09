@@ -10,6 +10,20 @@ import com.example.productscanner.view.MainActivity
 
 private val NOTIFICATION_ID = 0
 
+fun writeOnPrefereces(activity: MainActivity, id: Int){
+    val sharedPref = activity.getPreferences(Context.MODE_PRIVATE) ?: return
+    with(sharedPref.edit()){
+        putInt(id.toString(), id)
+        commit()
+    }
+}
+
+fun readOnPreferences(activity: MainActivity, id: Int): Int{
+    val sharedPref = activity.getPreferences(Context.MODE_PRIVATE)
+    val defaultValue = -1
+    return sharedPref.getInt(id.toString(), defaultValue)
+}
+
 /***
  * Extension function to send notifications
  */

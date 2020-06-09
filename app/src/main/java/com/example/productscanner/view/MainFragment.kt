@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
@@ -61,6 +62,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
     private fun setObservers() {
         viewModel.productsFiltered.observe(viewLifecycleOwner, Observer { productsList ->
             productsList?.let {
+                Log.d("Change list", "")
                 adapter.submitList(productsList)
             }
         })
