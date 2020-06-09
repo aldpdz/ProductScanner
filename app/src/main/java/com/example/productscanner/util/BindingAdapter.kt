@@ -1,4 +1,4 @@
-package com.example.productscanner.view
+package com.example.productscanner.util
 
 import android.view.View
 import android.widget.ImageView

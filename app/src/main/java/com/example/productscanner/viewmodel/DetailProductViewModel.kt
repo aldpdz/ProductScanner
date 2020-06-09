@@ -30,17 +30,17 @@ class DetailProductViewModel(private val app: Application): AndroidViewModel(app
         val expandedMsgStringBuilder = StringBuilder()
         if(oldProduct?.quantity != _detailProduct.value?.quantity){
             expandedMsgStringBuilder.append(app.getString(R.string.quantity_updated))
-                .append(oldProduct?.quantity)
-                .append(app.getString(R.string.quantity_update_to))
                 .append(_detailProduct.value?.quantity)
+                .append(app.getString(R.string.quantity_update_to))
+                .append(oldProduct?.quantity)
         }
 
         if(oldProduct?.price != _detailProduct.value?.price){
             if(expandedMsgStringBuilder.isNotEmpty()) expandedMsgStringBuilder.append("\n")
             expandedMsgStringBuilder.append(app.getString(R.string.price_updated))
-                .append(oldProduct?.price)
-                .append(app.getString(R.string.price_updated_to))
                 .append(_detailProduct.value?.price)
+                .append(app.getString(R.string.price_updated_to))
+                .append(oldProduct?.price)
         }
         Log.d("Notification text", expandedMsgStringBuilder.toString())
 

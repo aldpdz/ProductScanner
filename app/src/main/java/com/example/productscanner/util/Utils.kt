@@ -63,7 +63,7 @@ fun NotificationManager.sendNotification(
     val builder = NotificationCompat.Builder(
         applicationContext,
         applicationContext.getString(R.string.product_notification_channel_id))
-        .setSmallIcon(R.drawable.ic_launcher_background)
+        .setSmallIcon(R.mipmap.ic_launcher)
         .setContentTitle(applicationContext.getString(R.string.notification_title))
         .setContentText(messageBody)
         .setStyle(NotificationCompat.BigTextStyle().bigText(expandedMessage))

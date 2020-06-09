@@ -137,7 +137,7 @@ class CameraFragment : Fragment() {
         binding.cameraView.visibility = View.GONE
     }
 
-    fun hidePreview() {
+    private fun hidePreview() {
         binding.imagePreview.visibility = View.GONE
         binding.cameraView.visibility = View.VISIBLE
         viewModel.showButtons()

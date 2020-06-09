@@ -1,19 +1,16 @@
 package com.example.productscanner.view
 
+import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.example.productscanner.R
 import com.example.productscanner.databinding.ActivityMainBinding
-import com.example.productscanner.model.Product
-import com.example.productscanner.util.readOnPreferences
 import com.example.productscanner.viewmodel.MainActivityViewModel
 
 class MainActivity : AppCompatActivity() {
