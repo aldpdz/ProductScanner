@@ -1,6 +1,5 @@
 package com.example.productscanner.view
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
@@ -16,16 +15,7 @@ import androidx.navigation.fragment.findNavController
 
 import com.example.productscanner.R
 import com.example.productscanner.databinding.CameraFragmentBinding
-import com.example.productscanner.viewmodel.CameraViewModel
-import com.example.productscanner.viewmodel.MainActivityViewModel
-import com.example.productscanner.viewmodel.ScannerStatus
-import com.example.productscanner.viewmodel.TypeScanner
-import com.google.mlkit.vision.barcode.Barcode
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.Text
-import com.google.mlkit.vision.text.TextRecognition
+import com.example.productscanner.viewmodel.*
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.PictureResult
 
@@ -34,7 +24,6 @@ class CameraFragment : Fragment() {
     private lateinit var viewModel: CameraViewModel
     private lateinit var viewModelShared: MainActivityViewModel
     private lateinit var binding: CameraFragmentBinding
-    private val sufix:String = "SKU-"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,6 +37,7 @@ class CameraFragment : Fragment() {
         viewModelShared = (activity as MainActivity).viewModel
         viewModel = ViewModelProviders.of(this).get(CameraViewModel::class.java)
         viewModel.setProducts(viewModelShared.products)
+        binding.viewModel = viewModel
 
         (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.scanner)
 
@@ -56,13 +46,13 @@ class CameraFragment : Fragment() {
         binding.btnScanUpc.setOnClickListener {
             viewModel.typeScanner = TypeScanner.UPC
             binding.cameraView.takePicture()
-            hideButtons()
+            viewModel.hideButtons()
         }
 
         binding.btnScanSku.setOnClickListener {
             viewModel.typeScanner = TypeScanner.SKU
             binding.cameraView.takePicture()
-            hideButtons()
+            viewModel.hideButtons()
         }
 
         binding.cameraView.addCameraListener(object: CameraListener(){
@@ -75,10 +65,10 @@ class CameraFragment : Fragment() {
 
                 when(viewModel.typeScanner){
                     TypeScanner.UPC -> {
-                        runBarcodeScanner(bitmap)
+                        viewModel.runBarcodeScanner(bitmap)
                     }
                     TypeScanner.SKU -> {
-                        textRecognition(bitmap)
+                        viewModel.textRecognition(bitmap)
                     }
                 }
             }
@@ -90,10 +80,10 @@ class CameraFragment : Fragment() {
     }
 
     private fun setObservers(){
-        viewModel.scannerStatus.observe(viewLifecycleOwner, Observer {
+        viewModel.scannerStatusItem.observe(viewLifecycleOwner, Observer {
             it?.let {
                 when(it){
-                    ScannerStatus.FOUND -> {
+                    ScannerStatusItem.FOUND -> {
                         viewModel.productByBarCode?.let { product ->
                             this.findNavController()
                                 .navigate(CameraFragmentDirections
@@ -101,7 +91,7 @@ class CameraFragment : Fragment() {
                         }
                         viewModel.displayBarCodeToDetailComplete()
                     }
-                    ScannerStatus.NOT_FOUND -> {
+                    ScannerStatusItem.NOT_FOUND -> {
                         Toast.makeText(context, "Item not found",Toast.LENGTH_LONG).show()
                         hidePreview()
                         viewModel.displayBarCodeToDetailComplete()
@@ -109,48 +99,21 @@ class CameraFragment : Fragment() {
                 }
             }
         })
-    }
 
-    fun runBarcodeScanner(bitmap: Bitmap){
-        val image = InputImage.fromBitmap(bitmap, 0)
-
-        val options = BarcodeScannerOptions.Builder()
-            .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
-            .build()
-
-        val scanner = BarcodeScanning.getClient(options)
-
-        scanner.process(image)
-            .addOnSuccessListener {
-                processBarcodes(it)
+        viewModel.scannerStatus.observe(viewLifecycleOwner, Observer {
+            it?.let{
+                hidePreview()
+                when(it){
+                    ScannerStatus.TRY_AGAIN -> {
+                        tryAgain()
+                    }
+                    ScannerStatus.FAIL -> {
+                        onFail()
+                    }
+                }
+                viewModel.scannerStatusFailComplete()
             }
-            .addOnFailureListener {
-                onFail()
-            }
-    }
-
-    private fun processBarcodes(barcodes: List<Barcode>){
-        if(barcodes.isEmpty()){
-            tryAgain()
-        }else{
-            val barCode: String? = barcodes[0].displayValue
-            barCode?.let {
-                viewModel.getProduct(it)
-            }
-        }
-    }
-
-    fun textRecognition(bitmap: Bitmap){
-        val image = InputImage.fromBitmap(bitmap, 0)
-        val recognizer = TextRecognition.getClient()
-
-        recognizer.process(image)
-            .addOnSuccessListener { texts ->
-                processTextRecognitionResult(texts)
-            }
-            .addOnFailureListener {
-                onFail()
-            }
+        })
     }
 
     private fun onFail() {
@@ -162,48 +125,11 @@ class CameraFragment : Fragment() {
         hidePreview()
     }
 
-    private fun processTextRecognitionResult(texts: Text){
-        val blocks = texts.textBlocks
-        if(blocks.isEmpty()){
-            tryAgain()
-        }else{
-            val skuCode = findSKUCode(texts)
-            if (skuCode == null){
-                tryAgain()
-            }else{
-                viewModel.getProduct(skuCode)
-            }
-        }
-    }
-
     private fun tryAgain() {
         Toast.makeText(
             activity, "Try again", Toast.LENGTH_SHORT
         ).show()
         hidePreview()
-    }
-
-    private fun findSKUCode(texts: Text):String?{
-        val lines = texts.text.split("\n")
-        for (line in lines){
-            val words = line.split(" ")
-            for (word in words){
-                if (word.contains(sufix))
-                    return word
-            }
-        }
-        return null
-    }
-
-
-    fun hideButtons(){
-        binding.btnScanSku.visibility = View.GONE
-        binding.btnScanUpc.visibility = View.GONE
-    }
-
-    fun showButtons(){
-        binding.btnScanSku.visibility = View.VISIBLE
-        binding.btnScanUpc.visibility = View.VISIBLE
     }
 
     fun showPreview() {
@@ -214,6 +140,6 @@ class CameraFragment : Fragment() {
     fun hidePreview() {
         binding.imagePreview.visibility = View.GONE
         binding.cameraView.visibility = View.VISIBLE
-        showButtons()
+        viewModel.showButtons()
     }
 }

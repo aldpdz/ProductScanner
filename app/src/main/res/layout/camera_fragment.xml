@@ -3,6 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data >
+        <variable
+            name="viewModel"
+            type="com.example.productscanner.viewmodel.CameraViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -24,6 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:text="scan upc"
+            android:visibility="@{viewModel.btnVisibility}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline"
             app:layout_constraintStart_toStartOf="parent" />
@@ -52,6 +59,7 @@
             android:id="@+id/btn_scan_sku"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="@{viewModel.btnVisibility}"
             android:text="scan sku"
             app:layout_constraintBottom_toBottomOf="@+id/btn_scan_upc"
             app:layout_constraintEnd_toEndOf="parent"

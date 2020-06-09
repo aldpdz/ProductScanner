@@ -17,7 +17,6 @@ import com.example.productscanner.databinding.FragmentMainBinding
 import com.example.productscanner.viewmodel.MainActivityViewModel
 import com.example.productscanner.viewmodel.MainFragmentViewModel
 import com.example.productscanner.viewmodel.ProductApiStatus
-import com.example.productscanner.viewmodel.ScannerStatus
 import java.util.*
 
 /**
