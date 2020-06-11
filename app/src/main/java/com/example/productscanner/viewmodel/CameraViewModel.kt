@@ -39,6 +39,7 @@ class CameraViewModel : ViewModel() {
         this.products = products
     }
 
+    // TODO run on a coroutine
     fun runBarcodeScanner(bitmap: Bitmap){
         val image = InputImage.fromBitmap(bitmap, 0)
 
@@ -68,6 +69,7 @@ class CameraViewModel : ViewModel() {
         }
     }
 
+    // TODO run on a coroutine
     fun textRecognition(bitmap: Bitmap){
         val image = InputImage.fromBitmap(bitmap, 0)
         val recognizer = TextRecognition.getClient()

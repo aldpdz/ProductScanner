@@ -30,16 +30,18 @@ class MainFragmentViewModel: ViewModel() {
     }
 
     fun filterProducts(){
-        if (_query.isNullOrEmpty()){
-            _productsFiltered.value = products?.value
-        }else{
-            val filteredProducts = ArrayList<Product>()
-            for(product in products?.value!!){
-                if(product.name.toLowerCase(Locale.getDefault()).contains(_query!!)){
-                    filteredProducts.add(product)
+        products?.let {
+            if (_query.isNullOrEmpty()){
+                _productsFiltered.value = products?.value
+            }else{
+                val filteredProducts = ArrayList<Product>()
+                for(product in it.value!!){
+                    if(product.name.toLowerCase(Locale.getDefault()).contains(_query!!)){
+                        filteredProducts.add(product)
+                    }
                 }
+                _productsFiltered.value = filteredProducts
             }
-            _productsFiltered.value = filteredProducts
         }
     }
 

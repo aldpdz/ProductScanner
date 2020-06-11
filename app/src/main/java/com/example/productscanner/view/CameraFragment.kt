@@ -59,7 +59,10 @@ class CameraFragment : Fragment() {
             @Override
             override fun onPictureTaken(result: PictureResult) {
                 Log.d("Camera View", "Picture taken")
+                // TODO send it to a coroutine
                 val bitmap = BitmapFactory.decodeByteArray(result.data, 0, result.data.size)
+
+                // TODO observe change when the bitmap is ready
                 binding.imagePreview.setImageBitmap(bitmap)
                 showPreview()
 
