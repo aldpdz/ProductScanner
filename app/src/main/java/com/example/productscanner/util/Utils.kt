@@ -4,8 +4,11 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import androidx.core.app.NotificationCompat
+import androidx.navigation.NavDeepLinkBuilder
 import com.example.productscanner.R
+import com.example.productscanner.model.Product
 import com.example.productscanner.view.MainActivity
 
 private val NOTIFICATION_ID = 0
@@ -30,35 +33,17 @@ fun readOnPreferences(activity: MainActivity, id: Int): Int{
 fun NotificationManager.sendNotification(
     messageBody: String,
     expandedMessage: String,
-    applicationContext: Context)
+    applicationContext: Context,
+    product: Product)
 {
+    val bundle = Bundle()
+    bundle.putParcelable("argProduct", product)
 
-    // Intent to launch an activity
-    val contentIntent = Intent(applicationContext, MainActivity::class.java)
-
-    // Grant rights to another application
-    val contentPendingIntent = PendingIntent.getActivity(
-        applicationContext,
-        NOTIFICATION_ID,
-        contentIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT
-    )
-
-//    val bundle = bundleOf(
-//        Pair("argProduct", product!!)
-//    )
-
-//    val bundle = Bundle()
-//    bundle.putParcelable("argProduct", product)
-//
-//    val contentPendingIntent = NavDeepLinkBuilder(applicationContext)
-////        .setComponentName(MainActivity::class.java)
-//
-//        .setGraph(R.navigation.navigation)
-//        .setDestination(R.id.detailProduct)
-//        .setArguments(bundle)
-//        .createPendingIntent()
-
+    val pendingIntent = NavDeepLinkBuilder(applicationContext)
+        .setGraph(R.navigation.navigation)
+        .setDestination(R.id.detailProduct)
+        .setArguments(bundle)
+        .createPendingIntent()
 
     val builder = NotificationCompat.Builder(
         applicationContext,
@@ -67,7 +52,7 @@ fun NotificationManager.sendNotification(
         .setContentTitle(applicationContext.getString(R.string.notification_title))
         .setContentText(messageBody)
         .setStyle(NotificationCompat.BigTextStyle().bigText(expandedMessage))
-        .setContentIntent(contentPendingIntent)
+        .setContentIntent(pendingIntent)
         .setAutoCancel(true) // Remove notification after is activated
         .setPriority(NotificationCompat.PRIORITY_DEFAULT) // Support devices running API 25 or lower
 

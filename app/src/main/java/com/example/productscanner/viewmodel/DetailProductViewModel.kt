@@ -44,10 +44,14 @@ class DetailProductViewModel(private val app: Application): AndroidViewModel(app
         }
         Log.d("Notification text", expandedMsgStringBuilder.toString())
 
-        notificationManager.sendNotification(
-            app.getString(R.string.messageNotification),
-            expandedMsgStringBuilder.toString(),
-            app)
+        _detailProduct.value?.let {
+            notificationManager.sendNotification(
+                app.getString(R.string.messageNotification),
+                expandedMsgStringBuilder.toString(),
+                app,
+                it
+            )
+        }
     }
 
     val quantityString = Transformations.map(_quantity){

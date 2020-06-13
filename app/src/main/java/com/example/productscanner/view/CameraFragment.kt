@@ -29,6 +29,8 @@ class CameraFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.scanner)
+
         binding = CameraFragmentBinding.inflate(inflater)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.cameraView.setLifecycleOwner(viewLifecycleOwner)
@@ -37,8 +39,6 @@ class CameraFragment : Fragment() {
         viewModel = ViewModelProviders.of(this).get(CameraViewModel::class.java)
         viewModel.setProducts(viewModelShared.products)
         binding.viewModel = viewModel
-
-        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.scanner)
 
         hidePreview()
 
