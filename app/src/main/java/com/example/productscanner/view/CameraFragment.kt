@@ -60,20 +60,21 @@ class CameraFragment : Fragment() {
             override fun onPictureTaken(result: PictureResult) {
                 Log.d("Camera View", "Picture taken")
                 // TODO send it to a coroutine
-                val bitmap = BitmapFactory.decodeByteArray(result.data, 0, result.data.size)
+//                val bitmap = BitmapFactory.decodeByteArray(result.data, 0, result.data.size)
+                viewModel.getBitmap(result.data)
 
                 // TODO observe change when the bitmap is ready
-                binding.imagePreview.setImageBitmap(bitmap)
-                showPreview()
+//                binding.imagePreview.setImageBitmap(bitmap)
+//                showPreview()
 
-                when(viewModel.typeScanner){
-                    TypeScanner.UPC -> {
-                        viewModel.runBarcodeScanner(bitmap)
-                    }
-                    TypeScanner.SKU -> {
-                        viewModel.textRecognition(bitmap)
-                    }
-                }
+//                when(viewModel.typeScanner){
+//                    TypeScanner.UPC -> {
+//                        viewModel.runBarcodeScanner(bitmap)
+//                    }
+//                    TypeScanner.SKU -> {
+//                        viewModel.textRecognition(bitmap)
+//                    }
+//                }
             }
         })
 
@@ -83,6 +84,7 @@ class CameraFragment : Fragment() {
     }
 
     private fun setObservers(){
+        // The scanner was sucessful
         viewModel.scannerStatusItem.observe(viewLifecycleOwner, Observer {
             it?.let {
                 when(it){
@@ -103,6 +105,7 @@ class CameraFragment : Fragment() {
             }
         })
 
+        // If the scanner fail
         viewModel.scannerStatus.observe(viewLifecycleOwner, Observer {
             it?.let{
                 hidePreview()
@@ -115,6 +118,13 @@ class CameraFragment : Fragment() {
                     }
                 }
                 viewModel.scannerStatusFailComplete()
+            }
+        })
+
+        viewModel.bitMap.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                binding.imagePreview.setImageBitmap(it)
+                showPreview()
             }
         })
     }

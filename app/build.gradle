@@ -16,7 +16,7 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-        multiDexEnabled true // Past the liminations of the DEX bytecode file
+        multiDexEnabled true // Past the limitations of the DEX bytecode file
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -58,7 +58,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
-//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     // Kotlin navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
@@ -67,6 +66,8 @@ dependencies {
     // Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+    // Helps to treat callbacks as synchronous calls
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutines_version"
 
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:2.6.0"
@@ -82,7 +83,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition:16.0.0'
     implementation 'com.google.android.gms:play-services-mlkit-barcode-scanning:16.0.0'
 
-    // Past the liminations of the DEX bytecode file
+    // Past the limitations of the DEX bytecode file
     implementation 'com.android.support:multidex:1.0.3'
 
 }
