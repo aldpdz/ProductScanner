@@ -24,6 +24,8 @@ enum class TypeScanner {UPC, SKU}
 
 class CameraViewModel : ViewModel() {
 
+    // method to listen permissions from the shared model
+
     private var job: Job = Job()
     private val viewModelScope = CoroutineScope(Dispatchers.Main + job)
 

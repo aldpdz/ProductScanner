@@ -1,6 +1,5 @@
 package com.example.productscanner.view
 
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -59,22 +58,8 @@ class CameraFragment : Fragment() {
             @Override
             override fun onPictureTaken(result: PictureResult) {
                 Log.d("Camera View", "Picture taken")
-                // TODO send it to a coroutine
-//                val bitmap = BitmapFactory.decodeByteArray(result.data, 0, result.data.size)
                 viewModel.getBitmap(result.data)
 
-                // TODO observe change when the bitmap is ready
-//                binding.imagePreview.setImageBitmap(bitmap)
-//                showPreview()
-
-//                when(viewModel.typeScanner){
-//                    TypeScanner.UPC -> {
-//                        viewModel.runBarcodeScanner(bitmap)
-//                    }
-//                    TypeScanner.SKU -> {
-//                        viewModel.textRecognition(bitmap)
-//                    }
-//                }
             }
         })
 
@@ -84,7 +69,7 @@ class CameraFragment : Fragment() {
     }
 
     private fun setObservers(){
-        // The scanner was sucessful
+        // The scanner was successful
         viewModel.scannerStatusItem.observe(viewLifecycleOwner, Observer {
             it?.let {
                 when(it){
@@ -145,7 +130,7 @@ class CameraFragment : Fragment() {
         hidePreview()
     }
 
-    fun showPreview() {
+    private fun showPreview() {
         binding.imagePreview.visibility = View.VISIBLE
         binding.cameraView.visibility = View.GONE
     }
