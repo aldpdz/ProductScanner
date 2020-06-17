@@ -72,11 +72,10 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
             }
         })
         viewModel.navigationToDetail.observe(viewLifecycleOwner, Observer {
-            it?.let {
+            it.getContentIfNotHandled()?.let {product ->
                 this.findNavController()
                     .navigate(MainFragmentDirections
-                        .actionMainFragmentToDetailProduct(it))
-                viewModel.displayNavigationToDetailComplete()
+                        .actionMainFragmentToDetailProduct(product))
             }
         })
         viewModel.status?.observe(viewLifecycleOwner, Observer {

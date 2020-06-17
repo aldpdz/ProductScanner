@@ -4,18 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.productscanner.model.Product
+import com.example.productscanner.util.Event
 import java.util.*
 import kotlin.collections.ArrayList
 
 class MainFragmentViewModel: ViewModel() {
     private val _productsFiltered = MutableLiveData<List<Product>>()
-    private val _navigationToDetail = MutableLiveData<Product>()
+    private val _navigationToDetail = MutableLiveData<Event<Product>>()
 
     var _query: String? = null
     private var products: LiveData<List<Product>>? = null
     val productsFiltered: LiveData<List<Product>> get() = _productsFiltered
     var productsError : LiveData<String?>? = null
-    val navigationToDetail: LiveData<Product> get() = _navigationToDetail
+    val navigationToDetail: LiveData<Event<Product>> get() = _navigationToDetail
     var status: LiveData<ProductApiStatus>? = null
 
     fun setResponseData(productsError: LiveData<String?>, status: LiveData<ProductApiStatus>, products: LiveData<List<Product>>){
@@ -46,10 +47,6 @@ class MainFragmentViewModel: ViewModel() {
     }
 
     fun displayNavigationToDetail(product: Product){
-        _navigationToDetail.value = product
-    }
-
-    fun displayNavigationToDetailComplete(){
-        _navigationToDetail.value = null
+        _navigationToDetail.value = Event(product)
     }
 }

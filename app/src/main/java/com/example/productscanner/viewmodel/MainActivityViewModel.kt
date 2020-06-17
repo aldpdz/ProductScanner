@@ -71,6 +71,9 @@ class MainActivityViewModel: ViewModel() {
         _productsError.value = message
     }
 
+    /***
+     * Sets the isSaved attribute to true if the products is find in the preferences file
+     */
     fun setSavedIds(activity: MainActivity){
         jobPreference = CoroutineScope(Dispatchers.IO).launch {
             val newProducts: List<Product>? =  _products.value?.toList()
@@ -88,6 +91,9 @@ class MainActivityViewModel: ViewModel() {
         }
     }
 
+    /***
+     * Saves the product in the preferences file
+     */
     fun saveIdProduct(activity: MainActivity, idProduct: Int){
         jobPreference = CoroutineScope(Dispatchers.IO).launch {
             writeOnPrefereces(activity, idProduct)
