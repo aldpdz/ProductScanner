@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.productscanner.model.Product
-import com.example.productscanner.model.ProductsApi
+import com.example.productscanner.repositories.ProductsRepository
 import com.example.productscanner.util.readOnPreferences
 import com.example.productscanner.util.writeOnPrefereces
 import com.example.productscanner.view.MainActivity
@@ -14,6 +14,8 @@ import kotlinx.coroutines.*
 enum class ProductApiStatus {LOADING, ERROR, DONE}
 
 class MainActivityViewModel: ViewModel() {
+    private val repository: ProductsRepository = ProductsRepository()
+
     private var job: Job? = null
     private var jobPreference: Job? = null
     private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
@@ -42,14 +44,14 @@ class MainActivityViewModel: ViewModel() {
     private fun getProducts(){
         job = CoroutineScope(Dispatchers.Main + exceptionHandler).launch {
             _status.value = ProductApiStatus.LOADING
-            val response = ProductsApi.retrofitService.getProducts()
-            if (response.isSuccessful) {
-                _products.value = response.body()
+            val response = repository.getProducts()
+            if(response.body != null){
+                _products.value = response.body
                 _loadPreference.value = true
                 _productsError.value = null
                 _status.value = ProductApiStatus.DONE
-            } else {
-                onError("The products couldn't be loaded")
+            }else{
+                response.errorMessage?.let { onError(it) }
             }
         }
     }
