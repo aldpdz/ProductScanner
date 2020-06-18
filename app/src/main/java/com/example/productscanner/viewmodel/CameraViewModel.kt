@@ -42,8 +42,6 @@ class CameraViewModel : ViewModel() {
     var productByBarCode: Product? = null
     var typeScanner: TypeScanner? = null
 
-    private val prefix: String = "SKU-"
-
     init {
         _btnVisibility.value = View.VISIBLE
     }
@@ -119,24 +117,12 @@ class CameraViewModel : ViewModel() {
         }
     }
 
-    private fun findSKUCode(texts: Text):String?{
-        val lines = texts.text.split("\n")
-        for (line in lines){
-            val words = line.split(" ")
-            for (word in words){
-                if (word.contains(prefix))
-                    return word
-            }
-        }
-        return null
-    }
-
     private fun processTextRecognitionResult(texts: Text){
         val blocks = texts.textBlocks
         if(blocks.isEmpty()){
             _scannerStatus.value = ScannerStatus.TRY_AGAIN
         }else{
-            val skuCode = findSKUCode(texts)
+            val skuCode = findSKUCode(texts.text)
             if (skuCode == null){
                 _scannerStatus.value = ScannerStatus.TRY_AGAIN
             }else{

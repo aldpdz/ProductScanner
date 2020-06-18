@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.example.productscanner.model.Product
 import com.example.productscanner.repositories.ProductsRepository
 import com.example.productscanner.util.readOnPreferences
-import com.example.productscanner.util.writeOnPrefereces
+import com.example.productscanner.util.writeOnPreferences
 import com.example.productscanner.view.MainActivity
 import kotlinx.coroutines.*
 
@@ -98,7 +98,7 @@ class MainActivityViewModel: ViewModel() {
      */
     fun saveIdProduct(activity: MainActivity, idProduct: Int){
         jobPreference = CoroutineScope(Dispatchers.IO).launch {
-            writeOnPrefereces(activity, idProduct)
+            writeOnPreferences(activity, idProduct)
             for (product in _products.value!!){
                 if(product.id == idProduct){
                     product.isSaved = true

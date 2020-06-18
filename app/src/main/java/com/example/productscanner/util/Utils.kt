@@ -13,7 +13,7 @@ import com.example.productscanner.view.MainActivity
 
 private val NOTIFICATION_ID = 0
 
-fun writeOnPrefereces(activity: MainActivity, id: Int){
+fun writeOnPreferences(activity: MainActivity, id: Int){
     val sharedPref = activity.getPreferences(Context.MODE_PRIVATE) ?: return
     with(sharedPref.edit()){
         putInt(id.toString(), id)
