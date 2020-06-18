@@ -71,20 +71,18 @@ class CameraFragment : Fragment() {
     private fun setObservers(){
         // The scanner was successful
         viewModel.scannerStatusItem.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                when(it){
+            it.getContentIfNotHandled()?.let {scannerStatusItem ->
+                when(scannerStatusItem){
                     ScannerStatusItem.FOUND -> {
                         viewModel.productByBarCode?.let { product ->
                             this.findNavController()
                                 .navigate(CameraFragmentDirections
                                     .actionCameraxToDetailProduct(product))
                         }
-                        viewModel.displayBarCodeToDetailComplete()
                     }
                     ScannerStatusItem.NOT_FOUND -> {
                         Toast.makeText(context, "Item not found",Toast.LENGTH_LONG).show()
                         hidePreview()
-                        viewModel.displayBarCodeToDetailComplete()
                     }
                 }
             }
@@ -92,9 +90,8 @@ class CameraFragment : Fragment() {
 
         // If the scanner fail
         viewModel.scannerStatus.observe(viewLifecycleOwner, Observer {
-            it?.let{
-                hidePreview()
-                when(it){
+            it.getContentIfNotHandled()?.let { scannerStatus ->
+                when(scannerStatus){
                     ScannerStatus.TRY_AGAIN -> {
                         tryAgain()
                     }
@@ -102,7 +99,6 @@ class CameraFragment : Fragment() {
                         onFail()
                     }
                 }
-                viewModel.scannerStatusFailComplete()
             }
         })
 

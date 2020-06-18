@@ -5,11 +5,5 @@ private val skuCodeRegex: Regex = "SKU-code_\\d\\d".toRegex(regexOption)
 
 fun findSKUCode(texts: String):String?{
 
-    val code = skuCodeRegex.find(texts)
-
-    if(code != null){
-        return code.value
-    }else{
-        return null
-    }
+    return skuCodeRegex.find(texts)?.value
 }

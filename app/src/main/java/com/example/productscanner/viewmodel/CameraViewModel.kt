@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.productscanner.model.Product
+import com.example.productscanner.util.Event
 import com.google.mlkit.vision.barcode.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
@@ -29,14 +30,14 @@ class CameraViewModel : ViewModel() {
     private var job: Job = Job()
     private val viewModelScope = CoroutineScope(Dispatchers.Main + job)
 
-    private val _scannerStatusItem = MutableLiveData<ScannerStatusItem>()
-    private val _scannerStatus = MutableLiveData<ScannerStatus>()
+    private val _scannerStatusItem = MutableLiveData<Event<ScannerStatusItem>>()
+    private val _scannerStatus = MutableLiveData<Event<ScannerStatus>>()
     private val _btnVisibility = MutableLiveData<Int>()
     private val _bitMap = MutableLiveData<Bitmap>()
 
     private var products: LiveData<List<Product>>? = null
-    val scannerStatusItem: LiveData<ScannerStatusItem> get() = _scannerStatusItem
-    val scannerStatus: LiveData<ScannerStatus> get() = _scannerStatus
+    val scannerStatusItem: LiveData<Event<ScannerStatusItem>> get() = _scannerStatusItem
+    val scannerStatus: LiveData<Event<ScannerStatus>> get() = _scannerStatus
     val btnVisibility: LiveData<Int> get() = _btnVisibility
     val bitMap: LiveData<Bitmap> get() = _bitMap
     var productByBarCode: Product? = null
@@ -78,7 +79,7 @@ class CameraViewModel : ViewModel() {
                 val barCodes = processImageBarCode(image, scanner)
                 processBarCodes(barCodes)
             }catch (e: Exception){
-                _scannerStatus.value = ScannerStatus.FAIL
+                _scannerStatus.value = Event(ScannerStatus.FAIL)
             }
         }
     }
@@ -91,7 +92,7 @@ class CameraViewModel : ViewModel() {
                 val text = processImageText(image, recognizer)
                 processTextRecognitionResult(text)
             }catch (e: Exception){
-                _scannerStatus.value = ScannerStatus.FAIL
+                _scannerStatus.value = Event(ScannerStatus.FAIL)
             }
         }
     }
@@ -108,7 +109,7 @@ class CameraViewModel : ViewModel() {
 
     private fun processBarCodes(barCodes: List<Barcode>){
         if(barCodes.isEmpty()){
-            _scannerStatus.value = ScannerStatus.TRY_AGAIN
+            _scannerStatus.value = Event(ScannerStatus.TRY_AGAIN)
         }else{
             val barCode: String? = barCodes[0].displayValue
             barCode?.let {
@@ -120,16 +121,17 @@ class CameraViewModel : ViewModel() {
     private fun processTextRecognitionResult(texts: Text){
         val blocks = texts.textBlocks
         if(blocks.isEmpty()){
-            _scannerStatus.value = ScannerStatus.TRY_AGAIN
+            _scannerStatus.value = Event(ScannerStatus.TRY_AGAIN)
         }else{
             val skuCode = findSKUCode(texts.text)
             if (skuCode == null){
-                _scannerStatus.value = ScannerStatus.TRY_AGAIN
+                _scannerStatus.value = Event(ScannerStatus.TRY_AGAIN)
             }else{
                 getProduct(skuCode)
             }
         }
     }
+
 
     private fun getProduct(code: String){
         var found = false
@@ -150,9 +152,9 @@ class CameraViewModel : ViewModel() {
             }
         }
         if(found){
-            _scannerStatusItem.value = ScannerStatusItem.FOUND
+            _scannerStatusItem.value = Event(ScannerStatusItem.FOUND)
         }else{
-            _scannerStatusItem.value = ScannerStatusItem.NOT_FOUND
+            _scannerStatusItem.value = Event(ScannerStatusItem.NOT_FOUND)
         }
     }
 
@@ -162,14 +164,6 @@ class CameraViewModel : ViewModel() {
 
     fun showButtons(){
         _btnVisibility.value = View.VISIBLE
-    }
-
-    fun displayBarCodeToDetailComplete(){
-        _scannerStatusItem.value = null
-    }
-    
-    fun scannerStatusFailComplete(){
-        _scannerStatus.value = null
     }
 
     override fun onCleared() {
