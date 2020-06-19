@@ -1,9 +1,9 @@
 package com.example.productscanner.util
 
-import android.net.Uri
 import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
+import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -14,8 +14,7 @@ import com.example.productscanner.viewmodel.ProductApiStatus
 @BindingAdapter("picture")
 fun bindImage(imgView: ImageView, imgUrl: String?){
     imgUrl?.let {
-        val uri = Uri.parse(it)
-        val imgUri = uri.buildUpon().scheme("https").build()
+        val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
         Glide.with(imgView.context)
             .load(imgUri)
             .apply(RequestOptions()

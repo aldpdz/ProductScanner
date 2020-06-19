@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProviders
 import com.example.productscanner.R
 import com.example.productscanner.databinding.FragmentDetailProductBinding
@@ -20,7 +21,7 @@ import com.example.productscanner.viewmodel.MainActivityViewModel
 class DetailProductFragment : Fragment() {
 
     private lateinit var viewModel: DetailProductViewModel
-    private lateinit var viewModelShared: MainActivityViewModel
+    private val viewModelShared by activityViewModels<MainActivityViewModel>()
     private lateinit var binding: FragmentDetailProductBinding
 
     override fun onCreateView(
@@ -31,7 +32,6 @@ class DetailProductFragment : Fragment() {
         binding = FragmentDetailProductBinding.inflate(inflater)
 
         val detailProduct = arguments?.let { DetailProductFragmentArgs.fromBundle(it).argProduct }
-        viewModelShared = (activity as (MainActivity)).viewModel
 
         viewModel = ViewModelProviders.of(this).get(DetailProductViewModel::class.java)
         viewModel.setDetailProduct(detailProduct)

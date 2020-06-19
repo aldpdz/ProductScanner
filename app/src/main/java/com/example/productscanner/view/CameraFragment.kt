@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
@@ -21,7 +22,7 @@ import com.otaliastudios.cameraview.PictureResult
 class CameraFragment : Fragment() {
 
     private lateinit var viewModel: CameraViewModel
-    private lateinit var viewModelShared: MainActivityViewModel
+    private val viewModelShared by activityViewModels<MainActivityViewModel>()
     private lateinit var binding: CameraFragmentBinding
 
     override fun onCreateView(
@@ -35,7 +36,6 @@ class CameraFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.cameraView.setLifecycleOwner(viewLifecycleOwner)
 
-        viewModelShared = (activity as MainActivity).viewModel
         viewModel = ViewModelProviders.of(this).get(CameraViewModel::class.java)
         viewModel.setProducts(viewModelShared.products)
         binding.viewModel = viewModel
