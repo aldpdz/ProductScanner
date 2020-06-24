@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.productscanner.model.Product
+import com.example.productscanner.model.ProductsApi
 import com.example.productscanner.repositories.ProductsRepository
 import com.example.productscanner.util.readOnPreferences
 import com.example.productscanner.util.writeOnPreferences
@@ -14,7 +15,7 @@ import kotlinx.coroutines.*
 enum class ProductApiStatus {LOADING, ERROR, DONE}
 
 class MainActivityViewModel: ViewModel() {
-    private val repository: ProductsRepository = ProductsRepository()
+    private val repository: ProductsRepository = ProductsRepository(ProductsApi.retrofitService)
 
     private var job: Job? = null
     private var jobPreference: Job? = null

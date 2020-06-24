@@ -1,11 +1,13 @@
 package com.example.productscanner.repositories
 
 import com.example.productscanner.model.Product
-import com.example.productscanner.model.ProductsApi
+import com.example.productscanner.model.ProductsApiService
 
-class ProductsRepository {
+// TODO Use constructor dependency injection
+// TODO Replace with a dp library
+class ProductsRepository (private val productsApiService: ProductsApiService){
     suspend fun getProducts(): Response<List<Product>?>{
-        val response = ProductsApi.retrofitService.getProducts()
+        val response = productsApiService.getProducts()
         return if(response.isSuccessful){
             Response(response.body(), null)
         }else{
