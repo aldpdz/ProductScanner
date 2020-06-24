@@ -5,8 +5,9 @@ import com.example.productscanner.model.ProductsApiService
 
 // TODO Use constructor dependency injection
 // TODO Replace with a dp library
-class ProductsRepository (private val productsApiService: ProductsApiService){
-    suspend fun getProducts(): Response<List<Product>?>{
+class ProductsRepository (private val productsApiService: ProductsApiService) :
+    IProductsRepository {
+    override suspend fun getProducts(): Response<List<Product>?>{
         val response = productsApiService.getProducts()
         return if(response.isSuccessful){
             Response(response.body(), null)

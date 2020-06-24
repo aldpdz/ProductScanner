@@ -1,12 +1,9 @@
 package com.example.productscanner.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.example.productscanner.model.Product
-import com.example.productscanner.model.ProductsApi
-import com.example.productscanner.repositories.ProductsRepository
+import com.example.productscanner.repositories.IProductsRepository
 import com.example.productscanner.util.readOnPreferences
 import com.example.productscanner.util.writeOnPreferences
 import com.example.productscanner.view.MainActivity
@@ -14,10 +11,7 @@ import kotlinx.coroutines.*
 
 enum class ProductApiStatus {LOADING, ERROR, DONE}
 
-class MainActivityViewModel: ViewModel() {
-    private val repository: ProductsRepository = ProductsRepository(ProductsApi.retrofitService)
-
-    private var job: Job? = null
+class MainActivityViewModel(private val repository: IProductsRepository): ViewModel() {
     private var jobPreference: Job? = null
     private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
         onError(throwable.localizedMessage)
@@ -35,15 +29,20 @@ class MainActivityViewModel: ViewModel() {
 
     init {
         getProducts()
-        _loadPreference.value = null
     }
 
+    /***
+     * Refresh the data from the network
+     */
     fun refreshData(){
         getProducts()
     }
 
+    /***
+     * Load the products from the network
+     */
     private fun getProducts(){
-        job = CoroutineScope(Dispatchers.Main + exceptionHandler).launch {
+        viewModelScope.launch(exceptionHandler) {
             _status.value = ProductApiStatus.LOADING
             val response = repository.getProducts()
             if(response.body != null){
@@ -57,6 +56,10 @@ class MainActivityViewModel: ViewModel() {
         }
     }
 
+    /***
+     * Updates the product
+     * @param product: object product to be updated
+     */
     fun updateProduct(product: Product?){
         _products.value?.let {
             for(_product in it){
@@ -68,12 +71,19 @@ class MainActivityViewModel: ViewModel() {
         }
     }
 
+    // TODO unit test
+    /***
+     * Manage the repository error
+     * @param message: String to display
+     */
     private fun onError(message: String){
         _products.value = ArrayList()
         _status.value = ProductApiStatus.ERROR
         _productsError.value = message
     }
 
+    // TODO unit test instrumental
+    // TODO update to use vieModelScope
     /***
      * Sets the isSaved attribute to true if the products is find in the preferences file
      */
@@ -94,8 +104,10 @@ class MainActivityViewModel: ViewModel() {
         }
     }
 
+    // TODO Unit test instrumental
     /***
      * Saves the product in the preferences file
+     * @param idProduct: id of the product
      */
     fun saveIdProduct(activity: MainActivity, idProduct: Int){
         jobPreference = CoroutineScope(Dispatchers.IO).launch {
@@ -110,7 +122,16 @@ class MainActivityViewModel: ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        job?.cancel()
         jobPreference?.cancel()
     }
+}
+
+// TODO use generic ViewModelFactory
+// Standard way to change how ViewModels are constructed
+@Suppress("UNCHECKED_CAST")
+class MainActivityViewModelFactory(
+    private val repository: IProductsRepository
+) : ViewModelProvider.NewInstanceFactory(){
+    override fun <T : ViewModel?> create(modelClass: Class<T>) =
+        (MainActivityViewModel(repository) as T)
 }

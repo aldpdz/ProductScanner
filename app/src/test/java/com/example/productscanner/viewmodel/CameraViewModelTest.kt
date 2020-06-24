@@ -7,11 +7,10 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import com.example.productscanner.getOrAwaitValue
 import org.hamcrest.CoreMatchers.`is`
 
-@RunWith(AndroidJUnit4::class)
+//@RunWith(AndroidJUnit4::class) needed when using context
 class CameraViewModelTest{
 
     // Subject under test
@@ -29,6 +28,7 @@ class CameraViewModelTest{
     @Test
     fun atStart_buttonsAreVisible(){
         // Then the buttons are visible
+
         val value = cameraViewModel.btnVisibility.getOrAwaitValue()
         assertThat(value, `is`(View.VISIBLE))
     }
