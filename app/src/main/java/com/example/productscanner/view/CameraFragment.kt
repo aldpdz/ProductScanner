@@ -58,7 +58,7 @@ class CameraFragment : Fragment() {
             @Override
             override fun onPictureTaken(result: PictureResult) {
                 Log.d("Camera View", "Picture taken")
-                viewModel.getBitmap(result.data)
+                viewModel.processInputImage(result.data)
 
             }
         })

@@ -6,6 +6,7 @@ import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.productscanner.model.Product
 import com.example.productscanner.util.Event
 import com.google.mlkit.vision.barcode.Barcode
@@ -26,9 +27,6 @@ enum class TypeScanner {UPC, SKU}
 class CameraViewModel : ViewModel() {
 
     // TODO method to listen permissions from the shared model
-
-    private var job: Job = Job()
-    private val viewModelScope = CoroutineScope(Dispatchers.Main + job)
 
     private val _scannerStatusItem = MutableLiveData<Event<ScannerStatusItem>>()
     private val _scannerStatus = MutableLiveData<Event<ScannerStatus>>()
@@ -51,7 +49,8 @@ class CameraViewModel : ViewModel() {
         this.products = products
     }
 
-    fun getBitmap(byteArray: ByteArray){
+    // TODO instrumental test
+    fun processInputImage(byteArray: ByteArray){
         val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
         _bitMap.value = bitmap
 
@@ -164,10 +163,5 @@ class CameraViewModel : ViewModel() {
 
     fun showButtons(){
         _btnVisibility.value = View.VISIBLE
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        job.cancel()
     }
 }

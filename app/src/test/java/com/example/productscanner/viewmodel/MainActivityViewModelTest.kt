@@ -21,7 +21,6 @@ class MainActivityViewModelTest{
     private lateinit var repository: FakeTestRepository
     // Subject under test
     private lateinit var mainActivityViewModel: MainActivityViewModel
-    private lateinit var listProducts: List<Product>
 
     // Executes each task synchronously using Architecture Components.
     // Runs all the Architecture Components-related background jobs in the same
@@ -112,6 +111,6 @@ class MainActivityViewModelTest{
 
         // Assert that the product has been updated
         val products = mainActivityViewModel.products.getOrAwaitValue()
-        assertThat(productUpdated, IsEqual(products[0]))
+        assertThat(products[0], IsEqual(productUpdated))
     }
 }

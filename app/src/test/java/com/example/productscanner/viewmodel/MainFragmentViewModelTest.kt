@@ -44,10 +44,10 @@ class MainFragmentViewModelTest{
         val statusVM = mainFragmentViewModel.status?.getOrAwaitValue()
 
         // The error is null
-        assertThat(productsError.value, `is`(productsErrorVM))
+        assertThat(productsErrorVM, `is`(productsError.value))
 
         // The status is DONE
-        assertThat(status.value, `is`(statusVM))
+        assertThat(statusVM, `is`(status.value))
     }
 
     @Test
@@ -65,7 +65,7 @@ class MainFragmentViewModelTest{
         val statusVM = mainFragmentViewModel.status?.getOrAwaitValue()
 
         // The status is DONE
-        assertThat(status.value, `is`(statusVM))
+        assertThat(statusVM, `is`(status.value))
     }
 
     @Test
@@ -84,10 +84,10 @@ class MainFragmentViewModelTest{
         val statusVM = mainFragmentViewModel.status?.getOrAwaitValue()
 
         // The error is "error connexion"
-        assertThat(productsError.value, `is`(productsErrorVM))
+        assertThat(productsErrorVM, `is`(productsError.value))
 
         // The status is ERROR
-        assertThat(status.value, `is`(statusVM))
+        assertThat(statusVM, `is`(status.value))
     }
 
     @Test
@@ -217,9 +217,6 @@ class MainFragmentViewModelTest{
         val productToDisplay = mainFragmentViewModel.navigationToDetail.getOrAwaitValue()
 
         // The product is equal to product1
-        assertThat(product1, IsEqual(productToDisplay.getContentIfNotHandled()))
+        assertThat(productToDisplay.getContentIfNotHandled(), IsEqual(product1))
     }
-
-
-
 }
