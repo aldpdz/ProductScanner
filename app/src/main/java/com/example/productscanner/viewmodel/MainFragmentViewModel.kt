@@ -12,7 +12,8 @@ class MainFragmentViewModel: ViewModel() {
     private val _productsFiltered = MutableLiveData<List<Product>>()
     private val _navigationToDetail = MutableLiveData<Event<Product>>()
 
-    var _query: String? = null
+    private var _query: String? = null
+    // TODO maybe use mutable live data instead
     private var products: LiveData<List<Product>>? = null
     val productsFiltered: LiveData<List<Product>> get() = _productsFiltered
     var productsError : LiveData<String?>? = null
@@ -31,12 +32,12 @@ class MainFragmentViewModel: ViewModel() {
     }
 
     fun filterProducts(){
-        products?.let {
+        products?.value?.let {
             if (_query.isNullOrEmpty()){
                 _productsFiltered.value = products?.value
             }else{
                 val filteredProducts = ArrayList<Product>()
-                for(product in it.value!!){
+                for(product in it){
                     if(product.name.toLowerCase(Locale.getDefault()).contains(_query!!)){
                         filteredProducts.add(product)
                     }

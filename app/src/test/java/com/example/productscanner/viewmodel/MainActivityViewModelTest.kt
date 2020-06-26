@@ -24,6 +24,9 @@ class MainActivityViewModelTest{
     private lateinit var listProducts: List<Product>
 
     // Executes each task synchronously using Architecture Components.
+    // Runs all the Architecture Components-related background jobs in the same
+    // thread so that the test results happen synchronously.
+    // Use when dealing with live data
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
