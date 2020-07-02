@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
@@ -28,7 +29,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var binding : FragmentMainBinding
     private lateinit var adapter: ProductAdapter
-    private lateinit var viewModel: MainFragmentViewModel
+    private val viewModel by viewModels<MainFragmentViewModel>()
     private lateinit var searchView: SearchView
     private val viewModelShared by activityViewModels<MainActivityViewModel>()
 
@@ -39,7 +40,6 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
         // Inflate the layout for this fragment
         binding = FragmentMainBinding.inflate(inflater)
 
-        viewModel = ViewModelProviders.of(this).get(MainFragmentViewModel::class.java)
         viewModel.setResponseData(viewModelShared.productsError, viewModelShared.status, viewModelShared.products)
         binding.viewModel = viewModel
 

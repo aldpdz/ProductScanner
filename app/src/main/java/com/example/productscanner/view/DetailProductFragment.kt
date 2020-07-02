@@ -6,9 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import com.example.productscanner.R
 import com.example.productscanner.databinding.FragmentDetailProductBinding
 import com.example.productscanner.model.Product
@@ -20,8 +23,11 @@ import com.example.productscanner.viewmodel.MainActivityViewModel
  */
 class DetailProductFragment : Fragment() {
 
-    private lateinit var viewModel: DetailProductViewModel
+    private val viewModel by viewModels<DetailProductViewModel>()
+    // TODO reuse activityViewModels after DI with Hilt
+    // TODO verify the use of activityViewModel instead of viewModels
     private val viewModelShared by activityViewModels<MainActivityViewModel>()
+
     private lateinit var binding: FragmentDetailProductBinding
 
     override fun onCreateView(
@@ -32,8 +38,6 @@ class DetailProductFragment : Fragment() {
         binding = FragmentDetailProductBinding.inflate(inflater)
 
         val detailProduct = arguments?.let { DetailProductFragmentArgs.fromBundle(it).argProduct }
-
-        viewModel = ViewModelProviders.of(this).get(DetailProductViewModel::class.java)
         viewModel.setDetailProduct(detailProduct)
 
         detailProduct?.let {
@@ -64,6 +68,9 @@ class DetailProductFragment : Fragment() {
                 if(product != detailProduct){ // if there are changes in the product
                     viewModel.sendNotification(product)
                     viewModelShared.updateProduct(product)
+                    this.findNavController()
+                        .navigate(DetailProductFragmentDirections
+                            .actionDetailProductToMainFragment())
                 }
             }
         }
