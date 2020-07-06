@@ -10,28 +10,26 @@ import android.view.*
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.productscanner.R
 import com.example.productscanner.databinding.FragmentMainBinding
-import com.example.productscanner.viewmodel.MainActivityViewModel
-import com.example.productscanner.viewmodel.MainFragmentViewModel
+import com.example.productscanner.viewmodel.SharedViewModel
 import com.example.productscanner.viewmodel.ProductApiStatus
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
 /**
  * A simple [Fragment] subclass.
  */
+@AndroidEntryPoint
 class MainFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var binding : FragmentMainBinding
     private lateinit var adapter: ProductAdapter
-    private val viewModel by viewModels<MainFragmentViewModel>()
     private lateinit var searchView: SearchView
-    private val viewModelShared by activityViewModels<MainActivityViewModel>()
+    private val sharedViewModel by viewModels<SharedViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,12 +37,10 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentMainBinding.inflate(inflater)
-
-        viewModel.setResponseData(viewModelShared.productsError, viewModelShared.status, viewModelShared.products)
-        binding.viewModel = viewModel
+        binding.viewModel = sharedViewModel
 
         adapter = ProductAdapter(OpenProductListener { product ->
-            viewModel.displayNavigationToDetail(product)
+            sharedViewModel.displayNavigationToDetail(product)
         })
 
         binding.rvProducts.adapter = adapter
@@ -61,28 +57,36 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     private fun setObservers() {
-        viewModel.productsFiltered.observe(viewLifecycleOwner, Observer { productsList ->
+        sharedViewModel.productsFiltered.observe(viewLifecycleOwner, Observer { productsList ->
             productsList?.let {
                 Log.d("Change list", "")
                 adapter.submitList(productsList)
             }
         })
-        viewModel.productsError?.observe(viewLifecycleOwner, Observer { error ->
+        sharedViewModel.productsError.observe(viewLifecycleOwner, Observer { error ->
             error?.let{
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel.navigationToDetail.observe(viewLifecycleOwner, Observer {
+        sharedViewModel.navigationToDetail.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {product ->
                 this.findNavController()
                     .navigate(MainFragmentDirections
                         .actionMainFragmentToDetailProduct(product))
             }
         })
-        viewModel.status?.observe(viewLifecycleOwner, Observer {
+        sharedViewModel.status.observe(viewLifecycleOwner, Observer {
             it?.let {
                 if(it == ProductApiStatus.DONE){
-                    viewModel.filterProducts()
+                    sharedViewModel.filterProducts()
+                }
+            }
+        })
+
+        sharedViewModel.loadPreference.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                if(it){
+                    sharedViewModel.setSavedIds(this.activity as MainActivity)
                 }
             }
         })
@@ -103,7 +107,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
                 true
             }
             R.id.refresh -> {
-                viewModelShared.refreshData()
+                sharedViewModel.refreshData()
                 true
             }
             R.id.action_search -> {
@@ -137,12 +141,12 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     override fun onQueryTextSubmit(p0: String?): Boolean {
-        viewModel.queryProducts(p0?.toLowerCase(Locale.getDefault()))
+        sharedViewModel.queryProducts(p0?.toLowerCase(Locale.getDefault()))
         return false
     }
 
     override fun onQueryTextChange(p0: String?): Boolean {
-        viewModel.queryProducts(p0?.toLowerCase(Locale.getDefault()))
+        sharedViewModel.queryProducts(p0?.toLowerCase(Locale.getDefault()))
         return false
     }
 }

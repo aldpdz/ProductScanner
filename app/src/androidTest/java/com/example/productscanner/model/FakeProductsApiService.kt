@@ -1,8 +1,9 @@
 package com.example.productscanner.model
 
+import javax.inject.Inject
 import com.example.productscanner.repositories.IProductsRepository
 
-class FakeAndroidTestRepository: IProductsRepository {
+class FakeAndroidTestRepository @Inject constructor(): IProductsRepository {
 
     var productsServiceData: LinkedHashMap<String, Product> = LinkedHashMap()
 
@@ -13,7 +14,7 @@ class FakeAndroidTestRepository: IProductsRepository {
         )
     }
 
-    fun addProducts(vararg products: Product){
+    override fun addProducts(vararg products: Product){
         for (product in products){
             productsServiceData[product.id.toString()] = product
         }

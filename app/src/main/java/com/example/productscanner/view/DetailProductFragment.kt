@@ -6,27 +6,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.productscanner.R
 import com.example.productscanner.databinding.FragmentDetailProductBinding
 import com.example.productscanner.model.Product
 import com.example.productscanner.viewmodel.DetailProductViewModel
-import com.example.productscanner.viewmodel.MainActivityViewModel
+import com.example.productscanner.viewmodel.SharedViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * A simple [Fragment] subclass.
  */
+@AndroidEntryPoint
 class DetailProductFragment : Fragment() {
 
     private val viewModel by viewModels<DetailProductViewModel>()
-    // TODO reuse activityViewModels after DI with Hilt
-    // TODO verify the use of activityViewModel instead of viewModels
-    private val viewModelShared by activityViewModels<MainActivityViewModel>()
+    private val shareViewModel by viewModels<SharedViewModel>()
 
     private lateinit var binding: FragmentDetailProductBinding
 
@@ -42,7 +39,7 @@ class DetailProductFragment : Fragment() {
 
         detailProduct?.let {
             if(!detailProduct.isSaved){
-                viewModelShared.saveIdProduct(activity as MainActivity, it.id)
+                activity?.let { it1 -> shareViewModel.saveIdProduct(it1, it.id) }
             }
         }
 
@@ -67,7 +64,7 @@ class DetailProductFragment : Fragment() {
                 val product: Product? = detailProduct?.copy(quantity =  quantity.toInt(), price = price.toFloat())
                 if(product != detailProduct){ // if there are changes in the product
                     viewModel.sendNotification(product)
-                    viewModelShared.updateProduct(product)
+                    shareViewModel.updateProduct(product)
                     this.findNavController()
                         .navigate(DetailProductFragmentDirections
                             .actionDetailProductToMainFragment())

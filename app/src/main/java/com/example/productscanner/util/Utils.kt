@@ -1,5 +1,6 @@
 package com.example.productscanner.util
 
+import android.app.Activity
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -13,7 +14,7 @@ import com.example.productscanner.view.MainActivity
 
 private val NOTIFICATION_ID = 0
 
-fun writeOnPreferences(activity: MainActivity, id: Int){
+fun writeOnPreferences(activity: Activity, id: Int){
     val sharedPref = activity.getPreferences(Context.MODE_PRIVATE) ?: return
     with(sharedPref.edit()){
         putInt(id.toString(), id)

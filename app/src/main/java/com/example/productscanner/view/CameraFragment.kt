@@ -8,10 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 
 import com.example.productscanner.R
@@ -19,11 +17,13 @@ import com.example.productscanner.databinding.CameraFragmentBinding
 import com.example.productscanner.viewmodel.*
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.PictureResult
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class CameraFragment : Fragment() {
 
     private val viewModel by viewModels<CameraViewModel>()
-    private val viewModelShared by activityViewModels<MainActivityViewModel>()
+    private val shareViewModel by viewModels<SharedViewModel>()
     private lateinit var binding: CameraFragmentBinding
 
     override fun onCreateView(
@@ -37,7 +37,7 @@ class CameraFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.cameraView.setLifecycleOwner(viewLifecycleOwner)
 
-        viewModel.setProducts(viewModelShared.products)
+        viewModel.setProducts(shareViewModel.products)
         binding.viewModel = viewModel
 
         hidePreview()
@@ -81,6 +81,7 @@ class CameraFragment : Fragment() {
                         }
                     }
                     ScannerStatusItem.NOT_FOUND -> {
+                        // TODO add to string resources
                         Toast.makeText(context, "Item not found",Toast.LENGTH_LONG).show()
                         hidePreview()
                     }
@@ -111,6 +112,7 @@ class CameraFragment : Fragment() {
     }
 
     private fun onFail() {
+        // TODO add to string resources
         Toast.makeText(
             context,
             "Sorry, something went wrong!",
@@ -120,6 +122,7 @@ class CameraFragment : Fragment() {
     }
 
     private fun tryAgain() {
+        // TODO add to string resources
         Toast.makeText(
             activity, "Try again", Toast.LENGTH_SHORT
         ).show()

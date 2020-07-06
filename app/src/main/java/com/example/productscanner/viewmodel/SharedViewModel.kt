@@ -1,22 +1,30 @@
 package com.example.productscanner.viewmodel
 
+import android.app.Activity
 import android.util.Log
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.example.productscanner.model.Product
 import com.example.productscanner.repositories.IProductsRepository
+import com.example.productscanner.util.Event
 import com.example.productscanner.util.readOnPreferences
 import com.example.productscanner.util.writeOnPreferences
 import com.example.productscanner.view.MainActivity
 import kotlinx.coroutines.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 enum class ProductApiStatus {LOADING, ERROR, DONE}
 
-class MainActivityViewModel(private val repository: IProductsRepository): ViewModel() {
+class SharedViewModel @ViewModelInject constructor(
+    private val repository: IProductsRepository): ViewModel() {
     private var jobPreference: Job? = null
     private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
         onError(throwable.localizedMessage)
     }
 
+    private val _productsFiltered = MutableLiveData<List<Product>>()
+    private val _navigationToDetail = MutableLiveData<Event<Product>>()
     private val _products = MutableLiveData<List<Product>>()
     private val _productsError = MutableLiveData<String?>()
     private val _status = MutableLiveData<ProductApiStatus>()
@@ -25,7 +33,11 @@ class MainActivityViewModel(private val repository: IProductsRepository): ViewMo
     val productsError : LiveData<String?> get() =  _productsError
     val status: LiveData<ProductApiStatus> get() = _status
     val products: LiveData<List<Product>> get() = _products
+    val productsFiltered: LiveData<List<Product>> get() = _productsFiltered
     val loadPreference: LiveData<Boolean?> get() = _loadPreference
+    val navigationToDetail: LiveData<Event<Product>> get() = _navigationToDetail
+
+    private var _query: String? = null
 
     init {
         getProducts()
@@ -109,7 +121,7 @@ class MainActivityViewModel(private val repository: IProductsRepository): ViewMo
      * Saves the product in the preferences file
      * @param idProduct: id of the product
      */
-    fun saveIdProduct(activity: MainActivity, idProduct: Int){
+    fun saveIdProduct(activity: Activity, idProduct: Int){
         jobPreference = CoroutineScope(Dispatchers.IO).launch {
             writeOnPreferences(activity, idProduct)
             for (product in _products.value!!){
@@ -120,18 +132,33 @@ class MainActivityViewModel(private val repository: IProductsRepository): ViewMo
         }
     }
 
+    fun queryProducts(query: String?){
+        this._query = query
+        filterProducts()
+    }
+
+    fun filterProducts(){
+        products.value?.let {
+            if (_query.isNullOrEmpty()){
+                _productsFiltered.value = products.value
+            }else{
+                val filteredProducts = ArrayList<Product>()
+                for(product in it){
+                    if(product.name.toLowerCase(Locale.getDefault()).contains(_query!!)){
+                        filteredProducts.add(product)
+                    }
+                }
+                _productsFiltered.value = filteredProducts
+            }
+        }
+    }
+
+    fun displayNavigationToDetail(product: Product){
+        _navigationToDetail.value = Event(product)
+    }
+
     override fun onCleared() {
         super.onCleared()
         jobPreference?.cancel()
     }
-}
-
-// TODO use generic ViewModelFactory
-// Standard way to change how ViewModels are constructed
-@Suppress("UNCHECKED_CAST")
-class MainActivityViewModelFactory(
-    private val repository: IProductsRepository
-) : ViewModelProvider.NewInstanceFactory(){
-    override fun <T : ViewModel?> create(modelClass: Class<T>) =
-        (MainActivityViewModel(repository) as T)
 }

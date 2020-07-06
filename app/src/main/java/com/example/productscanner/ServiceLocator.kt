@@ -16,7 +16,7 @@ object ServiceLocator{
 
     fun provideProductRepository(): IProductsRepository{
         synchronized(this){
-            return productRepository ?: ProductsRepository(ProductsApi.retrofitService)
+            return productRepository ?: ProductsRepository()
         }
     }
 

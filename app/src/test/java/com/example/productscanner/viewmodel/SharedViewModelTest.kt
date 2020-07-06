@@ -15,12 +15,12 @@ import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class MainActivityViewModelTest{
+class SharedViewModelTest{
 
     // Use a fake repository to be injected into the viewModel
     private lateinit var repository: FakeTestRepository
     // Subject under test
-    private lateinit var mainActivityViewModel: MainActivityViewModel
+    private lateinit var sharedViewModel: SharedViewModel
 
     // Executes each task synchronously using Architecture Components.
     // Runs all the Architecture Components-related background jobs in the same
@@ -72,16 +72,16 @@ class MainActivityViewModelTest{
             true)
 
         repository.addProducts(product1, product2, product3)
-        mainActivityViewModel =  MainActivityViewModel(repository)
+        sharedViewModel =  SharedViewModel(repository)
     }
 
     @Test
     fun startApp_callGetProducts(){
         // Then the products must be loaded from the repository
-        val products = mainActivityViewModel.products.getOrAwaitValue()
-        val loadPreference = mainActivityViewModel.loadPreference.getOrAwaitValue()
-        val productsError = mainActivityViewModel.productsError.getOrAwaitValue()
-        val status = mainActivityViewModel.status.getOrAwaitValue()
+        val products = sharedViewModel.products.getOrAwaitValue()
+        val loadPreference = sharedViewModel.loadPreference.getOrAwaitValue()
+        val productsError = sharedViewModel.productsError.getOrAwaitValue()
+        val status = sharedViewModel.status.getOrAwaitValue()
 
         // The products are loaded from the repository
         assertThat(products, IsEqual(repository.getListProducts()))
@@ -107,10 +107,10 @@ class MainActivityViewModelTest{
             25.0f,
             false)
         // Update the product in the view model
-        mainActivityViewModel.updateProduct(productUpdated)
+        sharedViewModel.updateProduct(productUpdated)
 
         // Assert that the product has been updated
-        val products = mainActivityViewModel.products.getOrAwaitValue()
+        val products = sharedViewModel.products.getOrAwaitValue()
         assertThat(products[0], IsEqual(productUpdated))
     }
 }

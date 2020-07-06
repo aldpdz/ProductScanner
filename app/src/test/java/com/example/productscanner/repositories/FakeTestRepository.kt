@@ -10,7 +10,7 @@ class FakeTestRepository: IProductsRepository {
         return Response(productsServiceData.values.toList(), null)
     }
 
-    fun addProducts(vararg products: Product){
+    override fun addProducts(vararg products: Product){
         for (product in products){
             productsServiceData[product.id.toString()] = product
         }

@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.example.productscanner.viewmodel.MainFragmentViewModel" />
+            type="com.example.productscanner.viewmodel.SharedViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

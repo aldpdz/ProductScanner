@@ -10,31 +10,39 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.example.productscanner.R
-import com.example.productscanner.ServiceLocator
+import com.example.productscanner.di.ProductsRepositoryModule
 import com.example.productscanner.model.FakeAndroidTestRepository
 import com.example.productscanner.model.Product
-import org.junit.After
+import com.example.productscanner.repositories.IProductsRepository
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.UninstallModules
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.lang.Thread.sleep
+import javax.inject.Inject
+import javax.inject.Singleton
 
+@UninstallModules(ProductsRepositoryModule::class) // Ignore production module
 @LargeTest // End-to-end test
 @RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
 class MainActivityTest{
-    private lateinit var repository: FakeAndroidTestRepository
+
+    @Inject
+    lateinit var repository: IProductsRepository
+
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
 
     @Before
     fun initRepository(){
-        repository = FakeAndroidTestRepository()
-        ServiceLocator.productRepository = repository
-    }
-
-    @After
-    fun cleanUp(){
-        // It needs to be reset, because there might be the possibility that the ServiceLocator
-        // is share between tests.
-        ServiceLocator.resetRepository()
+        hiltRule.inject()
     }
 
     @Test
@@ -80,5 +88,14 @@ class MainActivityTest{
 
         // Important when you're working with a database
         activityScenario.close()
+    }
+
+    // Just for this class
+    @Module
+    @InstallIn(ApplicationComponent::class)
+    abstract class ProductsRepositoryTestModule{
+        @Singleton
+        @Binds
+        abstract fun bindProductsRepository(productsRepository: FakeAndroidTestRepository): IProductsRepository
     }
 }
