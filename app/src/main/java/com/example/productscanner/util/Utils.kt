@@ -22,7 +22,7 @@ fun writeOnPreferences(activity: Activity, id: Int){
     }
 }
 
-fun readOnPreferences(activity: MainActivity, id: Int): Int{
+fun readOnPreferences(activity: Activity, id: Int): Int{
     val sharedPref = activity.getPreferences(Context.MODE_PRIVATE)
     val defaultValue = -1
     return sharedPref.getInt(id.toString(), defaultValue)

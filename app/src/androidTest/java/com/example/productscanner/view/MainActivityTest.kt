@@ -1,6 +1,8 @@
 package com.example.productscanner.view
 
+import android.content.Context
 import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
@@ -63,6 +65,7 @@ class MainActivityTest{
         repository.addProducts(product1)
 
         // Todo use better approach with resources
+//        getApplicationContext<Context>().getString(R.string.price)
         val prefixPrice = "Price: $"
         val prefixQuantity = "Quantity: "
 

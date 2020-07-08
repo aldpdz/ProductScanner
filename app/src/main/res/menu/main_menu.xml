@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <item
-        android:id="@+id/detail"
+        android:id="@+id/scan"
         android:title="@string/scan" />
     <item
         android:id="@+id/refresh"

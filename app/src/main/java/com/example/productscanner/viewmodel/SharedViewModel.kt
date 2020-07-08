@@ -9,7 +9,6 @@ import com.example.productscanner.repositories.IProductsRepository
 import com.example.productscanner.util.Event
 import com.example.productscanner.util.readOnPreferences
 import com.example.productscanner.util.writeOnPreferences
-import com.example.productscanner.view.MainActivity
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -99,7 +98,7 @@ class SharedViewModel @ViewModelInject constructor(
     /***
      * Sets the isSaved attribute to true if the products is find in the preferences file
      */
-    fun setSavedIds(activity: MainActivity){
+    fun setSavedIds(activity: Activity){
         jobPreference = CoroutineScope(Dispatchers.IO).launch {
             val newProducts: List<Product>? =  _products.value?.toList()
             newProducts?.let{
