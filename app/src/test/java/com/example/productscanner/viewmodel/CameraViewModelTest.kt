@@ -10,8 +10,8 @@ import org.junit.Test
 import com.example.productscanner.getOrAwaitValue
 import com.example.productscanner.model.Product
 import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.core.IsEqual
 
-//@RunWith(AndroidJUnit4::class) needed when using context
 class CameraViewModelTest{
 
     // Subject under test
@@ -35,13 +35,14 @@ class CameraViewModelTest{
 
     @Test
     fun getProduct_upc_productFound(){
+        // GIVEN - a set of products
         val product1 = Product(
             1,
             "Product1",
             "Description product1",
             "Path image",
             "sku-product1",
-            "upc-product1",
+            "054585412659",
             1,
             1.0f,
             false)
@@ -60,6 +61,36 @@ class CameraViewModelTest{
         listProducts.value = listOf(product1, product2)
 
         cameraViewModel.setProducts(listProducts)
+
+        // WHEN - scanning an image
+        // TODO not working
+        val image = CameraViewModelTest::class.java.getResource("/fish-bike.jpg")!!.readBytes()
+        cameraViewModel.typeScanner = TypeScanner.UPC
+        cameraViewModel.processInputImage(image)
+
+        val product = cameraViewModel.productByBarCode
+        val statusScannerStatusItem = cameraViewModel.scannerStatusItem.getOrAwaitValue()
+
+        // THEN - the product is product1
+        assertThat(product, IsEqual(product1))
+        // The status is FOUND
+        assertThat(statusScannerStatusItem.getContentIfNotHandled(), `is`(ScannerStatusItem.FOUND))
+    }
+
+    @Test
+    fun getProduct_upc_productNotFound(){}
+
+    @Test
+    fun getProduct_sku_productFound(){}
+
+    @Test
+    fun getProduct_sku_productNotFound(){}
+
+    @Test
+    fun processInputImage_upc_tryAgain(){}
+
+    @Test
+    fun processInputImage_sku_tryAgain(){
 
     }
 }
