@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -23,7 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class CameraFragment : Fragment() {
 
     private val viewModel by viewModels<CameraViewModel>()
-    private val shareViewModel by viewModels<SharedViewModel>()
+    private val shareViewModel by activityViewModels<SharedViewModel>()
     private lateinit var binding: CameraFragmentBinding
 
     override fun onCreateView(
