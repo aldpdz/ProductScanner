@@ -55,7 +55,6 @@ class MainFragmentTest{
         hiltRule.inject()
     }
 
-
     @Test
     fun displayProduct_whenRepositoryHasData(){
         val product1 = Product(

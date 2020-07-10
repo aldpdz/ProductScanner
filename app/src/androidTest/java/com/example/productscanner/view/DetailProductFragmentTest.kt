@@ -1,5 +1,7 @@
 package com.example.productscanner.view
 
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -47,7 +49,7 @@ class DetailProductFragmentTest{
     fun displayCorrectDetail(){
         // GIVEN - A product
         val product1 = Product(
-            1,
+            0,
             "Product1",
             "Description product1",
             "https://raw.githubusercontent.com/aldpdz/productScannerData/master/mouse.jpg",
@@ -65,11 +67,15 @@ class DetailProductFragmentTest{
         val bundle = DetailProductFragmentArgs(product1).toBundle()
         launchFragmentInHiltContainer<DetailProductFragment>(bundle, R.style.AppTheme)
 
+        val context = getApplicationContext<Context>()
+        val upc = context.getString(R.string.upc) + product1.upc
+        val sku = context.getString(R.string.sku) + product1.sku
+
         // THEN - details are displayed on the screen
         onView(withId(R.id.tv_name_detail)).check(matches(withText(product1.name)))
         onView(withId(R.id.tv_description_detail)).check(matches(withText(product1.description)))
-        onView(withId(R.id.tv_upc_detail)).check(matches(withText(product1.upc)))
-        onView(withId(R.id.tv_sku_detail)).check(matches(withText(product1.sku)))
+        onView(withId(R.id.tv_upc_detail)).check(matches(withText(upc)))
+        onView(withId(R.id.tv_sku_detail)).check(matches(withText(sku)))
         onView(withId(R.id.et_quantity)).check(matches(withText("1")))
         onView(withId(R.id.et_price)).check(matches(withText("1.0")))
         // TODO check image

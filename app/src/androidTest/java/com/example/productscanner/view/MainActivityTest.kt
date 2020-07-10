@@ -42,6 +42,7 @@ class MainActivityTest{
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
+    // TODO handle erase the share preference as with sql
     @Before
     fun initRepository(){
         hiltRule.inject()
