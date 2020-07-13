@@ -2,7 +2,7 @@ package com.example.productscanner.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.productscanner.getOrAwaitValue
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.network.NetworkProduct
 import org.hamcrest.core.IsEqual
 import org.junit.Assert.*
 import org.junit.Before
@@ -26,7 +26,7 @@ class MainFragmentViewModelTest{
 
     @Test
     fun displayNavigationToDetail_Product(){
-        val product1 = Product(
+        val product1 = NetworkProduct(
             1,
             "Product1_query",
             "Description product1",

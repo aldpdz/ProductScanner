@@ -86,7 +86,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
         sharedViewModel.loadPreference.observe(viewLifecycleOwner, Observer {
             it?.let {
                 if(it){
-                    this.activity?.let { it1 -> sharedViewModel.setSavedIds(it1) }
+                    this.activity?.let { it1 -> sharedViewModel.loadIdsFromPreferences(it1) }
                 }
             }
         })

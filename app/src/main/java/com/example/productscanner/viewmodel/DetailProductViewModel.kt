@@ -6,41 +6,41 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.example.productscanner.R
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.util.sendNotification
 import java.lang.StringBuilder
 
 class DetailProductViewModel(private val app: Application): AndroidViewModel(app) {
-    private val _detailProduct = MutableLiveData<Product>()
+    private val _detailProduct = MutableLiveData<NetworkProduct>()
     private val _quantity = MutableLiveData<Int>()
     private val _price = MutableLiveData<Float>()
-    val detailProduct: LiveData<Product> get() = _detailProduct
+    val detailNetworkProduct: LiveData<NetworkProduct> get() = _detailProduct
 
-    fun setDetailProduct(product: Product?){
-        _detailProduct.value = product
-        _quantity.value = product?.quantity
-        _price.value = product?.price
+    fun setDetailProduct(networkProduct: NetworkProduct?){
+        _detailProduct.value = networkProduct
+        _quantity.value = networkProduct?.quantity
+        _price.value = networkProduct?.price
     }
 
-    fun sendNotification(oldProduct: Product?){
+    fun sendNotification(oldNetworkProduct: NetworkProduct?){
         val notificationManager = ContextCompat.getSystemService(app,
             NotificationManager::class.java) as NotificationManager
 
         // Create expanded text
         val expandedMsgStringBuilder = StringBuilder()
-        if(oldProduct?.quantity != _detailProduct.value?.quantity){
+        if(oldNetworkProduct?.quantity != _detailProduct.value?.quantity){
             expandedMsgStringBuilder.append(app.getString(R.string.quantity_updated))
                 .append(_detailProduct.value?.quantity)
                 .append(app.getString(R.string.quantity_update_to))
-                .append(oldProduct?.quantity)
+                .append(oldNetworkProduct?.quantity)
         }
 
-        if(oldProduct?.price != _detailProduct.value?.price){
+        if(oldNetworkProduct?.price != _detailProduct.value?.price){
             if(expandedMsgStringBuilder.isNotEmpty()) expandedMsgStringBuilder.append("\n")
             expandedMsgStringBuilder.append(app.getString(R.string.price_updated))
                 .append(_detailProduct.value?.price)
                 .append(app.getString(R.string.price_updated_to))
-                .append(oldProduct?.price)
+                .append(oldNetworkProduct?.price)
         }
         Log.d("Notification text", expandedMsgStringBuilder.toString())
 

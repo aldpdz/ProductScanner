@@ -3,14 +3,14 @@ package com.example.productscanner.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.util.Event
 
 class MainFragmentViewModel: ViewModel() {
-    private val _navigationToDetail = MutableLiveData<Event<Product>>()
-    val navigationToDetail: LiveData<Event<Product>> get() = _navigationToDetail
+    private val _navigationToDetail = MutableLiveData<Event<NetworkProduct>>()
+    val navigationToDetail: LiveData<Event<NetworkProduct>> get() = _navigationToDetail
 
-    fun displayNavigationToDetail(product: Product){
-        _navigationToDetail.value = Event(product)
+    fun displayNavigationToDetail(networkProduct: NetworkProduct){
+        _navigationToDetail.value = Event(networkProduct)
     }
 }

@@ -5,22 +5,22 @@ import com.example.productscanner.repositories.IProductsRepository
 
 class FakeAndroidTestRepository @Inject constructor(): IProductsRepository {
 
-    var productsServiceData: LinkedHashMap<String, Product> = LinkedHashMap()
+    var productsServiceData: LinkedHashMap<String, NetworkProduct> = LinkedHashMap()
 
-    override suspend fun getProducts(): com.example.productscanner.repositories.Response<List<Product>?> {
+    override suspend fun getProductsFromRemote(): com.example.productscanner.repositories.Response<List<NetworkProduct>?> {
         return com.example.productscanner.repositories.Response(
             productsServiceData.values.toList(),
             null
         )
     }
 
-    override fun addProducts(vararg products: Product){
-        for (product in products){
+    override fun addProducts(vararg networkProducts: NetworkProduct){
+        for (product in networkProducts){
             productsServiceData[product.id.toString()] = product
         }
     }
 
-    fun getListProducts(): List<Product>{
+    fun getListProducts(): List<NetworkProduct>{
         return productsServiceData.values.toList()
     }
 }

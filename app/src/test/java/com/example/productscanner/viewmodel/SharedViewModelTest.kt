@@ -3,7 +3,7 @@ package com.example.productscanner.viewmodel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.productscanner.MainCoroutineRule
 import com.example.productscanner.getOrAwaitValue
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.repositories.FakeTestRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.CoreMatchers.`is`
@@ -21,7 +21,7 @@ class SharedViewModelTest{
     private lateinit var repository: FakeTestRepository
     // Subject under test
     private lateinit var sharedViewModel: SharedViewModel
-    private lateinit var listProducts: List<Product>
+    private lateinit var listNetworkProducts: List<NetworkProduct>
 
     // Executes each task synchronously using Architecture Components.
     // Runs all the Architecture Components-related background jobs in the same
@@ -39,7 +39,7 @@ class SharedViewModelTest{
         // We initialise the products, with two saved products
         repository = FakeTestRepository()
         // Fake products
-        val product1 = Product(
+        val product1 = NetworkProduct(
             1,
             "Product1 query",
             "Description product1",
@@ -51,7 +51,7 @@ class SharedViewModelTest{
             false
         )
 
-        val product2 = Product(
+        val product2 = NetworkProduct(
             2,
             "Product2",
             "Description product2",
@@ -63,7 +63,7 @@ class SharedViewModelTest{
             true
         )
 
-        val product3 = Product(
+        val product3 = NetworkProduct(
             3,
             "Product3",
             "Description product3",
@@ -74,14 +74,14 @@ class SharedViewModelTest{
             3.0f,
             true
         )
-        listProducts = listOf(product1, product2, product3)
+        listNetworkProducts = listOf(product1, product2, product3)
         repository.addProducts(product1, product2, product3)
     }
 
     @Test
     fun displayNavigationToDetail(){
         // GIVEN - a product
-        val product1 = Product(
+        val product1 = NetworkProduct(
             1,
             "Product1",
             "Description product1",
@@ -114,7 +114,7 @@ class SharedViewModelTest{
         val status = sharedViewModel.status.getOrAwaitValue()
 
         // The products are loaded from the repository
-        assertThat(products, IsEqual(listProducts))
+        assertThat(products, IsEqual(listNetworkProducts))
         // The preferences can be loaded
         assertThat(loadPreference, `is`(true))
         // There is no error
@@ -148,7 +148,7 @@ class SharedViewModelTest{
         sharedViewModel = SharedViewModel(repository)
 
         // Create a new product to update
-        val productUpdated = Product(
+        val productUpdated = NetworkProduct(
             1,
             "Product1 query",
             "Description product1",
@@ -172,7 +172,7 @@ class SharedViewModelTest{
         sharedViewModel = SharedViewModel(repository)
 
         // Create a new product to update
-        val productUpdated = Product(
+        val productUpdated = NetworkProduct(
             1,
             "Product1 query",
             "Description product1",
@@ -191,7 +191,7 @@ class SharedViewModelTest{
         val products = sharedViewModel.products.getOrAwaitValue()
 
         // THEN - there are not changes in the list
-        assertThat(products, IsEqual(listProducts))
+        assertThat(products, IsEqual(listNetworkProducts))
     }
 
     @Test
@@ -204,7 +204,7 @@ class SharedViewModelTest{
         val filteredProducts = sharedViewModel.productsFiltered.getOrAwaitValue()
 
         // THEN - all the products are presented in the list
-        assertThat(filteredProducts, IsEqual(listProducts))
+        assertThat(filteredProducts, IsEqual(listNetworkProducts))
     }
 
     @Test
@@ -217,7 +217,7 @@ class SharedViewModelTest{
         val filteredProducts = sharedViewModel.productsFiltered.getOrAwaitValue()
 
         // THEN - the list just contain one product
-        assertThat(filteredProducts, IsEqual(listOf(listProducts[0])))
+        assertThat(filteredProducts, IsEqual(listOf(listNetworkProducts[0])))
     }
 
     @Test

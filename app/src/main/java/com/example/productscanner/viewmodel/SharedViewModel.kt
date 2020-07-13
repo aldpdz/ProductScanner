@@ -4,10 +4,11 @@ import android.app.Activity
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.database.Result
+import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.repositories.IProductsRepository
 import com.example.productscanner.util.Event
-import com.example.productscanner.util.readOnPreferences
+import com.example.productscanner.util.getAllKeys
 import com.example.productscanner.util.writeOnPreferences
 import kotlinx.coroutines.*
 import java.util.*
@@ -22,21 +23,25 @@ class SharedViewModel @ViewModelInject constructor(
         onError(throwable.localizedMessage)
     }
 
-    private val _productsFiltered = MutableLiveData<List<Product>>()
-    private val _navigationToDetail = MutableLiveData<Event<Product>>()
-    private val _products = MutableLiveData<List<Product>>()
-    private val _productsError = MutableLiveData<String?>()
-    private val _status = MutableLiveData<ProductApiStatus>()
-    private val _loadPreference = MutableLiveData<Boolean?>()
+    private val _productsFiltered = MutableLiveData<List<DomainProduct>>()
+    val productsFiltered: LiveData<List<DomainProduct>> get() = _productsFiltered
 
+    private val _navigationToDetail = MutableLiveData<Event<DomainProduct>>()
+    val navigationToDetail: LiveData<Event<DomainProduct>> get() = _navigationToDetail
+
+    private val _productsError = MutableLiveData<String?>()
     val productsError : LiveData<String?> get() =  _productsError
+
+    private val _status = MutableLiveData<ProductApiStatus>()
     val status: LiveData<ProductApiStatus> get() = _status
-    val products: LiveData<List<Product>> get() = _products
-    val productsFiltered: LiveData<List<Product>> get() = _productsFiltered
+
+    private val _loadPreference = MutableLiveData<Boolean?>()
     val loadPreference: LiveData<Boolean?> get() = _loadPreference
-    val navigationToDetail: LiveData<Event<Product>> get() = _navigationToDetail
+
+    val products = repository.getProductsFromLocal()
 
     private var _query: String? = null
+    private var idsFromPreferences = listOf<Int>()
 
     init {
         getProducts()
@@ -55,28 +60,16 @@ class SharedViewModel @ViewModelInject constructor(
     private fun getProducts(){
         viewModelScope.launch(exceptionHandler) {
             _status.value = ProductApiStatus.LOADING
-            val response = repository.getProducts()
-            if(response.body != null){
-                _products.value = response.body
-                _loadPreference.value = true
-                _productsError.value = null
-                _status.value = ProductApiStatus.DONE
-            }else{
-                response.errorMessage?.let { onError(it) }
-            }
-        }
-    }
+            val response = repository.getProductsFromRemote()
 
-    /***
-     * Updates the product
-     * @param product: object product to be updated
-     */
-    fun updateProduct(product: Product?){
-        _products.value?.let {
-            for(_product in it){
-                if(_product.id == product?.id){
-                    _product.quantity = product.quantity
-                    _product.price = product.price
+            when(response){
+                is Result.Success -> {
+                    _loadPreference.value = true
+                    _productsError.value = null
+                    _status.value = ProductApiStatus.DONE
+                }
+                is Result.Error -> {
+                    onError("The data couldn't be loaded")
                 }
             }
         }
@@ -88,9 +81,20 @@ class SharedViewModel @ViewModelInject constructor(
      * @param message: String to display
      */
     private fun onError(message: String){
-        _products.value = ArrayList()
         _status.value = ProductApiStatus.ERROR
         _productsError.value = message
+    }
+
+    /***
+     * Load products' ids from preferences
+     */
+    fun loadIdsFromPreferences(activity: Activity){
+        Log.i("ShareVM", "Load preferences")
+        jobPreference = CoroutineScope(Dispatchers.IO).launch {
+            idsFromPreferences = getAllKeys(activity).toList().map {
+                it.toInt()
+            }
+        }
     }
 
     // TODO unit test instrumental
@@ -98,21 +102,16 @@ class SharedViewModel @ViewModelInject constructor(
     /***
      * Sets the isSaved attribute to true if the products is find in the preferences file
      */
-    fun setSavedIds(activity: Activity){
-        jobPreference = CoroutineScope(Dispatchers.IO).launch {
-            val newProducts: List<Product>? =  _products.value?.toList()
-            newProducts?.let{
-                for (product in it){
-                    if (readOnPreferences(activity, product.id) != -1){
-                        product.isSaved = true
-                    }
-                    Log.d("Preferences", "saved products")
+    fun setSavedIds(argProducts: List<DomainProduct>?) : List<DomainProduct>?{
+        val newProducts: List<DomainProduct>? = argProducts
+        newProducts?.let{
+            for (product in it){
+                if(product.id in idsFromPreferences){
+                    product.isSaved = true
                 }
             }
-            withContext(Dispatchers.Main){
-                _products.value = newProducts
-            }
         }
+        return newProducts
     }
 
     // TODO Unit test instrumental
@@ -123,7 +122,7 @@ class SharedViewModel @ViewModelInject constructor(
     fun saveIdProduct(activity: Activity, idProduct: Int){
         jobPreference = CoroutineScope(Dispatchers.IO).launch {
             writeOnPreferences(activity, idProduct)
-            for (product in _products.value!!){
+            for (product in products.value!!){
                 if(product.id == idProduct){
                     product.isSaved = true
                 }
@@ -136,24 +135,25 @@ class SharedViewModel @ViewModelInject constructor(
         filterProducts()
     }
 
+    // TODO - maybe add a switchmap
     fun filterProducts(){
         products.value?.let {
             if (_query.isNullOrEmpty()){
-                _productsFiltered.value = products.value
+                _productsFiltered.value = setSavedIds(products.value)
             }else{
-                val filteredProducts = ArrayList<Product>()
+                val filteredProducts = ArrayList<DomainProduct>()
                 for(product in it){
                     if(product.name.toLowerCase(Locale.getDefault()).contains(_query!!)){
                         filteredProducts.add(product)
                     }
                 }
-                _productsFiltered.value = filteredProducts
+                _productsFiltered.value = setSavedIds(filteredProducts)
             }
         }
     }
 
-    fun displayNavigationToDetail(product: Product){
-        _navigationToDetail.value = Event(product)
+    fun displayNavigationToDetail(domainProduct: DomainProduct){
+        _navigationToDetail.value = Event(domainProduct)
     }
 
     override fun onCleared() {

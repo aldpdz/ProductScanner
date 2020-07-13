@@ -6,7 +6,7 @@
     <data>
         <variable
             name="product"
-            type="com.example.productscanner.data.network.Product" />
+            type="com.example.productscanner.data.domain.DomainProduct" />
         <variable
             name="clickListener"
             type="com.example.productscanner.view.OpenProductListener" />

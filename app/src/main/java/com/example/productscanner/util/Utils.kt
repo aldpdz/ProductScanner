@@ -7,7 +7,7 @@ import android.os.Bundle
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.example.productscanner.R
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.domain.DomainProduct
 
 private val NOTIFICATION_ID = 0
 
@@ -25,6 +25,10 @@ fun readOnPreferences(activity: Activity, id: Int): Int{
     return sharedPref.getInt(id.toString(), defaultValue)
 }
 
+fun getAllKeys(activity: Activity): MutableSet<String> {
+    return activity.getPreferences(Context.MODE_PRIVATE).all.keys
+}
+
 /***
  * Extension function to send notifications
  */
@@ -32,11 +36,11 @@ fun NotificationManager.sendNotification(
     messageBody: String,
     expandedMessage: String,
     applicationContext: Context,
-    product: Product
+    domainProduct: DomainProduct
 )
 {
     val bundle = Bundle()
-    bundle.putParcelable("argProduct", product)
+    bundle.putParcelable("argProduct", domainProduct)
 
     val pendingIntent = NavDeepLinkBuilder(applicationContext)
         .setGraph(R.navigation.navigation)

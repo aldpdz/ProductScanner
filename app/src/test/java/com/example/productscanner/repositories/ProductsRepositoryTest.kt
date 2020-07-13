@@ -1,7 +1,7 @@
 package com.example.productscanner.repositories
 
 import com.example.productscanner.data.network.FakeProductsApiService
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.data.network.ProductsApiService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
@@ -13,7 +13,7 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class ProductsRepositoryTest{
     // Fake products
-    private val product1 = Product(
+    private val product1 = NetworkProduct(
         1,
         "Product1",
         "Description product1",
@@ -25,7 +25,7 @@ class ProductsRepositoryTest{
         false
     )
 
-    private val product2 = Product(
+    private val product2 = NetworkProduct(
         2,
         "Product2",
         "Description product2",
@@ -37,7 +37,7 @@ class ProductsRepositoryTest{
         false
     )
 
-    private val product3 = Product(
+    private val product3 = NetworkProduct(
         3,
         "Product3",
         "Description product3",

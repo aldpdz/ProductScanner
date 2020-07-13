@@ -1,7 +1,6 @@
 package com.example.productscanner.data.database
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.example.productscanner.data.domain.DomainProduct
 
 @Entity(tableName = "products")

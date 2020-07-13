@@ -75,7 +75,7 @@ class CameraFragment : Fragment() {
             it.getContentIfNotHandled()?.let {scannerStatusItem ->
                 when(scannerStatusItem){
                     ScannerStatusItem.FOUND -> {
-                        viewModel.productByBarCode?.let { product ->
+                        viewModel.networkProductByBarCode?.let { product ->
                             this.findNavController()
                                 .navigate(CameraFragmentDirections
                                     .actionCameraxToDetailProduct(product))

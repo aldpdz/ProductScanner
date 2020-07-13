@@ -22,7 +22,7 @@ import com.example.productscanner.R
 import com.example.productscanner.di.ProductsRepositoryModule
 import com.example.productscanner.launchFragmentInHiltContainer
 import com.example.productscanner.data.network.FakeAndroidTestRepository
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.repositories.IProductsRepository
 import dagger.Binds
 import dagger.Module
@@ -57,7 +57,7 @@ class MainFragmentTest{
 
     @Test
     fun displayProduct_whenRepositoryHasData(){
-        val product1 = Product(
+        val product1 = NetworkProduct(
             1,
             "Product1",
             "Description product1",
@@ -81,7 +81,7 @@ class MainFragmentTest{
     @Test
     fun displayFilterProducts(){
         // GIVEN - two products
-        val product1 = Product(
+        val product1 = NetworkProduct(
             1,
             "Product1",
             "Description product1",
@@ -93,7 +93,7 @@ class MainFragmentTest{
             false
         )
 
-        val product2 = Product(
+        val product2 = NetworkProduct(
             2,
             "Product2",
             "Description product2",
@@ -120,7 +120,7 @@ class MainFragmentTest{
 
     @Test
     fun clickProduct_navigateToDetailFragment(){
-        val product1 = Product(
+        val product1 = NetworkProduct(
             1,
             "Product1",
             "Description product1",
@@ -132,7 +132,7 @@ class MainFragmentTest{
             false
         )
 
-        val product2 = Product(
+        val product2 = NetworkProduct(
             2,
             "Product2",
             "Description product2",

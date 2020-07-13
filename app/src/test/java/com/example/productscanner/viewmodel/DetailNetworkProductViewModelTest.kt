@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.productscanner.getOrAwaitValue
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.network.NetworkProduct
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.core.IsEqual
 import org.junit.Assert.*
@@ -14,7 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class) // to get the context
-class DetailProductViewModelTest{
+class DetailNetworkProductViewModelTest{
 
     private lateinit var detailProductViewModel: DetailProductViewModel
 
@@ -29,7 +29,7 @@ class DetailProductViewModelTest{
 
     @Test
     fun setDetailProduct(){
-        val product1 = Product(
+        val product1 = NetworkProduct(
             1,
             "Product1",
             "Description product1",
@@ -43,7 +43,7 @@ class DetailProductViewModelTest{
 
         detailProductViewModel.setDetailProduct(product1)
 
-        val productVM = detailProductViewModel.detailProduct.getOrAwaitValue()
+        val productVM = detailProductViewModel.detailNetworkProduct.getOrAwaitValue()
         val price = detailProductViewModel.priceString.getOrAwaitValue()
         val quantity = detailProductViewModel.quantityString.getOrAwaitValue()
 

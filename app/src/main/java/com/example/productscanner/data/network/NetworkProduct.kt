@@ -1,11 +1,9 @@
 package com.example.productscanner.data.network
 
-import android.os.Parcelable
+import com.example.productscanner.data.database.DatabaseProduct
 import com.google.gson.annotations.SerializedName
-import kotlinx.android.parcel.Parcelize
 
-@Parcelize
-data class Product(
+data class NetworkProduct(
     @SerializedName("ID")
     val id: Int,
     @SerializedName("Name")
@@ -23,4 +21,19 @@ data class Product(
     @SerializedName("Price")
     var price: Float,
     var isSaved: Boolean = false
-) : Parcelable
+)
+
+fun List<NetworkProduct>.asDatabaseModel(): List<DatabaseProduct>{
+    return map{
+        DatabaseProduct(
+            id = it.id,
+            name = it.name,
+            description = it.description,
+            picture = it.picture,
+            sku = it.sku,
+            upc = it.upc,
+            quantity = it.quantity,
+            price = it.price
+        )
+    }
+}

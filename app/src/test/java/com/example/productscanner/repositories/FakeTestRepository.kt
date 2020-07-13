@@ -1,13 +1,13 @@
 package com.example.productscanner.repositories
 
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.network.NetworkProduct
 
 class FakeTestRepository(): IProductsRepository {
 
-    var productsServiceData: LinkedHashMap<String, Product>? = LinkedHashMap()
+    var productsServiceData: LinkedHashMap<String, NetworkProduct>? = LinkedHashMap()
     var error: String? = null
 
-    override suspend fun getProducts(): Response<List<Product>?> {
+    override suspend fun getProductsFromRemote(): Response<List<NetworkProduct>?> {
         return if (error != null) {
             Response(null, error)
         }else{
@@ -15,13 +15,13 @@ class FakeTestRepository(): IProductsRepository {
         }
     }
 
-    override fun addProducts(vararg products: Product){
-        for (product in products){
+    override fun addProducts(vararg networkProducts: NetworkProduct){
+        for (product in networkProducts){
             productsServiceData?.set(product.id.toString(), product)
         }
     }
 
-    fun getListProducts(): List<Product>?{
+    fun getListProducts(): List<NetworkProduct>?{
         return productsServiceData?.values?.toList()
     }
 }

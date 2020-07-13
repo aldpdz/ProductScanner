@@ -12,7 +12,7 @@ import androidx.test.filters.LargeTest
 import com.example.productscanner.R
 import com.example.productscanner.di.ProductsRepositoryModule
 import com.example.productscanner.data.network.FakeAndroidTestRepository
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.repositories.IProductsRepository
 import dagger.Binds
 import dagger.Module
@@ -48,7 +48,7 @@ class MainActivityTest{
 
     @Test
     fun editPriceQuantity(){
-        val product1 = Product(
+        val product1 = NetworkProduct(
             1,
             "Product1",
             "Description product1",

@@ -1,9 +1,14 @@
 package com.example.productscanner.repositories
 
-import com.example.productscanner.data.network.Product
+import androidx.lifecycle.LiveData
+import com.example.productscanner.data.database.Result
+import com.example.productscanner.data.domain.DomainProduct
+import com.example.productscanner.data.network.NetworkProduct
 
 interface IProductsRepository {
-    suspend fun getProducts(): Response<List<Product>?>
+    suspend fun getProductsFromRemote(): Result<String>
 
-    fun addProducts(vararg products: Product) // just for testing
+    fun getProductsFromLocal() : LiveData<List<DomainProduct>>
+
+    fun addProducts(vararg networkProducts: NetworkProduct) // just for testing
 }

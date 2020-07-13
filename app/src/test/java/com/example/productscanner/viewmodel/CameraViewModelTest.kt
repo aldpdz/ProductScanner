@@ -8,7 +8,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import com.example.productscanner.getOrAwaitValue
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.network.NetworkProduct
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.core.IsEqual
 
@@ -36,7 +36,7 @@ class CameraViewModelTest{
     @Test
     fun getProduct_upc_productFound(){
         // GIVEN - a set of products
-        val product1 = Product(
+        val product1 = NetworkProduct(
             1,
             "Product1",
             "Description product1",
@@ -48,7 +48,7 @@ class CameraViewModelTest{
             false
         )
 
-        val product2 = Product(
+        val product2 = NetworkProduct(
             2,
             "Product2",
             "Description product2",
@@ -59,7 +59,7 @@ class CameraViewModelTest{
             2.0f,
             true
         )
-        val listProducts = MutableLiveData<List<Product>>()
+        val listProducts = MutableLiveData<List<NetworkProduct>>()
         listProducts.value = listOf(product1, product2)
 
         cameraViewModel.setProducts(listProducts)
@@ -70,7 +70,7 @@ class CameraViewModelTest{
         cameraViewModel.typeScanner = TypeScanner.UPC
         cameraViewModel.processInputImage(image)
 
-        val product = cameraViewModel.productByBarCode
+        val product = cameraViewModel.networkProductByBarCode
         val statusScannerStatusItem = cameraViewModel.scannerStatusItem.getOrAwaitValue()
 
         // THEN - the product is product1

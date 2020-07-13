@@ -12,7 +12,7 @@ import com.example.productscanner.R
 import com.example.productscanner.di.ProductsRepositoryModule
 import com.example.productscanner.launchFragmentInHiltContainer
 import com.example.productscanner.data.network.FakeAndroidTestRepository
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.repositories.IProductsRepository
 import dagger.Binds
 import dagger.Module
@@ -32,7 +32,7 @@ import javax.inject.Singleton
 @RunWith(AndroidJUnit4::class)
 @UninstallModules(ProductsRepositoryModule::class)
 @HiltAndroidTest
-class DetailProductFragmentTest{
+class DetailNetworkProductFragmentTest{
 
     @Inject
     lateinit var repository: IProductsRepository
@@ -48,7 +48,7 @@ class DetailProductFragmentTest{
     @Test
     fun displayCorrectDetail(){
         // GIVEN - A product
-        val product1 = Product(
+        val product1 = NetworkProduct(
             0,
             "Product1",
             "Description product1",
