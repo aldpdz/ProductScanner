@@ -9,7 +9,7 @@ import androidx.navigation.ui.NavigationUI
 import com.example.productscanner.R
 import com.example.productscanner.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
-
+// test
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
