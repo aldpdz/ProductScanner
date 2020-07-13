@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.productscanner.databinding.ProductListBinding
-import com.example.productscanner.model.Product
+import com.example.productscanner.data.network.Product
 import androidx.recyclerview.widget.ListAdapter
 
 class ProductAdapter(val clickListener: OpenProductListener) :

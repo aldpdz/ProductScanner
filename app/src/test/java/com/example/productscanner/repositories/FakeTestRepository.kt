@@ -1,6 +1,6 @@
 package com.example.productscanner.repositories
 
-import com.example.productscanner.model.Product
+import com.example.productscanner.data.network.Product
 
 class FakeTestRepository(): IProductsRepository {
 

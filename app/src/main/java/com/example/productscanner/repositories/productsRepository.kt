@@ -1,7 +1,7 @@
 package com.example.productscanner.repositories
 
-import com.example.productscanner.model.Product
-import com.example.productscanner.model.ProductsApiService
+import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.network.ProductsApiService
 import javax.inject.Inject
 
 class ProductsRepository @Inject constructor() : IProductsRepository {

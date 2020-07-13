@@ -1,8 +1,8 @@
 package com.example.productscanner.repositories
 
-import com.example.productscanner.model.FakeProductsApiService
-import com.example.productscanner.model.Product
-import com.example.productscanner.model.ProductsApiService
+import com.example.productscanner.data.network.FakeProductsApiService
+import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.network.ProductsApiService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.core.IsEqual
@@ -22,7 +22,8 @@ class ProductsRepositoryTest{
         "upc-product1",
         1,
         1.0f,
-        false)
+        false
+    )
 
     private val product2 = Product(
         2,
@@ -33,7 +34,8 @@ class ProductsRepositoryTest{
         "upc-product2",
         2,
         2.0f,
-        false)
+        false
+    )
 
     private val product3 = Product(
         3,
@@ -44,7 +46,8 @@ class ProductsRepositoryTest{
         "upc-product3",
         3,
         3.0f,
-        false)
+        false
+    )
 
     private val productsFromApi = listOf(product1, product2, product3)
 
@@ -52,7 +55,10 @@ class ProductsRepositoryTest{
 
     @Before
     fun createRepository(){
-        productsRepository = FakeProductsApiService(productsFromApi.toMutableList())
+        productsRepository =
+            FakeProductsApiService(
+                productsFromApi.toMutableList()
+            )
     }
 
     @Test

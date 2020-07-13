@@ -1,4 +1,4 @@
-package com.example.productscanner.model
+package com.example.productscanner.data.network
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName

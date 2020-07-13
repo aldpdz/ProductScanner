@@ -21,8 +21,8 @@ import androidx.test.filters.MediumTest
 import com.example.productscanner.R
 import com.example.productscanner.di.ProductsRepositoryModule
 import com.example.productscanner.launchFragmentInHiltContainer
-import com.example.productscanner.model.FakeAndroidTestRepository
-import com.example.productscanner.model.Product
+import com.example.productscanner.data.network.FakeAndroidTestRepository
+import com.example.productscanner.data.network.Product
 import com.example.productscanner.repositories.IProductsRepository
 import dagger.Binds
 import dagger.Module
@@ -66,7 +66,8 @@ class MainFragmentTest{
             "upc-product1",
             1,
             1.0f,
-            false)
+            false
+        )
 
         repository.addProducts(product1)
 
@@ -89,7 +90,8 @@ class MainFragmentTest{
             "upc-product1",
             1,
             1.0f,
-            false)
+            false
+        )
 
         val product2 = Product(
             2,
@@ -100,7 +102,8 @@ class MainFragmentTest{
             "upc-product2",
             2,
             2.0f,
-            true)
+            true
+        )
 
         repository.addProducts(product1, product2)
 
@@ -126,7 +129,8 @@ class MainFragmentTest{
             "upc-product1",
             1,
             1.0f,
-            false)
+            false
+        )
 
         val product2 = Product(
             2,
@@ -137,7 +141,8 @@ class MainFragmentTest{
             "upc-product2",
             2,
             2.0f,
-            true)
+            true
+        )
 
         repository.addProducts(product1, product2)
 

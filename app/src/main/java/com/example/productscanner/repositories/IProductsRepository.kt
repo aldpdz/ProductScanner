@@ -1,7 +1,6 @@
 package com.example.productscanner.repositories
 
-import androidx.annotation.VisibleForTesting
-import com.example.productscanner.model.Product
+import com.example.productscanner.data.network.Product
 
 interface IProductsRepository {
     suspend fun getProducts(): Response<List<Product>?>

@@ -8,7 +8,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import com.example.productscanner.getOrAwaitValue
-import com.example.productscanner.model.Product
+import com.example.productscanner.data.network.Product
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.core.IsEqual
 
@@ -45,7 +45,8 @@ class CameraViewModelTest{
             "054585412659",
             1,
             1.0f,
-            false)
+            false
+        )
 
         val product2 = Product(
             2,
@@ -56,7 +57,8 @@ class CameraViewModelTest{
             "upc-product2",
             2,
             2.0f,
-            true)
+            true
+        )
         val listProducts = MutableLiveData<List<Product>>()
         listProducts.value = listOf(product1, product2)
 

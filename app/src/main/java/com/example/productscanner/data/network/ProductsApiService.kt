@@ -1,4 +1,4 @@
-package com.example.productscanner.model
+package com.example.productscanner.data.network
 
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -19,6 +19,7 @@ interface ProductsApiService{
 
 object ProductsApi{
     val retrofitService: ProductsApiService by lazy {
-        retrofit.create(ProductsApiService::class.java)
+        retrofit.create(
+            ProductsApiService::class.java)
     }
 }

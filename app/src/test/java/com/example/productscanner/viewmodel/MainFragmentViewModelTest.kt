@@ -2,7 +2,7 @@ package com.example.productscanner.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.productscanner.getOrAwaitValue
-import com.example.productscanner.model.Product
+import com.example.productscanner.data.network.Product
 import org.hamcrest.core.IsEqual
 import org.junit.Assert.*
 import org.junit.Before
@@ -35,7 +35,8 @@ class MainFragmentViewModelTest{
             "upc-product1",
             1,
             1.0f,
-            false)
+            false
+        )
 
         // WHEN - to change to a new fragment
         mainFragmentViewModel.displayNavigationToDetail(product1)

@@ -12,7 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.productscanner.R
 import com.example.productscanner.databinding.FragmentDetailProductBinding
-import com.example.productscanner.model.Product
+import com.example.productscanner.data.network.Product
 import com.example.productscanner.viewmodel.DetailProductViewModel
 import com.example.productscanner.viewmodel.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint

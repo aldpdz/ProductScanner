@@ -1,8 +1,6 @@
 package com.example.productscanner.view
 
-import android.content.Context
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
@@ -13,8 +11,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.example.productscanner.R
 import com.example.productscanner.di.ProductsRepositoryModule
-import com.example.productscanner.model.FakeAndroidTestRepository
-import com.example.productscanner.model.Product
+import com.example.productscanner.data.network.FakeAndroidTestRepository
+import com.example.productscanner.data.network.Product
 import com.example.productscanner.repositories.IProductsRepository
 import dagger.Binds
 import dagger.Module
@@ -59,7 +57,8 @@ class MainActivityTest{
             "upc-product1",
             1,
             1.0f,
-            false)
+            false
+        )
 
         // Set initial state
         // The initial state must be set before calling launch

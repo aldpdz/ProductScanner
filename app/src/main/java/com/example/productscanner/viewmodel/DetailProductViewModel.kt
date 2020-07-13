@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.example.productscanner.R
-import com.example.productscanner.model.Product
+import com.example.productscanner.data.network.Product
 import com.example.productscanner.util.sendNotification
 import java.lang.StringBuilder
 

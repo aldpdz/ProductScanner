@@ -4,7 +4,7 @@ import android.app.Activity
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import com.example.productscanner.model.Product
+import com.example.productscanner.data.network.Product
 import com.example.productscanner.repositories.IProductsRepository
 import com.example.productscanner.util.Event
 import com.example.productscanner.util.readOnPreferences

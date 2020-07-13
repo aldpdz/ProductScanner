@@ -2,15 +2,12 @@ package com.example.productscanner.util
 
 import android.app.Activity
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.example.productscanner.R
-import com.example.productscanner.model.Product
-import com.example.productscanner.view.MainActivity
+import com.example.productscanner.data.network.Product
 
 private val NOTIFICATION_ID = 0
 
@@ -35,7 +32,8 @@ fun NotificationManager.sendNotification(
     messageBody: String,
     expandedMessage: String,
     applicationContext: Context,
-    product: Product)
+    product: Product
+)
 {
     val bundle = Bundle()
     bundle.putParcelable("argProduct", product)

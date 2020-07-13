@@ -3,7 +3,7 @@ package com.example.productscanner.viewmodel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.productscanner.MainCoroutineRule
 import com.example.productscanner.getOrAwaitValue
-import com.example.productscanner.model.Product
+import com.example.productscanner.data.network.Product
 import com.example.productscanner.repositories.FakeTestRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.CoreMatchers.`is`
@@ -48,7 +48,8 @@ class SharedViewModelTest{
             "upc-product1",
             1,
             1.0f,
-            false)
+            false
+        )
 
         val product2 = Product(
             2,
@@ -59,7 +60,8 @@ class SharedViewModelTest{
             "upc-product2",
             2,
             2.0f,
-            true)
+            true
+        )
 
         val product3 = Product(
             3,
@@ -70,7 +72,8 @@ class SharedViewModelTest{
             "upc-product3",
             3,
             3.0f,
-            true)
+            true
+        )
         listProducts = listOf(product1, product2, product3)
         repository.addProducts(product1, product2, product3)
     }
@@ -87,7 +90,8 @@ class SharedViewModelTest{
             "upc-product1",
             1,
             1.0f,
-            false)
+            false
+        )
 
         // WHEN - calling displayNavigationToDetail
         sharedViewModel = SharedViewModel(repository)
@@ -153,7 +157,8 @@ class SharedViewModelTest{
             "upc-product1",
             25,
             25.0f,
-            false)
+            false
+        )
         // Update the product in the view model
         sharedViewModel.updateProduct(productUpdated)
 
@@ -176,7 +181,8 @@ class SharedViewModelTest{
             "upc-product1",
             25,
             25.0f,
-            false)
+            false
+        )
         // Update the product in the view model
         sharedViewModel.updateProduct(productUpdated)
         // Refresh the data

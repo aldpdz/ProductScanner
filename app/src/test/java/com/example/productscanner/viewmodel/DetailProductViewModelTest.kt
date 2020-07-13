@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.productscanner.getOrAwaitValue
-import com.example.productscanner.model.Product
+import com.example.productscanner.data.network.Product
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.core.IsEqual
 import org.junit.Assert.*
@@ -38,7 +38,8 @@ class DetailProductViewModelTest{
             "upc-product1",
             1,
             25.89f,
-            false)
+            false
+        )
 
         detailProductViewModel.setDetailProduct(product1)
 

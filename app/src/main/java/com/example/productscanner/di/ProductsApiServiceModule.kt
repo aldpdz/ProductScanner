@@ -1,5 +1,5 @@
 package com.example.productscanner.di
-import com.example.productscanner.model.ProductsApiService
+import com.example.productscanner.data.network.ProductsApiService
 import com.example.productscanner.repositories.IProductsRepository
 import com.example.productscanner.repositories.ProductsRepository
 import dagger.Binds
@@ -20,7 +20,7 @@ private const val BASE_URL = "https://raw.githubusercontent.com"
 object ProductsApiServiceModule{
     @Singleton
     @Provides
-    fun provideProductsApiService(): ProductsApiService{
+    fun provideProductsApiService(): ProductsApiService {
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(BASE_URL)

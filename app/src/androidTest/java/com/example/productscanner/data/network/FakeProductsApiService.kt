@@ -1,4 +1,4 @@
-package com.example.productscanner.model
+package com.example.productscanner.data.network
 
 import javax.inject.Inject
 import com.example.productscanner.repositories.IProductsRepository

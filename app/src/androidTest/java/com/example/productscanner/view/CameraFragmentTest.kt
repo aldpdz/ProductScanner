@@ -10,7 +10,7 @@ import androidx.test.filters.MediumTest
 import com.example.productscanner.R
 import com.example.productscanner.di.ProductsRepositoryModule
 import com.example.productscanner.launchFragmentInHiltContainer
-import com.example.productscanner.model.FakeAndroidTestRepository
+import com.example.productscanner.data.network.FakeAndroidTestRepository
 import com.example.productscanner.repositories.IProductsRepository
 import dagger.Binds
 import dagger.Module
@@ -19,7 +19,6 @@ import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
