@@ -4,13 +4,18 @@ import android.app.Activity
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.example.productscanner.R
 import com.example.productscanner.data.domain.DomainProduct
 
 private val NOTIFICATION_ID = 0
+const val IS_FIRST_INSTALLATION = "FIRST_INSTALLATION"
 
+/***
+ * Write on the preferences the product's id
+ */
 fun writeOnPreferences(activity: Activity, id: Int){
     val sharedPref = activity.getPreferences(Context.MODE_PRIVATE) ?: return
     with(sharedPref.edit()){
@@ -25,6 +30,29 @@ fun readOnPreferences(activity: Activity, id: Int): Int{
     return sharedPref.getInt(id.toString(), defaultValue)
 }
 
+/***
+ * Write on preferences the first time the data is loaded
+ */
+fun writeFirstLoad(activity: Activity){
+    Log.i("Utils", "Preference first data loaded")
+    val sharedPref = activity.getPreferences(Context.MODE_PRIVATE) ?: return
+    with(sharedPref.edit()){
+        putBoolean(IS_FIRST_INSTALLATION, false)
+        commit()
+    }
+}
+
+/***
+ * Check if the data has been loaded previously
+ */
+fun readFirstLoad(activity: Activity) : Boolean{
+    val sharedPref = activity.getPreferences(Context.MODE_PRIVATE)
+    return sharedPref.getBoolean(IS_FIRST_INSTALLATION, true)
+}
+
+/***
+ * Get all the products' keys from the preferences
+ */
 fun getAllKeys(activity: Activity): MutableSet<String> {
     return activity.getPreferences(Context.MODE_PRIVATE).all.keys
 }

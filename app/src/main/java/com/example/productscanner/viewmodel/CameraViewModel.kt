@@ -7,7 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.productscanner.data.network.NetworkProduct
+import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.util.Event
 import com.google.mlkit.vision.barcode.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScanner
@@ -29,25 +29,28 @@ class CameraViewModel : ViewModel() {
     // TODO method to listen permissions from the shared model
 
     private val _scannerStatusItem = MutableLiveData<Event<ScannerStatusItem>>()
-    private val _scannerStatus = MutableLiveData<Event<ScannerStatus>>()
-    private val _btnVisibility = MutableLiveData<Int>()
-    private val _bitMap = MutableLiveData<Bitmap>()
-
-    private var products: LiveData<List<NetworkProduct>>? = null
     val scannerStatusItem: LiveData<Event<ScannerStatusItem>> get() = _scannerStatusItem
+
+    private val _scannerStatus = MutableLiveData<Event<ScannerStatus>>()
     val scannerStatus: LiveData<Event<ScannerStatus>> get() = _scannerStatus
+
+    private val _btnVisibility = MutableLiveData<Int>()
     val btnVisibility: LiveData<Int> get() = _btnVisibility
+
+    private val _bitMap = MutableLiveData<Bitmap>()
     val bitMap: LiveData<Bitmap> get() = _bitMap
-    var networkProductByBarCode: NetworkProduct? = null
+
+//    private var products: LiveData<List<DomainProduct>>? = null
+    var productByBarCode: DomainProduct? = null
     var typeScanner: TypeScanner? = null
 
     init {
         _btnVisibility.value = View.VISIBLE
     }
 
-    fun setProducts(products: LiveData<List<NetworkProduct>>){
-        this.products = products
-    }
+//    fun setProducts(products: LiveData<List<NetworkProduct>>){
+//        this.products = products
+//    }
 
     // TODO instrumental test
     fun processInputImage(byteArray: ByteArray){
@@ -133,28 +136,29 @@ class CameraViewModel : ViewModel() {
 
 
     private fun getProduct(code: String){
-        var found = false
-        for(product in products?.value!!){
-            when(typeScanner){
-                TypeScanner.UPC -> {
-                    if(product.upc == code){
-                        networkProductByBarCode = product
-                        found = true
-                    }
-                }
-                TypeScanner.SKU -> {
-                    if(product.sku == code){
-                        networkProductByBarCode = product
-                        found = true
-                    }
-                }
-            }
-        }
-        if(found){
-            _scannerStatusItem.value = Event(ScannerStatusItem.FOUND)
-        }else{
-            _scannerStatusItem.value = Event(ScannerStatusItem.NOT_FOUND)
-        }
+        // TODO - implement with room
+//        var found = false
+//        for(product in products?.value!!){
+//            when(typeScanner){
+//                TypeScanner.UPC -> {
+//                    if(product.upc == code){
+//                        productByBarCode = product
+//                        found = true
+//                    }
+//                }
+//                TypeScanner.SKU -> {
+//                    if(product.sku == code){
+//                        productByBarCode = product
+//                        found = true
+//                    }
+//                }
+//            }
+//        }
+//        if(found){
+//            _scannerStatusItem.value = Event(ScannerStatusItem.FOUND)
+//        }else{
+//            _scannerStatusItem.value = Event(ScannerStatusItem.NOT_FOUND)
+//        }
     }
 
     fun hideButtons(){

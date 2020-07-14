@@ -24,6 +24,7 @@ fun bindImage(imgView: ImageView, imgUrl: String?){
     }
 }
 
+// TODO - maybe change to empty list
 @BindingAdapter("productApiStatus")
 fun bindStatus(statusImageView: ImageView, status: ProductApiStatus?){
     when(status){

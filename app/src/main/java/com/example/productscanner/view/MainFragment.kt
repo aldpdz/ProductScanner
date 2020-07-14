@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -46,6 +45,10 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
         binding.rvProducts.adapter = adapter
         binding.lifecycleOwner = viewLifecycleOwner // necessary to update values with bindingAdapter
 
+        this.activity?.let {
+            sharedViewModel.firstDataLoad(it)
+        }
+
         setHasOptionsMenu(true)
         setObservers()
 
@@ -63,11 +66,11 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
                 adapter.submitList(productsList)
             }
         })
-        sharedViewModel.productsError.observe(viewLifecycleOwner, Observer { error ->
-            error?.let{
-                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-            }
-        })
+//        sharedViewModel.productsError.observe(viewLifecycleOwner, Observer { error ->
+//            error?.let{
+//                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+//            }
+//        })
         sharedViewModel.navigationToDetail.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {product ->
                 this.findNavController()
@@ -78,16 +81,19 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
         sharedViewModel.status.observe(viewLifecycleOwner, Observer {
             it?.let {
                 if(it == ProductApiStatus.DONE){
-                    sharedViewModel.filterProducts()
+                    this.activity?.let { activity -> sharedViewModel.setFirstDataLoad(activity) }
                 }
             }
         })
-
+        // TODO - maybe use flow fro loadIdsFromPreferences to filterProducts
+        sharedViewModel.products.observe(viewLifecycleOwner, Observer {
+            it?.let{
+                this.activity?.let { activity -> sharedViewModel.loadIdsFromPreferences(activity) }
+            }
+        })
         sharedViewModel.loadPreference.observe(viewLifecycleOwner, Observer {
             it?.let {
-                if(it){
-                    this.activity?.let { it1 -> sharedViewModel.loadIdsFromPreferences(it1) }
-                }
+                sharedViewModel.filterProducts()
             }
         })
     }
@@ -107,7 +113,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
                 true
             }
             R.id.refresh -> {
-                sharedViewModel.refreshData()
+//                sharedViewModel.refreshData()
                 true
             }
             R.id.action_search -> {

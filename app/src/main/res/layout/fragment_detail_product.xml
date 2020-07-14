@@ -26,7 +26,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_name_detail"
-                app:picture="@{viewModel.detailNetworkProduct.picture}"
+                app:picture="@{viewModel.detailProduct.picture}"
                 tools:src="@tools:sample/backgrounds/scenic" />
 
             <TextView
@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp"
-                android:text="@{viewModel.detailNetworkProduct.description}"
+                android:text="@{viewModel.detailProduct.description}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/et_price"
                 app:layout_constraintStart_toStartOf="@+id/et_quantity"
@@ -50,7 +50,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:fontFamily="@font/roboto"
-                android:text="@{viewModel.detailNetworkProduct.name}"
+                android:text="@{viewModel.detailProduct.name}"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="@{@string/upc + viewModel.detailNetworkProduct.upc}"
+                android:text="@{@string/upc + viewModel.detailProduct.upc}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/product_image_detail"
                 tools:text="UPC: 123456789123" />
@@ -75,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 tools:text="SKU: 1234-SS-53"
-                android:text="@{@string/sku + viewModel.detailNetworkProduct.sku}"
+                android:text="@{@string/sku + viewModel.detailProduct.sku}"
                 app:layout_constraintEnd_toEndOf="@+id/tv_upc_detail"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/tv_upc_detail"

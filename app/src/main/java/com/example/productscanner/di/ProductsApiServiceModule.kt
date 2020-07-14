@@ -42,7 +42,7 @@ object DatabaseModule{
     @Singleton
     fun provideDatabase(@ApplicationContext appContext: Context): ProductsDatabase{
         return Room.databaseBuilder(
-            appContext,
+            appContext.applicationContext,
             ProductsDatabase::class.java,
             "products_scanner"
         ).build()

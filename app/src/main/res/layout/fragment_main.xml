@@ -35,15 +35,15 @@
             app:productApiStatusProgress="@{viewModel.status}"
             tools:visibility="visible"/>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@id/rv_products"
-            app:layout_constraintEnd_toEndOf="@id/rv_products"
-            app:layout_constraintStart_toStartOf="@id/rv_products"
-            app:layout_constraintTop_toTopOf="@id/rv_products"
-            app:productApiStatus="@{viewModel.status}"
-            tools:visibility="visible"/>
+<!--        <ImageView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:layout_constraintBottom_toBottomOf="@id/rv_products"-->
+<!--            app:layout_constraintEnd_toEndOf="@id/rv_products"-->
+<!--            app:layout_constraintStart_toStartOf="@id/rv_products"-->
+<!--            app:layout_constraintTop_toTopOf="@id/rv_products"-->
+<!--            app:productApiStatus="@{viewModel.status}"-->
+<!--            tools:visibility="visible"/>-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

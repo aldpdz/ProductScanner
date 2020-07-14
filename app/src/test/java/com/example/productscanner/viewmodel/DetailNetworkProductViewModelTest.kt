@@ -43,7 +43,7 @@ class DetailNetworkProductViewModelTest{
 
         detailProductViewModel.setDetailProduct(product1)
 
-        val productVM = detailProductViewModel.detailNetworkProduct.getOrAwaitValue()
+        val productVM = detailProductViewModel.detailProduct.getOrAwaitValue()
         val price = detailProductViewModel.priceString.getOrAwaitValue()
         val quantity = detailProductViewModel.quantityString.getOrAwaitValue()
 

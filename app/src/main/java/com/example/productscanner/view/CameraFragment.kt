@@ -38,7 +38,7 @@ class CameraFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.cameraView.setLifecycleOwner(viewLifecycleOwner)
 
-        viewModel.setProducts(shareViewModel.products)
+//        viewModel.setProducts(shareViewModel.products)
         binding.viewModel = viewModel
 
         hidePreview()
@@ -75,7 +75,7 @@ class CameraFragment : Fragment() {
             it.getContentIfNotHandled()?.let {scannerStatusItem ->
                 when(scannerStatusItem){
                     ScannerStatusItem.FOUND -> {
-                        viewModel.networkProductByBarCode?.let { product ->
+                        viewModel.productByBarCode?.let { product ->
                             this.findNavController()
                                 .navigate(CameraFragmentDirections
                                     .actionCameraxToDetailProduct(product))

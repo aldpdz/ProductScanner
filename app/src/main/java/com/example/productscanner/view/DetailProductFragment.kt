@@ -11,8 +11,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.productscanner.R
+import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.databinding.FragmentDetailProductBinding
-import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.viewmodel.DetailProductViewModel
 import com.example.productscanner.viewmodel.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,7 +35,7 @@ class DetailProductFragment : Fragment() {
 
         binding = FragmentDetailProductBinding.inflate(inflater)
 
-        val detailProduct = arguments?.let { DetailProductFragmentArgs.fromBundle(it).argNetworkProduct }
+        val detailProduct = arguments?.let { DetailProductFragmentArgs.fromBundle(it).argProduct }
         viewModel.setDetailProduct(detailProduct)
 
         detailProduct?.let {
@@ -54,7 +54,7 @@ class DetailProductFragment : Fragment() {
         return binding.root
     }
 
-    private fun setUpdateBtn(detailNetworkProduct: NetworkProduct?) {
+    private fun setUpdateBtn(product: DomainProduct?) {
         binding.btnUpdate.setOnClickListener {
             val price = binding.etPrice.text.toString()
             val quantity = binding.etQuantity.text.toString()
@@ -62,10 +62,10 @@ class DetailProductFragment : Fragment() {
             if (price.isEmpty() || quantity.isEmpty()) {
                 Toast.makeText(context, R.string.invalid_input, Toast.LENGTH_LONG).show()
             } else {
-                val networkProduct: NetworkProduct? = detailNetworkProduct?.copy(quantity =  quantity.toInt(), price = price.toFloat())
-                if(networkProduct != detailNetworkProduct){ // if there are changes in the product
-                    viewModel.sendNotification(networkProduct)
-                    shareViewModel.updateProduct(networkProduct)
+                val updatedProduct: DomainProduct? = product?.copy(quantity =  quantity.toInt(), price = price.toFloat())
+                if(updatedProduct != product){ // if there are changes in the product
+                    viewModel.sendNotification(updatedProduct)
+                    updatedProduct?.let {viewModel.updateProduct(it)}
                     this.findNavController()
                         .navigate(DetailProductFragmentDirections
                             .actionDetailProductToMainFragment())

@@ -70,7 +70,7 @@ class CameraViewModelTest{
         cameraViewModel.typeScanner = TypeScanner.UPC
         cameraViewModel.processInputImage(image)
 
-        val product = cameraViewModel.networkProductByBarCode
+        val product = cameraViewModel.productByBarCode
         val statusScannerStatusItem = cameraViewModel.scannerStatusItem.getOrAwaitValue()
 
         // THEN - the product is product1

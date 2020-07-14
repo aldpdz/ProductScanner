@@ -1,10 +1,12 @@
 package com.example.productscanner.data.database
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.example.productscanner.data.domain.DomainProduct
 
 @Entity(tableName = "products")
 data class DatabaseProduct constructor(
+    @PrimaryKey
     val id: Int,
     val name: String,
     val description: String,

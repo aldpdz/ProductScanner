@@ -7,9 +7,7 @@ import androidx.lifecycle.*
 import com.example.productscanner.data.database.Result
 import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.repositories.IProductsRepository
-import com.example.productscanner.util.Event
-import com.example.productscanner.util.getAllKeys
-import com.example.productscanner.util.writeOnPreferences
+import com.example.productscanner.util.*
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -29,8 +27,8 @@ class SharedViewModel @ViewModelInject constructor(
     private val _navigationToDetail = MutableLiveData<Event<DomainProduct>>()
     val navigationToDetail: LiveData<Event<DomainProduct>> get() = _navigationToDetail
 
-    private val _productsError = MutableLiveData<String?>()
-    val productsError : LiveData<String?> get() =  _productsError
+//    private val _productsError = MutableLiveData<String?>()
+//    val productsError : LiveData<String?> get() =  _productsError
 
     private val _status = MutableLiveData<ProductApiStatus>()
     val status: LiveData<ProductApiStatus> get() = _status
@@ -43,8 +41,26 @@ class SharedViewModel @ViewModelInject constructor(
     private var _query: String? = null
     private var idsFromPreferences = listOf<Int>()
 
-    init {
-        getProducts()
+//    init {
+////        getProducts()
+//    }
+
+    /***
+     * Load the data from the internet if it's the first time to load it
+     */
+    fun firstDataLoad(activity: Activity){
+        // true if it's the first time to load the data
+        if(readFirstLoad(activity)){
+            Log.i("SharedViewModel", "First time to load data")
+            getProducts()
+        }
+    }
+
+    /***
+     * Set in the preferences that the data has been loaded
+     */
+    fun setFirstDataLoad(activity: Activity){
+        writeFirstLoad(activity)
     }
 
     /***
@@ -64,8 +80,8 @@ class SharedViewModel @ViewModelInject constructor(
 
             when(response){
                 is Result.Success -> {
-                    _loadPreference.value = true
-                    _productsError.value = null
+//                    _loadPreference.value = true
+//                    _productsError.value = null
                     _status.value = ProductApiStatus.DONE
                 }
                 is Result.Error -> {
@@ -82,7 +98,7 @@ class SharedViewModel @ViewModelInject constructor(
      */
     private fun onError(message: String){
         _status.value = ProductApiStatus.ERROR
-        _productsError.value = message
+//        _productsError.value = message
     }
 
     /***
@@ -93,6 +109,9 @@ class SharedViewModel @ViewModelInject constructor(
         jobPreference = CoroutineScope(Dispatchers.IO).launch {
             idsFromPreferences = getAllKeys(activity).toList().map {
                 it.toInt()
+            }
+            withContext(Dispatchers.Main){
+                _loadPreference.value = true
             }
         }
     }
@@ -136,6 +155,9 @@ class SharedViewModel @ViewModelInject constructor(
     }
 
     // TODO - maybe add a switchmap
+    /***
+     * Filter the products base on the name with a query
+     */
     fun filterProducts(){
         products.value?.let {
             if (_query.isNullOrEmpty()){
