@@ -6,7 +6,6 @@ import com.example.productscanner.data.database.ProductsDatabase
 import com.example.productscanner.data.network.ProductsApiService
 import com.example.productscanner.repositories.IProductsRepository
 import com.example.productscanner.repositories.ProductsRepository
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,14 +31,9 @@ object ProductsApiServiceModule{
             .build()
             .create(ProductsApiService::class.java)
     }
-}
 
-@InstallIn(ApplicationComponent::class)
-@Module
-object DatabaseModule{
-
-    @Provides
     @Singleton
+    @Provides
     fun provideDatabase(@ApplicationContext appContext: Context): ProductsDatabase{
         return Room.databaseBuilder(
             appContext.applicationContext,
@@ -54,10 +48,18 @@ object DatabaseModule{
     }
 }
 
-@InstallIn(ApplicationComponent::class)
 @Module
-abstract class ProductsRepositoryModule{
+@InstallIn(ApplicationComponent::class)
+object ProductsRepositoryModule{
+
     @Singleton
-    @Binds
-    abstract fun bindProductsRepository(productsRepository: ProductsRepository): IProductsRepository
+    @Provides
+    fun provideProductRepository(
+        productsApiService: ProductsApiService,
+        productsDao: ProductDao
+    ): IProductsRepository{
+        return ProductsRepository(
+            productsApiService, productsDao
+        )
+    }
 }

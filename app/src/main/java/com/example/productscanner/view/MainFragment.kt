@@ -85,14 +85,16 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
                 }
             }
         })
-        // TODO - maybe use flow fro loadIdsFromPreferences to filterProducts
+        // TODO - maybe use flow for loadIdsFromPreferences to filterProducts
         sharedViewModel.products.observe(viewLifecycleOwner, Observer {
             it?.let{
+                Log.i("MainFragment", "Product loaded from database")
                 this.activity?.let { activity -> sharedViewModel.loadIdsFromPreferences(activity) }
             }
         })
         sharedViewModel.loadPreference.observe(viewLifecycleOwner, Observer {
             it?.let {
+                Log.i("MainFragment", "Starting to filter products")
                 sharedViewModel.filterProducts()
             }
         })

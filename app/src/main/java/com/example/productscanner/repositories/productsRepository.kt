@@ -7,17 +7,18 @@ import com.example.productscanner.data.database.ProductDao
 import com.example.productscanner.data.database.Result
 import com.example.productscanner.data.database.asDomainModel
 import com.example.productscanner.data.domain.DomainProduct
-import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.data.network.ProductsApiService
 import com.example.productscanner.data.network.asDatabaseModel
-import javax.inject.Inject
 
-class ProductsRepository @Inject constructor() : IProductsRepository {
+class ProductsRepository (
+    private val productsApiService: ProductsApiService,
+    private val productDao: ProductDao
+) : IProductsRepository {
 
-    @Inject lateinit var productsApiService: ProductsApiService
-    @Inject lateinit var productDao: ProductDao
+//    @Inject lateinit var productsApiService: ProductsApiService
+//    @Inject lateinit var productDao: ProductDao
 
-    val products: LiveData<List<DomainProduct>> =
+    override val products: LiveData<List<DomainProduct>> =
         // Convert one LiveData object into another LiveData
         Transformations.map(productDao.getProducts()){
             it.asDomainModel()
@@ -43,7 +44,7 @@ class ProductsRepository @Inject constructor() : IProductsRepository {
     override fun getProductsFromLocal() = products
 
     // Just for testing
-    override fun addProducts(vararg networkProducts: NetworkProduct){}
+    override fun addProducts(vararg products: DomainProduct){}
 }
 
 class Response<out T>(val body: T, val errorMessage: String?)

@@ -2,6 +2,7 @@ package com.example.productscanner.viewmodel
 
 import android.app.Activity
 import android.util.Log
+import androidx.core.text.isDigitsOnly
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.example.productscanner.data.database.Result
@@ -36,7 +37,7 @@ class SharedViewModel @ViewModelInject constructor(
     private val _loadPreference = MutableLiveData<Boolean?>()
     val loadPreference: LiveData<Boolean?> get() = _loadPreference
 
-    val products = repository.getProductsFromLocal()
+    val products = repository.products
 
     private var _query: String? = null
     private var idsFromPreferences = listOf<Int>()
@@ -50,9 +51,11 @@ class SharedViewModel @ViewModelInject constructor(
      */
     fun firstDataLoad(activity: Activity){
         // true if it's the first time to load the data
-        if(readFirstLoad(activity)){
-            Log.i("SharedViewModel", "First time to load data")
-            getProducts()
+        jobPreference =  CoroutineScope(Dispatchers.IO).launch {
+            if(readFirstLoad(activity)){
+                Log.i("SharedViewModel", "First time to load data")
+                getProducts()
+            }
         }
     }
 
@@ -60,7 +63,9 @@ class SharedViewModel @ViewModelInject constructor(
      * Set in the preferences that the data has been loaded
      */
     fun setFirstDataLoad(activity: Activity){
-        writeFirstLoad(activity)
+        jobPreference =  CoroutineScope(Dispatchers.IO).launch {
+            writeFirstLoad(activity)
+        }
     }
 
     /***
@@ -80,7 +85,6 @@ class SharedViewModel @ViewModelInject constructor(
 
             when(response){
                 is Result.Success -> {
-//                    _loadPreference.value = true
 //                    _productsError.value = null
                     _status.value = ProductApiStatus.DONE
                 }
@@ -106,13 +110,17 @@ class SharedViewModel @ViewModelInject constructor(
      */
     fun loadIdsFromPreferences(activity: Activity){
         Log.i("ShareVM", "Load preferences")
-        jobPreference = CoroutineScope(Dispatchers.IO).launch {
-            idsFromPreferences = getAllKeys(activity).toList().map {
-                it.toInt()
-            }
-            withContext(Dispatchers.Main){
-                _loadPreference.value = true
-            }
+        viewModelScope.launch {
+            getIdsFromPreferences(activity)
+            _loadPreference.value = true
+        }
+    }
+
+    private fun getIdsFromPreferences(activity: Activity) = CoroutineScope(Dispatchers.IO).launch {
+        idsFromPreferences = getAllKeys(activity).toList().filter {
+            it.isDigitsOnly()
+        }.map {
+            it.toInt()
         }
     }
 
@@ -121,7 +129,7 @@ class SharedViewModel @ViewModelInject constructor(
     /***
      * Sets the isSaved attribute to true if the products is find in the preferences file
      */
-    fun setSavedIds(argProducts: List<DomainProduct>?) : List<DomainProduct>?{
+    private fun setSavedIds(argProducts: List<DomainProduct>?) : List<DomainProduct>?{
         val newProducts: List<DomainProduct>? = argProducts
         newProducts?.let{
             for (product in it){

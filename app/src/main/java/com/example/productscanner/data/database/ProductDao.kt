@@ -12,5 +12,5 @@ interface ProductDao {
     fun getProducts(): LiveData<List<DatabaseProduct>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Overwrite if already exists
-    fun insertAll(products: List<DatabaseProduct>)
+    suspend fun insertAll(products: List<DatabaseProduct>)
 }
