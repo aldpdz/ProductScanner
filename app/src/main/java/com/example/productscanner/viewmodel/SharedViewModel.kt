@@ -5,14 +5,16 @@ import android.util.Log
 import androidx.core.text.isDigitsOnly
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import com.example.productscanner.data.database.Result
+import com.example.productscanner.data.Result
 import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.repositories.IProductsRepository
 import com.example.productscanner.util.*
 import kotlinx.coroutines.*
+import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayList
 
+// TODO - change name
 enum class ProductApiStatus {LOADING, ERROR, DONE}
 
 class SharedViewModel @ViewModelInject constructor(
@@ -37,14 +39,11 @@ class SharedViewModel @ViewModelInject constructor(
     private val _loadPreference = MutableLiveData<Boolean?>()
     val loadPreference: LiveData<Boolean?> get() = _loadPreference
 
-    val products = repository.products
+    val products = repository.getProductsFromLocal()
+        .distinctUntilChanged().switchMap { getData(it) }
 
     private var _query: String? = null
     private var idsFromPreferences = listOf<Int>()
-
-//    init {
-////        getProducts()
-//    }
 
     /***
      * Load the data from the internet if it's the first time to load it
@@ -81,16 +80,11 @@ class SharedViewModel @ViewModelInject constructor(
     private fun getProducts(){
         viewModelScope.launch(exceptionHandler) {
             _status.value = ProductApiStatus.LOADING
-            val response = repository.getProductsFromRemote()
-
-            when(response){
-                is Result.Success -> {
-//                    _productsError.value = null
-                    _status.value = ProductApiStatus.DONE
-                }
-                is Result.Error -> {
-                    onError("The data couldn't be loaded")
-                }
+            try {
+                repository.getProductsFromRemote()
+                _status.value = ProductApiStatus.DONE
+            }catch (e: Exception){
+                onError("The data couldn't be loaded")
             }
         }
     }
@@ -109,6 +103,7 @@ class SharedViewModel @ViewModelInject constructor(
      * Load products' ids from preferences
      */
     fun loadIdsFromPreferences(activity: Activity){
+        // TODO - good case to livedata builder with emit
         Log.i("ShareVM", "Load preferences")
         viewModelScope.launch {
             getIdsFromPreferences(activity)
@@ -180,6 +175,18 @@ class SharedViewModel @ViewModelInject constructor(
                 _productsFiltered.value = setSavedIds(filteredProducts)
             }
         }
+    }
+
+    private fun getData(productsResult: Result<List<DomainProduct>>): LiveData<List<DomainProduct>>{
+        val result = MutableLiveData<List<DomainProduct>>()
+
+        if(productsResult is Result.Success){
+            result.value = productsResult.data
+        }else{
+            result.value = emptyList()
+            // TODO - show error
+        }
+        return result
     }
 
     fun displayNavigationToDetail(domainProduct: DomainProduct){

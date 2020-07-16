@@ -2,6 +2,7 @@ package com.example.productscanner.data.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.productscanner.data.Result
 import com.example.productscanner.data.domain.DomainProduct
 
 @Entity(tableName = "products")
@@ -30,4 +31,11 @@ fun List<DatabaseProduct>.asDomainModel(): List<DomainProduct>{
             price = it.price
         )
     }
+}
+
+fun Result<List<DatabaseProduct>>.asDomainModel(): Result<List<DomainProduct>>{
+    val content = let { result ->
+        (result as Result.Success).data.asDomainModel()
+    }
+    return Result.Success(content)
 }

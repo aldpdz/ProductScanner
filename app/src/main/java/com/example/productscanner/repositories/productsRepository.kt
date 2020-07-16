@@ -1,47 +1,45 @@
 package com.example.productscanner.repositories
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.example.productscanner.data.database.ProductDao
-import com.example.productscanner.data.database.Result
-import com.example.productscanner.data.database.asDomainModel
+import com.example.productscanner.data.Result
+import com.example.productscanner.data.database.*
 import com.example.productscanner.data.domain.DomainProduct
-import com.example.productscanner.data.network.ProductsApiService
+import com.example.productscanner.data.network.IProductRemoteSource
 import com.example.productscanner.data.network.asDatabaseModel
 
 class ProductsRepository (
-    private val productsApiService: ProductsApiService,
-    private val productDao: ProductDao
+    private val productLocalSource: IProductLocalSource,
+    private val productRemoteSource: IProductRemoteSource
 ) : IProductsRepository {
-
-//    @Inject lateinit var productsApiService: ProductsApiService
-//    @Inject lateinit var productDao: ProductDao
-
-    override val products: LiveData<List<DomainProduct>> =
-        // Convert one LiveData object into another LiveData
-        Transformations.map(productDao.getProducts()){
-            it.asDomainModel()
-        }
 
     /***
      * Getting the data from the remote source and update local cache
      */
-    override suspend fun getProductsFromRemote(): Result<String>{
-        val response = productsApiService.getProducts()
-        return if(response.isSuccessful){
+    override suspend fun getProductsFromRemote(){
+        val response = productRemoteSource.getProducts()
+        if(response is Result.Success){
             Log.i("Repository", "Data loaded")
-            response.body()?.let{
-                productDao.insertAll(it.asDatabaseModel())
-            }
-            Result.Success("success")
-        }else{
+            saveProducts(response.data.asDatabaseModel())
+        }else if (response is Result.Error){
             Log.i("Repository", "Failed to load data")
-            Result.Error(Exception())
+            throw response.exception
         }
     }
 
-    override fun getProductsFromLocal() = products
+    /***
+     * Save the products in the database
+     */
+    override suspend fun saveProducts(databaseProducts: List<DatabaseProduct>){
+        productLocalSource.insertProducts(databaseProducts)
+    }
+
+    /***
+     * Get the products from the local database
+     */
+    override fun getProductsFromLocal() = Transformations.map(productLocalSource.getProducts()) {
+        it.asDomainModel()
+    }
 
     // Just for testing
     override fun addProducts(vararg products: DomainProduct){}

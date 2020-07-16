@@ -1,15 +1,17 @@
 package com.example.productscanner.repositories
 
 import androidx.lifecycle.LiveData
-import com.example.productscanner.data.database.Result
+import com.example.productscanner.data.Result
+import com.example.productscanner.data.database.DatabaseProduct
 import com.example.productscanner.data.domain.DomainProduct
 
 interface IProductsRepository {
-    val products: LiveData<List<DomainProduct>>
 
-    suspend fun getProductsFromRemote(): Result<String>
+    suspend fun getProductsFromRemote()
 
-    fun getProductsFromLocal() : LiveData<List<DomainProduct>>
+    suspend fun saveProducts(databaseProducts: List<DatabaseProduct>)
+
+    fun getProductsFromLocal() : LiveData<Result<List<DomainProduct>>>
 
     fun addProducts(vararg products: DomainProduct) // just for testing
 }

@@ -1,4 +1,4 @@
-package com.example.productscanner.data.database
+package com.example.productscanner.data
 
 import java.lang.Exception
 
