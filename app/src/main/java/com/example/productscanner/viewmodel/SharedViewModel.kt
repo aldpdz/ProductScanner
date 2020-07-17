@@ -20,6 +20,7 @@ enum class ProductApiStatus {LOADING, ERROR, DONE}
 class SharedViewModel @ViewModelInject constructor(
     private val repository: IProductsRepository): ViewModel() {
     private var jobPreference: Job? = null
+    private var deferred: Deferred<List<Int>>? = null
     private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
         onError(throwable.localizedMessage)
     }
@@ -53,6 +54,7 @@ class SharedViewModel @ViewModelInject constructor(
         jobPreference =  CoroutineScope(Dispatchers.IO).launch {
             if(readFirstLoad(activity)){
                 Log.i("SharedViewModel", "First time to load data")
+                // TODO - call outside this coroutines
                 getProducts()
             }
         }
@@ -106,17 +108,20 @@ class SharedViewModel @ViewModelInject constructor(
         // TODO - good case to livedata builder with emit
         Log.i("ShareVM", "Load preferences")
         viewModelScope.launch {
-            getIdsFromPreferences(activity)
+            idsFromPreferences = getIdsFromPreferences(activity)
             _loadPreference.value = true
         }
     }
 
-    private fun getIdsFromPreferences(activity: Activity) = CoroutineScope(Dispatchers.IO).launch {
-        idsFromPreferences = getAllKeys(activity).toList().filter {
-            it.isDigitsOnly()
-        }.map {
-            it.toInt()
+    private suspend fun getIdsFromPreferences(activity: Activity): List<Int>{
+        deferred = CoroutineScope(Dispatchers.IO).async {
+            getAllKeys(activity).toList().filter {
+                it.isDigitsOnly()
+            }.map {
+                it.toInt()
+            }
         }
+        return deferred!!.await()
     }
 
     // TODO unit test instrumental
@@ -196,5 +201,6 @@ class SharedViewModel @ViewModelInject constructor(
     override fun onCleared() {
         super.onCleared()
         jobPreference?.cancel()
+        deferred?.cancel()
     }
 }
