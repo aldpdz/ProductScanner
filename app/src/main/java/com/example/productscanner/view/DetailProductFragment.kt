@@ -17,9 +17,6 @@ import com.example.productscanner.viewmodel.DetailProductViewModel
 import com.example.productscanner.viewmodel.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
-/**
- * A simple [Fragment] subclass.
- */
 @AndroidEntryPoint
 class DetailProductFragment : Fragment() {
 

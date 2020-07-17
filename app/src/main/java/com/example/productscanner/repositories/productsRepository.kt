@@ -1,12 +1,11 @@
 package com.example.productscanner.repositories
 
 import android.util.Log
-import androidx.lifecycle.Transformations
 import com.example.productscanner.data.Result
 import com.example.productscanner.data.database.*
 import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.data.network.IProductRemoteSource
-import com.example.productscanner.data.network.asDatabaseModel
+import com.example.productscanner.data.network.NetworkProduct
 
 class ProductsRepository (
     private val productLocalSource: IProductLocalSource,
@@ -20,7 +19,7 @@ class ProductsRepository (
         val response = productRemoteSource.getProducts()
         if(response is Result.Success){
             Log.i("Repository", "Data loaded")
-            saveProducts(response.data.asDatabaseModel())
+            saveProducts(response.data)
         }else if (response is Result.Error){
             Log.i("Repository", "Failed to load data")
             throw response.exception
@@ -30,15 +29,17 @@ class ProductsRepository (
     /***
      * Save the products in the database
      */
-    override suspend fun saveProducts(databaseProducts: List<DatabaseProduct>){
-        productLocalSource.insertProducts(databaseProducts)
+    override suspend fun saveProducts(products: List<NetworkProduct>){
+        productLocalSource.insertProducts(products)
     }
 
     /***
      * Get the products from the local database
      */
-    override fun getProductsFromLocal() = Transformations.map(productLocalSource.getProducts()) {
-        it.asDomainModel()
+    override fun getProductsFromLocal() = productLocalSource.getProducts()
+
+    override suspend fun updateProduct(product: DomainProduct) {
+        productLocalSource.updateProduct(product)
     }
 
     // Just for testing
