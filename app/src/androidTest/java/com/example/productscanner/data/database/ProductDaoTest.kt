@@ -53,7 +53,27 @@ class ProductDaoTest {
         val productsSaved = database.productDao.getProducts()
 
         // THEN - The saved data contains the expected values.
-        assertThat<DatabaseProduct>(productsSaved.getOrAwaitValueInstrumental()[0] as DatabaseProduct, notNullValue())
+        assertThat<DatabaseProduct>(productsSaved.getOrAwaitValueInstrumental()[0], notNullValue())
         assertThat(productsSaved.getOrAwaitValueInstrumental()[0], IsEqual(product))
+    }
+
+    @Test
+    fun updateProduct() = runBlockingTest {
+        // GIVEN - Insert a product.
+        val product = DatabaseProduct(
+        1, "Product1", "Description", "Picture", "sku-code",
+        "upc-code", 25, 15.0f)
+        database.productDao.insertAll(listOf(product))
+
+        // WHEN - Update one of the products
+        val updatedProduct = DatabaseProduct(
+            1, "Product1", "Description", "Picture", "sku-code",
+            "upc-code", 50, 30.0f)
+        database.productDao.updateProduct(updatedProduct)
+        val productsSaved = database.productDao.getProducts()
+
+        // THEN - The product has been updated
+        assertThat<DatabaseProduct>(productsSaved.getOrAwaitValueInstrumental()[0], notNullValue())
+        assertThat(productsSaved.getOrAwaitValueInstrumental()[0], IsEqual(updatedProduct))
     }
 }
