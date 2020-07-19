@@ -19,8 +19,7 @@ data class NetworkProduct(
     @SerializedName("Quantity")
     var quantity: Int,
     @SerializedName("Price")
-    var price: Float,
-    var isSaved: Boolean = false
+    var price: Float
 )
 
 fun List<NetworkProduct>.asDatabaseModel(): List<DatabaseProduct>{

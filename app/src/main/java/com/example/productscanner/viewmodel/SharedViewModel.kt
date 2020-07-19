@@ -15,6 +15,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 // TODO - change name
+// TODO - Remote error and local error
 enum class ProductApiStatus {LOADING, ERROR, DONE}
 
 class SharedViewModel @ViewModelInject constructor(
@@ -97,7 +98,7 @@ class SharedViewModel @ViewModelInject constructor(
      * @param message: String to display
      */
     private fun onError(message: String){
-        _status.value = ProductApiStatus.ERROR
+//        _status.value = ProductApiStatus.ERROR
 //        _productsError.value = message
     }
 
@@ -184,13 +185,18 @@ class SharedViewModel @ViewModelInject constructor(
 
     private fun getData(productsResult: Result<List<DomainProduct>>): LiveData<List<DomainProduct>>{
         val result = MutableLiveData<List<DomainProduct>>()
-
-        if(productsResult is Result.Success){
-            result.value = productsResult.data
-        }else{
-            result.value = emptyList()
-            // TODO - show error
+        result.value = (productsResult as Result.Success).data
+        result.value?.let {
+            if(it.isEmpty()){
+                _status.value = ProductApiStatus.ERROR
+            }
         }
+//        if(productsResult is Result.Success){
+//            result.value = productsResult.data
+//        }else{
+//            result.value = emptyList()
+//            // TODO - show error
+//        }
         return result
     }
 
