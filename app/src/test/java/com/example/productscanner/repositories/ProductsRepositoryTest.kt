@@ -6,6 +6,7 @@ import com.example.productscanner.data.database.FakeProductLocalSource
 import com.example.productscanner.data.database.IProductLocalSource
 import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.data.network.*
+import com.example.productscanner.domainToNetwork
 import com.example.productscanner.getOrAwaitValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
@@ -131,21 +132,5 @@ class ProductsRepositoryTest{
 
         // Then there are not products in the local source
         assertThat(result.data, IsEmptyCollection())
-    }
-
-
-    /***
-     * Convert a list of DomainProducts to a list of NetworkProducts
-     */
-    private fun domainToNetwork(products: List<DomainProduct>): List<NetworkProduct>{
-        val networkList = mutableListOf<NetworkProduct>()
-        for(product in products){
-            val networkProduct = NetworkProduct(
-                product.id, product.name, product.description,
-                product.picture, product.sku, product.upc,
-                product.quantity, product.price)
-            networkList.add(networkProduct)
-        }
-        return networkList
     }
 }

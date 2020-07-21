@@ -1,27 +1,60 @@
 package com.example.productscanner.repositories
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.example.productscanner.data.Result
+import com.example.productscanner.data.database.DatabaseProduct
+import com.example.productscanner.data.database.asDomainModel
+import com.example.productscanner.data.domain.DomainProduct
+import com.example.productscanner.data.domain.asDatabaseProduct
 import com.example.productscanner.data.network.NetworkProduct
+import com.example.productscanner.data.network.asDatabaseModel
 
-class FakeTestRepository(): IProductsRepository {
+class FakeTestRepository(
+    private var networkProducts: MutableList<NetworkProduct>
+): IProductsRepository {
+    private var databaseProducts: MutableList<DatabaseProduct> = ArrayList()
+    private var shouldReturnError = false
+    private var _liveDataDBProducts = MutableLiveData<Result<List<DomainProduct>>>()
+    private val liveDataDBProduct : LiveData<Result<List<DomainProduct>>> get() = _liveDataDBProducts
 
-    var productsServiceData: LinkedHashMap<String, NetworkProduct>? = LinkedHashMap()
-    var error: String? = null
+    init {
+        setLocalData()
+    }
 
-    override suspend fun getProductsFromRemote(): Response<List<NetworkProduct>?> {
-        return if (error != null) {
-            Response(null, error)
-        }else{
-            Response(productsServiceData?.values?.toList(), null)
+    fun setReturnError(value: Boolean){
+        shouldReturnError = value
+    }
+
+    override suspend fun getProductsFromRemote(){
+        if(shouldReturnError){
+            throw Exception()
+        }
+        databaseProducts = networkProducts.asDatabaseModel().toMutableList()
+        setLocalData()
+    }
+
+    override suspend fun saveProducts(networkProducts: List<NetworkProduct>) {
+        this.networkProducts = networkProducts.toMutableList()
+    }
+
+    override fun getProductsFromLocal(): LiveData<Result<List<DomainProduct>>> {
+        return liveDataDBProduct
+    }
+
+    override suspend fun updateProduct(product: DomainProduct) {
+        for((index, databaseProduct) in databaseProducts.withIndex()){
+            if(databaseProduct.id == product.id){
+                databaseProducts[index] = product.asDatabaseProduct()
+                setLocalData()
+            }
         }
     }
 
-    override fun addProducts(vararg networkProducts: NetworkProduct){
-        for (product in networkProducts){
-            productsServiceData?.set(product.id.toString(), product)
-        }
+    private fun setLocalData(){
+        val result = Result.Success(databaseProducts.asDomainModel())
+        _liveDataDBProducts.value = result
     }
 
-    fun getListProducts(): List<NetworkProduct>?{
-        return productsServiceData?.values?.toList()
-    }
+    override fun addProducts(vararg products: DomainProduct){}
 }
