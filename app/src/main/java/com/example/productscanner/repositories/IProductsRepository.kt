@@ -9,7 +9,7 @@ interface IProductsRepository {
 
     suspend fun getProductsFromRemote()
 
-    suspend fun saveProducts(products: List<NetworkProduct>)
+    suspend fun saveProducts(networkProducts: List<NetworkProduct>)
 
     fun getProductsFromLocal() : LiveData<Result<List<DomainProduct>>>
 

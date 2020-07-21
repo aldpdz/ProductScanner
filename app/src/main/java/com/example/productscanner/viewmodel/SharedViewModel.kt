@@ -15,8 +15,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 // TODO - change name
-// TODO - Remote error and local error
 enum class ProductApiStatus {LOADING, ERROR, DONE}
+enum class LocalStatus {ERROR, SUCCESS}
 
 class SharedViewModel @ViewModelInject constructor(
     private val repository: IProductsRepository): ViewModel() {
@@ -32,17 +32,19 @@ class SharedViewModel @ViewModelInject constructor(
     private val _navigationToDetail = MutableLiveData<Event<DomainProduct>>()
     val navigationToDetail: LiveData<Event<DomainProduct>> get() = _navigationToDetail
 
-//    private val _productsError = MutableLiveData<String?>()
-//    val productsError : LiveData<String?> get() =  _productsError
+    private val _productsError = MutableLiveData<String?>()
+    val productsError : LiveData<String?> get() =  _productsError
 
-    private val _status = MutableLiveData<ProductApiStatus>()
-    val status: LiveData<ProductApiStatus> get() = _status
+    private val _networkStatus = MutableLiveData<ProductApiStatus>()
+    val networkStatus: LiveData<ProductApiStatus> get() = _networkStatus
+
+    private val _localStatus = MutableLiveData<LocalStatus>()
+    val localStatus : LiveData<LocalStatus> get() = _localStatus
 
     private val _loadPreference = MutableLiveData<Boolean?>()
     val loadPreference: LiveData<Boolean?> get() = _loadPreference
 
-    val products = repository.getProductsFromLocal()
-        .distinctUntilChanged().switchMap { getData(it) }
+    val products = repository.getProductsFromLocal().map { getData(it) }
 
     private var _query: String? = null
     private var idsFromPreferences = listOf<Int>()
@@ -81,13 +83,15 @@ class SharedViewModel @ViewModelInject constructor(
      * Load the products from the network
      */
     private fun getProducts(){
+        _networkStatus.value = ProductApiStatus.LOADING
         viewModelScope.launch(exceptionHandler) {
-            _status.value = ProductApiStatus.LOADING
             try {
                 repository.getProductsFromRemote()
-                _status.value = ProductApiStatus.DONE
+                _productsError.value = null
             }catch (e: Exception){
                 onError("The data couldn't be loaded")
+            }finally {
+                _networkStatus.value = ProductApiStatus.DONE
             }
         }
     }
@@ -98,8 +102,7 @@ class SharedViewModel @ViewModelInject constructor(
      * @param message: String to display
      */
     private fun onError(message: String){
-//        _status.value = ProductApiStatus.ERROR
-//        _productsError.value = message
+        _productsError.value = message
     }
 
     /***
@@ -183,21 +186,14 @@ class SharedViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun getData(productsResult: Result<List<DomainProduct>>): LiveData<List<DomainProduct>>{
-        val result = MutableLiveData<List<DomainProduct>>()
-        result.value = (productsResult as Result.Success).data
-        result.value?.let {
-            if(it.isEmpty()){
-                _status.value = ProductApiStatus.ERROR
-            }
+    private fun getData(productsResult: Result<List<DomainProduct>>): List<DomainProduct>{
+        val localData = (productsResult as Result.Success).data
+        if(localData.isEmpty()){
+            _localStatus.value = LocalStatus.ERROR
+        }else{
+            _localStatus.value = LocalStatus.SUCCESS
         }
-//        if(productsResult is Result.Success){
-//            result.value = productsResult.data
-//        }else{
-//            result.value = emptyList()
-//            // TODO - show error
-//        }
-        return result
+        return localData
     }
 
     fun displayNavigationToDetail(domainProduct: DomainProduct){

@@ -29,8 +29,8 @@ class ProductsRepository (
     /***
      * Save the products in the database
      */
-    override suspend fun saveProducts(products: List<NetworkProduct>){
-        productLocalSource.insertProducts(products)
+    override suspend fun saveProducts(networkProducts: List<NetworkProduct>){
+        productLocalSource.insertProducts(networkProducts)
     }
 
     /***
@@ -45,5 +45,3 @@ class ProductsRepository (
     // Just for testing
     override fun addProducts(vararg products: DomainProduct){}
 }
-
-class Response<out T>(val body: T, val errorMessage: String?)
