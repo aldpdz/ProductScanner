@@ -3,8 +3,9 @@ package com.example.productscanner.viewmodel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.productscanner.getOrAwaitValue
-import com.example.productscanner.data.network.NetworkProduct
+import com.example.productscanner.data.domain.DomainProduct
+import com.example.productscanner.*
+import com.example.productscanner.repositories.FakeTestRepository
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.core.IsEqual
 import org.junit.Assert.*
@@ -16,6 +17,9 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class) // to get the context
 class DetailNetworkProductViewModelTest{
 
+    private lateinit var repository: FakeTestRepository
+
+    // Subject under test
     private lateinit var detailProductViewModel: DetailProductViewModel
 
     // To deal with live data
@@ -24,12 +28,14 @@ class DetailNetworkProductViewModelTest{
 
     @Before
     fun setupViewModel(){
-        detailProductViewModel = DetailProductViewModel(ApplicationProvider.getApplicationContext())
+        repository = FakeTestRepository()
+        detailProductViewModel = DetailProductViewModel(
+            ApplicationProvider.getApplicationContext(), repository)
     }
 
     @Test
     fun setDetailProduct(){
-        val product1 = NetworkProduct(
+        val product1 = DomainProduct(
             1,
             "Product1",
             "Description product1",

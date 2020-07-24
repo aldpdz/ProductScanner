@@ -3,10 +3,10 @@ package com.example.productscanner.viewmodel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.productscanner.MainCoroutineRule
 import com.example.productscanner.data.domain.DomainProduct
-import com.example.productscanner.getOrAwaitValue
 import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.repositories.FakeTestRepository
 import com.example.productscanner.domainToNetwork
+import com.example.productscanner.getOrAwaitValue
 import com.example.productscanner.observeForTesting
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -24,7 +24,6 @@ import org.junit.Test
 class SharedViewModelTest{
 
     // Use a fake repository to be injected into the viewModel
-    // We can use the original one
     private lateinit var repository: FakeTestRepository
     // Subject under test
     private lateinit var sharedViewModel: SharedViewModel
