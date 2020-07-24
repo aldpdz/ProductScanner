@@ -15,5 +15,9 @@ interface IProductsRepository {
 
     suspend fun updateProduct(product: DomainProduct)
 
+    suspend fun findBySKU(sku: String): Result<DomainProduct>
+
+    suspend fun findByUPC(upc: String): Result<DomainProduct>
+
     fun addProducts(vararg products: DomainProduct) // just for testing
 }

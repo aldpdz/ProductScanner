@@ -76,6 +76,7 @@ class SharedViewModel @ViewModelInject constructor(
      * Set in the preferences that the data has been loaded
      */
     fun setFirstDataLoad(activity: Activity){
+        Log.i("SharedVM", "First data load")
         jobPreference =  CoroutineScope(Dispatchers.IO).launch {
             writeFirstLoad(activity)
         }

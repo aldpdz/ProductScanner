@@ -33,6 +33,21 @@ fun List<DatabaseProduct>.asDomainModel(): List<DomainProduct>{
     }
 }
 
+fun DatabaseProduct.asDomainModel(): DomainProduct{
+    return let {
+        DomainProduct(
+            id = it.id,
+            name = it.name,
+            description = it.description,
+            picture = it.picture,
+            sku = it.sku,
+            upc = it.upc,
+            quantity = it.quantity,
+            price = it.price
+        )
+    }
+}
+
 fun Result<List<DatabaseProduct>>.asDomainModel(): Result<List<DomainProduct>>{
     val content = let { result ->
         (result as Result.Success).data.asDomainModel()

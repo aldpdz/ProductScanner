@@ -9,6 +9,7 @@ import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.data.network.asDatabaseModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 
 class ProductLocalSource internal constructor(
     private val productDao: ProductDao,
@@ -26,5 +27,23 @@ class ProductLocalSource internal constructor(
 
     override suspend fun updateProduct(product: DomainProduct) = withContext(ioDispatcher){
         productDao.updateProduct(product.asDatabaseProduct())
+    }
+
+    override suspend fun getProductBySKU(sku: String): Result<DomainProduct> = withContext(ioDispatcher){
+        val product = productDao.getProductBySKU(sku)
+        return@withContext if(product != null){
+            Result.Success(product.asDomainModel())
+        }else{
+            Result.Error(Exception("Product not found"))
+        }
+    }
+
+    override suspend fun getProductByUPC(upc: String): Result<DomainProduct> = withContext(ioDispatcher){
+        val product = productDao.getProductByUPC(upc)
+        return@withContext if(product != null){
+            Result.Success(product.asDomainModel())
+        }else{
+            Result.Error(Exception("Product not found"))
+        }
     }
 }

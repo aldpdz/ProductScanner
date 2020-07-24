@@ -42,6 +42,14 @@ class ProductsRepository (
         productLocalSource.updateProduct(product)
     }
 
+    override suspend fun findBySKU(sku: String): Result<DomainProduct> {
+        return productLocalSource.getProductBySKU(sku)
+    }
+
+    override suspend fun findByUPC(upc: String): Result<DomainProduct> {
+        return productLocalSource.getProductByUPC(upc)
+    }
+
     // Just for testing
     override fun addProducts(vararg products: DomainProduct){}
 }

@@ -14,6 +14,18 @@ interface ProductDao {
     fun getProducts(): LiveData<List<DatabaseProduct>>
 
     /***
+     * Get the product by the sku code
+     */
+    @Query("SELECT * from products WHERE sku = :sku")
+    suspend fun getProductBySKU(sku: String): DatabaseProduct?
+
+    /***
+     * Get the product by the upc code
+     */
+    @Query("SELECT * from products WHERE upc = :upc")
+    suspend fun getProductByUPC(upc: String): DatabaseProduct?
+
+    /***
      * Insert a list of products. If the product already exists, replace it
      * @param products the list of products to be inserted
      */

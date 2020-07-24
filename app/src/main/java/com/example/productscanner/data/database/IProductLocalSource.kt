@@ -9,4 +9,6 @@ interface IProductLocalSource {
     suspend fun insertProducts(networkProducts: List<NetworkProduct>)
     fun getProducts(): LiveData<Result<List<DomainProduct>>>
     suspend fun updateProduct(product: DomainProduct)
+    suspend fun getProductBySKU(sku: String): Result<DomainProduct>
+    suspend fun getProductByUPC(upc: String): Result<DomainProduct>
 }

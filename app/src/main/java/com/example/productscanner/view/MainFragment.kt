@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -60,11 +61,11 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     private fun setObservers() {
-//        sharedViewModel.productsError.observe(viewLifecycleOwner, Observer { error ->
-//            error?.let{
-//                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-//            }
-//        })
+        sharedViewModel.productsError.observe(viewLifecycleOwner, Observer { error ->
+            error?.let{
+                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            }
+        })
         sharedViewModel.navigationToDetail.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {product ->
                 this.findNavController()
@@ -115,7 +116,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
                 true
             }
             R.id.refresh -> {
-//                sharedViewModel.refreshData()
+                sharedViewModel.refreshData()
                 true
             }
             R.id.action_search -> {

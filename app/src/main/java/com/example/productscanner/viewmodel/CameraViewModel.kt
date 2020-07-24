@@ -3,11 +3,14 @@ package com.example.productscanner.viewmodel
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.view.View
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.productscanner.data.Result
 import com.example.productscanner.data.domain.DomainProduct
+import com.example.productscanner.repositories.IProductsRepository
 import com.example.productscanner.util.Event
 import com.google.mlkit.vision.barcode.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScanner
@@ -20,17 +23,21 @@ import com.google.mlkit.vision.text.TextRecognizer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 
-enum class ScannerStatusItem {FOUND, NOT_FOUND}
+enum class ScannerStatusItem {FOUND}
 enum class ScannerStatus{TRY_AGAIN, FAIL}
 enum class TypeScanner {UPC, SKU}
 
-class CameraViewModel : ViewModel() {
+class CameraViewModel @ViewModelInject constructor(
+    private val repository: IProductsRepository
+): ViewModel() {
 
     // TODO method to listen permissions from the shared model
 
+    // Status when the product is found
     private val _scannerStatusItem = MutableLiveData<Event<ScannerStatusItem>>()
     val scannerStatusItem: LiveData<Event<ScannerStatusItem>> get() = _scannerStatusItem
 
+    // Status for the mlkit library
     private val _scannerStatus = MutableLiveData<Event<ScannerStatus>>()
     val scannerStatus: LiveData<Event<ScannerStatus>> get() = _scannerStatus
 
@@ -40,17 +47,14 @@ class CameraViewModel : ViewModel() {
     private val _bitMap = MutableLiveData<Bitmap>()
     val bitMap: LiveData<Bitmap> get() = _bitMap
 
-//    private var products: LiveData<List<DomainProduct>>? = null
-    var productByBarCode: DomainProduct? = null
+    private val _productByCode = MutableLiveData<Event<DomainProduct>>()
+    val productByCode: LiveData<Event<DomainProduct>> get() = _productByCode
+
     var typeScanner: TypeScanner? = null
 
     init {
         _btnVisibility.value = View.VISIBLE
     }
-
-//    fun setProducts(products: LiveData<List<NetworkProduct>>){
-//        this.products = products
-//    }
 
     // TODO instrumental test
     fun processInputImage(byteArray: ByteArray){
@@ -136,7 +140,18 @@ class CameraViewModel : ViewModel() {
 
 
     private fun getProduct(code: String){
-        // TODO - implement with room
+        viewModelScope.launch {
+            when(typeScanner){
+                TypeScanner.SKU -> {
+                    val result = repository.findBySKU(code)
+                    checkResult(result)
+                }
+                TypeScanner.UPC -> {
+                    val result = repository.findByUPC(code)
+                    checkResult(result)
+                }
+            }
+        }
 //        var found = false
 //        for(product in products?.value!!){
 //            when(typeScanner){
@@ -159,6 +174,14 @@ class CameraViewModel : ViewModel() {
 //        }else{
 //            _scannerStatusItem.value = Event(ScannerStatusItem.NOT_FOUND)
 //        }
+    }
+
+    private fun checkResult(result: Result<DomainProduct>){
+        if (result is Result.Success){
+            _productByCode.value = Event(result.data)
+        }else{
+            _scannerStatusItem.value = Event(ScannerStatusItem.FOUND)
+        }
     }
 
     fun hideButtons(){
