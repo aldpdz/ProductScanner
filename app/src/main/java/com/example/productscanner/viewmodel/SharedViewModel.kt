@@ -21,7 +21,8 @@ enum class LocalStatus {ERROR, SUCCESS}
 class SharedViewModel @ViewModelInject constructor(
     private val repository: IProductsRepository): ViewModel() {
     private var jobPreference: Job? = null
-    private var deferred: Deferred<List<Int>>? = null
+    private var deferredKeys: Deferred<List<Int>>? = null
+    private var deferredBoolean: Deferred<Boolean>? = null
     private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
         onError(throwable.localizedMessage)
     }
@@ -54,13 +55,21 @@ class SharedViewModel @ViewModelInject constructor(
      */
     fun firstDataLoad(activity: Activity){
         // true if it's the first time to load the data
-        jobPreference =  CoroutineScope(Dispatchers.IO).launch {
-            if(readFirstLoad(activity)){
-                Log.i("SharedViewModel", "First time to load data")
-                // TODO - call outside this coroutines
-                getProducts()
+        viewModelScope.launch {
+            val firstLoad = getFirstLoad(activity)
+            firstLoad?.let {
+                if(it){
+                    getProducts()
+                }
             }
         }
+    }
+
+    private suspend fun getFirstLoad(activity: Activity): Boolean{
+        deferredBoolean = CoroutineScope(Dispatchers.IO).async {
+            readFirstLoad(activity)
+        }
+        return deferredBoolean!!.await()
     }
 
     /***
@@ -118,14 +127,14 @@ class SharedViewModel @ViewModelInject constructor(
     }
 
     private suspend fun getIdsFromPreferences(activity: Activity): List<Int>{
-        deferred = CoroutineScope(Dispatchers.IO).async {
+        deferredKeys = CoroutineScope(Dispatchers.IO).async {
             getAllKeys(activity).toList().filter {
                 it.isDigitsOnly()
             }.map {
                 it.toInt()
             }
         }
-        return deferred!!.await()
+        return deferredKeys!!.await()
     }
 
     // TODO unit test instrumental
@@ -203,6 +212,6 @@ class SharedViewModel @ViewModelInject constructor(
     override fun onCleared() {
         super.onCleared()
         jobPreference?.cancel()
-        deferred?.cancel()
+        deferredKeys?.cancel()
     }
 }

@@ -60,12 +60,6 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     private fun setObservers() {
-        sharedViewModel.productsFiltered.observe(viewLifecycleOwner, Observer { productsList ->
-            productsList?.let {
-                Log.d("Change list", "")
-                adapter.submitList(productsList)
-            }
-        })
 //        sharedViewModel.productsError.observe(viewLifecycleOwner, Observer { error ->
 //            error?.let{
 //                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
@@ -78,7 +72,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
                         .actionMainFragmentToDetailProduct(product))
             }
         })
-        sharedViewModel.status.observe(viewLifecycleOwner, Observer {
+        sharedViewModel.networkStatus.observe(viewLifecycleOwner, Observer {
             it?.let {
                 if(it == ProductApiStatus.DONE){
                     this.activity?.let { activity -> sharedViewModel.setFirstDataLoad(activity) }
@@ -96,6 +90,12 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
             it?.let {
                 Log.i("MainFragment", "Starting to filter products")
                 sharedViewModel.filterProducts()
+            }
+        })
+        sharedViewModel.productsFiltered.observe(viewLifecycleOwner, Observer { productsList ->
+            productsList?.let {
+                Log.d("Change list", "")
+                adapter.submitList(productsList)
             }
         })
     }

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.productscanner.R
+import com.example.productscanner.viewmodel.LocalStatus
 import com.example.productscanner.viewmodel.ProductApiStatus
 
 @BindingAdapter("picture")
@@ -25,10 +26,10 @@ fun bindImage(imgView: ImageView, imgUrl: String?){
 }
 
 // TODO - maybe change to empty list
-@BindingAdapter("productApiStatus")
-fun bindStatus(statusImageView: ImageView, status: ProductApiStatus?){
-    when(status){
-        ProductApiStatus.ERROR -> {
+@BindingAdapter("localStatus")
+fun bindLocalStatus(statusImageView: ImageView, localStatus: LocalStatus?){
+    when(localStatus){
+        LocalStatus.ERROR -> {
             statusImageView.visibility = View.VISIBLE
             statusImageView.setImageResource(R.drawable.ic_connection_error)
         }
