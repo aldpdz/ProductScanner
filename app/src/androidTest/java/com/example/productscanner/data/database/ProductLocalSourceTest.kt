@@ -10,7 +10,7 @@ import com.example.productscanner.MainCoroutineRuleInstrumental
 import com.example.productscanner.data.Result
 import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.data.network.NetworkProduct
-import com.example.productscanner.getOrAwaitValue
+import com.example.productscanner.getOrAwaitValueInstrumental
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
@@ -71,7 +71,7 @@ class ProductLocalSourceTest{
             "upc-code", 0, 25.0f, false)
 
         // WHEN - Retrieve all the tasks
-        val result = localSource.getProducts().getOrAwaitValue()
+        val result = localSource.getProducts().getOrAwaitValueInstrumental()
         result as Result.Success
 
         // THEN - Same product is returned
@@ -91,7 +91,7 @@ class ProductLocalSourceTest{
 
         // WHEN - Update the product
         localSource.updateProduct(updateProduct)
-        val result = localSource.getProducts().getOrAwaitValue()
+        val result = localSource.getProducts().getOrAwaitValueInstrumental()
         result as Result.Success
 
         // THEN - The updated product is returned

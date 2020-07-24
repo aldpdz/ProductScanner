@@ -9,33 +9,20 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.example.productscanner.R
-import com.example.productscanner.di.ProductsRepositoryModule
+import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.launchFragmentInHiltContainer
-import com.example.productscanner.data.network.FakeAndroidTestRepository
-import com.example.productscanner.data.network.NetworkProduct
-import com.example.productscanner.repositories.IProductsRepository
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.UninstallModules
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @MediumTest // integration test
 @RunWith(AndroidJUnit4::class)
-@UninstallModules(ProductsRepositoryModule::class)
+//@UninstallModules(ProductsRepositoryModule::class)
 @HiltAndroidTest
 class DetailNetworkProductFragmentTest{
-
-    @Inject
-    lateinit var repository: IProductsRepository
 
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
@@ -48,7 +35,7 @@ class DetailNetworkProductFragmentTest{
     @Test
     fun displayCorrectDetail(){
         // GIVEN - A product
-        val product1 = NetworkProduct(
+        val product1 = DomainProduct(
             0,
             "Product1",
             "Description product1",
@@ -57,12 +44,7 @@ class DetailNetworkProductFragmentTest{
             "upc-product1",
             1,
             1.0f,
-            false
-        )
-
-        // Set initial state
-        // The initial state must be set before calling launch
-        repository.addProducts(product1)
+            false)
 
         // WHEN - Details fragment launched to display product
         val bundle = DetailProductFragmentArgs(product1).toBundle()
@@ -80,14 +62,5 @@ class DetailNetworkProductFragmentTest{
         onView(withId(R.id.et_quantity)).check(matches(withText("1")))
         onView(withId(R.id.et_price)).check(matches(withText("1.0")))
         // TODO check image
-    }
-
-    // Just for this class
-    @Module
-    @InstallIn(ApplicationComponent::class)
-    abstract class ProductsRepositoryTestModule{
-        @Singleton
-        @Binds
-        abstract fun bindProductsRepository(productsRepository: FakeAndroidTestRepository): IProductsRepository
     }
 }
