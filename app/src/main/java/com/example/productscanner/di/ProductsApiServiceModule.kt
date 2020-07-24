@@ -78,8 +78,9 @@ object ProductsRepositoryModule{
 
     @Singleton
     @Provides
-    fun provideProductRepository(productLocalSource: IProductLocalSource,
-                                 productRemoteSource: IProductRemoteSource): IProductsRepository{
+    fun provideProductRepository(
+        productLocalSource: IProductLocalSource,
+        productRemoteSource: IProductRemoteSource): IProductsRepository{
         return ProductsRepository(productLocalSource, productRemoteSource)
     }
 }
