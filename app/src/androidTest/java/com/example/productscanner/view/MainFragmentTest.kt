@@ -18,46 +18,47 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.example.productscanner.R
+import com.example.productscanner.*
+import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.di.ProductsRepositoryModule
-import com.example.productscanner.launchFragmentInHiltContainer
-import com.example.productscanner.data.network.FakeAndroidTestRepository
 import com.example.productscanner.data.network.NetworkProduct
+import com.example.productscanner.repositories.FakeTestRepository
 import com.example.productscanner.repositories.IProductsRepository
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
+@ExperimentalCoroutinesApi
 @UninstallModules(ProductsRepositoryModule::class)
 @HiltAndroidTest
 class MainFragmentTest{
-    @Inject
-    lateinit var repository: IProductsRepository
 
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
+
+    @BindValue
+    @JvmField// avoid issues with Hilt
+    val repository: IProductsRepository = FakeTestRepository()
 
     @Before
     fun initRepository(){
         hiltRule.inject()
     }
 
+    // TODO add an extension function for runBlocking
     @Test
     fun displayProduct_whenRepositoryHasData(){
-        val product1 = NetworkProduct(
+        val networkProduct1 = NetworkProduct(
             1,
             "Product1",
             "Description product1",
@@ -65,11 +66,11 @@ class MainFragmentTest{
             "sku-product1",
             "upc-product1",
             1,
-            1.0f,
-            false
-        )
+            1.0f)
 
-        repository.addProducts(product1)
+        runBlocking {
+            repository.saveProducts(listOf(networkProduct1))
+        }
 
         // WHEN - On startup
         launchActivity()
@@ -79,9 +80,18 @@ class MainFragmentTest{
     }
 
     @Test
+    fun displayError_whenRepositoryHasNoData(){
+        // WHEN - On startup
+        launchActivity()
+
+        // THEN - Verify that the error image is load
+        onView(withId(R.id.statusProducts)).check(matches(isDisplayed()))
+    }
+
+    @Test
     fun displayFilterProducts(){
         // GIVEN - two products
-        val product1 = NetworkProduct(
+        val networkProduct1 = NetworkProduct(
             1,
             "Product1",
             "Description product1",
@@ -89,11 +99,9 @@ class MainFragmentTest{
             "sku-product1",
             "upc-product1",
             1,
-            1.0f,
-            false
-        )
+            1.0f)
 
-        val product2 = NetworkProduct(
+        val networkProduct2 = NetworkProduct(
             2,
             "Product2",
             "Description product2",
@@ -101,11 +109,11 @@ class MainFragmentTest{
             "sku-product2",
             "upc-product2",
             2,
-            2.0f,
-            true
-        )
+            2.0f)
 
-        repository.addProducts(product1, product2)
+        runBlocking {
+            repository.saveProducts(listOf(networkProduct1, networkProduct2))
+        }
 
         // WHEN - On startup
         launchActivity()
@@ -120,7 +128,27 @@ class MainFragmentTest{
 
     @Test
     fun clickProduct_navigateToDetailFragment(){
-        val product1 = NetworkProduct(
+        val networkProduct1 = NetworkProduct(
+            1,
+            "Product1",
+            "Description product1",
+            "Path image",
+            "sku-product1",
+            "upc-product1",
+            1,
+            1.0f)
+
+        val networkProduct2 = NetworkProduct(
+            2,
+            "Product2",
+            "Description product2",
+            "Path image",
+            "sku-product2",
+            "upc-product2",
+            2,
+            2.0f)
+
+        val product = DomainProduct(
             1,
             "Product1",
             "Description product1",
@@ -129,22 +157,11 @@ class MainFragmentTest{
             "upc-product1",
             1,
             1.0f,
-            false
-        )
+            false)
 
-        val product2 = NetworkProduct(
-            2,
-            "Product2",
-            "Description product2",
-            "Path image",
-            "sku-product2",
-            "upc-product2",
-            2,
-            2.0f,
-            true
-        )
-
-        repository.addProducts(product1, product2)
+        runBlocking {
+            repository.saveProducts(listOf(networkProduct1, networkProduct2))
+        }
 
         // GIVEN - On the home screen
         val navController = mock(NavController::class.java)
@@ -157,14 +174,13 @@ class MainFragmentTest{
 
         // THEN - Verify that we navigate to the detail screen
         verify(navController).navigate(
-            MainFragmentDirections.actionMainFragmentToDetailProduct(product1)
+            MainFragmentDirections.actionMainFragmentToDetailProduct(product)
         )
     }
 
     @Test
     fun clickScanner_navigateToCameraFragment(){
         // GIVEN - On the home screen
-
         val context: Context = getApplicationContext<Context>()
         val addMenuItem = ActionMenuItem(context, 0, R.id.scan, 0, 0, null)
 
@@ -189,16 +205,9 @@ class MainFragmentTest{
         activityScenario.onActivity { activity ->
             // Disable animation in RecyclerView
             (activity.findViewById(R.id.rv_products) as RecyclerView).itemAnimator = null
+            // Clear all preferences
+            clearSharedPrefs(activity)
         }
         return activityScenario
-    }
-
-    // Just for this class
-    @Module
-    @InstallIn(ApplicationComponent::class)
-    abstract class ProductsRepositoryTestModule{
-        @Singleton
-        @Binds
-        abstract fun bindProductsRepository(productsRepository: FakeAndroidTestRepository): IProductsRepository
     }
 }

@@ -37,6 +37,7 @@ import androidx.test.core.app.ApplicationProvider
 inline fun <reified T : Fragment> launchFragmentInHiltContainer(
     fragmentArgs: Bundle? = null,
     @StyleRes themeResId: Int = R.style.FragmentScenarioEmptyFragmentActivityTheme,
+    clearPreferences: Boolean = true,
     crossinline action: Fragment.() -> Unit = {}
 ) {
     val startActivityIntent = Intent.makeMainActivity(
@@ -51,6 +52,10 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
             Preconditions.checkNotNull(T::class.java.classLoader),
             T::class.java.name
         )
+        if(clearPreferences){
+            clearSharedPrefs(activity)
+        }
+
         fragment.arguments = fragmentArgs
         activity.supportFragmentManager
             .beginTransaction()
