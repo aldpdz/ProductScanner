@@ -5,7 +5,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
-import com.example.productscanner.getOrAwaitValue
+import com.example.productscanner.getOrAwaitValueInstrumental
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.notNullValue
@@ -53,8 +53,8 @@ class ProductDaoTest {
         val productsSaved = database.productDao.getProducts()
 
         // THEN - The saved data contains the expected values.
-        assertThat<DatabaseProduct>(productsSaved.getOrAwaitValue()[0], notNullValue())
-        assertThat(productsSaved.getOrAwaitValue()[0], IsEqual(product))
+        assertThat<DatabaseProduct>(productsSaved.getOrAwaitValueInstrumental()[0], notNullValue())
+        assertThat(productsSaved.getOrAwaitValueInstrumental()[0], IsEqual(product))
     }
 
     @Test
@@ -73,7 +73,7 @@ class ProductDaoTest {
         val productsSaved = database.productDao.getProducts()
 
         // THEN - The product has been updated
-        assertThat<DatabaseProduct>(productsSaved.getOrAwaitValue()[0], notNullValue())
-        assertThat(productsSaved.getOrAwaitValue()[0], IsEqual(updatedProduct))
+        assertThat<DatabaseProduct>(productsSaved.getOrAwaitValueInstrumental()[0], notNullValue())
+        assertThat(productsSaved.getOrAwaitValueInstrumental()[0], IsEqual(updatedProduct))
     }
 }
