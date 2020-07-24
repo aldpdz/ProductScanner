@@ -19,16 +19,22 @@ android {
         multiDexEnabled true // Past the limitations of the DEX bytecode file
 
         testInstrumentationRunner "com.example.productscanner.CustomTestRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.incremental" : "true"]
+            }
+        }
     }
 
     android {
         sourceSets{
             String sharedTestDir = 'src/sharedTest/java'
             test{
-                java.srcDir sharedTestDir
+                java.srcDirs += sharedTestDir
             }
             androidTest{
-                java.srcDir sharedTestDir
+                java.srcDirs += sharedTestDir
             }
         }
     }
@@ -56,12 +62,14 @@ android {
         jvmTarget = "1.8"
     }
 
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding = true
     }
 
     testOptions{
-        unitTests.returnDefaultValues = true // to load image in test unit
+        // solves the error exceptions in unit tests with Log
+        // consider use Mockito to mock the Log
+        unitTests.returnDefaultValues = true
     }
 }
 

@@ -9,18 +9,14 @@ import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.data.domain.asDatabaseProduct
 import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.data.network.asDatabaseModel
+import javax.inject.Inject
 
-class FakeTestRepository(
-    private var networkProducts: MutableList<NetworkProduct>
-): IProductsRepository {
+class FakeTestRepository: IProductsRepository {
+    private var networkProducts: MutableList<NetworkProduct> = ArrayList()
     private var databaseProducts: MutableList<DatabaseProduct> = ArrayList()
     private var shouldReturnError = false
     private var _liveDataDBProducts = MutableLiveData<Result<List<DomainProduct>>>()
     private val liveDataDBProduct : LiveData<Result<List<DomainProduct>>> get() = _liveDataDBProducts
-
-    init {
-        setLocalData()
-    }
 
     fun setReturnError(value: Boolean){
         shouldReturnError = value
@@ -28,6 +24,7 @@ class FakeTestRepository(
 
     override suspend fun getProductsFromRemote(){
         if(shouldReturnError){
+            setLocalData()
             throw Exception()
         }
         databaseProducts = networkProducts.asDatabaseModel().toMutableList()

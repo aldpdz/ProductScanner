@@ -9,6 +9,7 @@ import com.example.productscanner.repositories.FakeTestRepository
 import com.example.productscanner.domainToNetwork
 import com.example.productscanner.observeForTesting
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.nullValue
@@ -83,7 +84,7 @@ class SharedViewModelTest{
         )
 
         // WHEN - calling displayNavigationToDetail
-        repository = FakeTestRepository(ArrayList())
+        repository = FakeTestRepository()
         sharedViewModel = SharedViewModel(repository)
         sharedViewModel.displayNavigationToDetail(product1)
 
@@ -98,7 +99,8 @@ class SharedViewModelTest{
         // Pause dispatcher so you can verify initial values
         mainCoroutineRule.pauseDispatcher()
 
-        repository = FakeTestRepository(networkProducts.toMutableList())
+        repository = FakeTestRepository()
+        runBlocking { repository.saveProducts(networkProducts) }
         sharedViewModel = SharedViewModel(repository)
         sharedViewModel.refreshData()
 
@@ -129,7 +131,8 @@ class SharedViewModelTest{
     @Test
     fun callGetProducts_Failure(){
         // When - There is an error loading de data from the remote source
-        repository = FakeTestRepository(networkProducts.toMutableList())
+        repository = FakeTestRepository()
+        runBlocking { repository.saveProducts(networkProducts) }
         repository.setReturnError(true)
         sharedViewModel = SharedViewModel(repository)
         sharedViewModel.refreshData()
@@ -152,7 +155,8 @@ class SharedViewModelTest{
 
     @Test
     fun refresh_Success() = runBlockingTest{
-        repository = FakeTestRepository(networkProducts.toMutableList())
+        repository = FakeTestRepository()
+        runBlocking { repository.saveProducts(networkProducts) }
         sharedViewModel = SharedViewModel(repository)
         sharedViewModel.refreshData()
 
@@ -181,7 +185,8 @@ class SharedViewModelTest{
 
     @Test
     fun refresh_Failure() = runBlockingTest{
-        repository = FakeTestRepository(networkProducts.toMutableList())
+        repository = FakeTestRepository()
+        runBlocking { repository.saveProducts(networkProducts) }
         sharedViewModel = SharedViewModel(repository)
         sharedViewModel.refreshData()
 
@@ -229,7 +234,8 @@ class SharedViewModelTest{
 
     @Test
     fun queryProducts_nullOrEmptyQueryListProducts_allProducts(){
-        repository = FakeTestRepository(networkProducts.toMutableList())
+        repository = FakeTestRepository()
+        runBlocking { repository.saveProducts(networkProducts) }
         sharedViewModel = SharedViewModel(repository)
         sharedViewModel.refreshData()
 
@@ -245,7 +251,8 @@ class SharedViewModelTest{
 
     @Test
     fun queryProducts_queryListProducts_productsFiltered(){
-        repository = FakeTestRepository(networkProducts.toMutableList())
+        repository = FakeTestRepository()
+        runBlocking { repository.saveProducts(networkProducts) }
         sharedViewModel = SharedViewModel(repository)
         sharedViewModel.refreshData()
 
@@ -264,7 +271,7 @@ class SharedViewModelTest{
     @Test
     fun queryProducts_queryNoProducts_null() {
         // WHEN - there are not products and a valid string query
-        repository = FakeTestRepository(ArrayList())
+        repository = FakeTestRepository()
         sharedViewModel = SharedViewModel(repository)
         sharedViewModel.refreshData()
 
@@ -282,7 +289,7 @@ class SharedViewModelTest{
     @Test
     fun queryProducts_nullOrEmptyQueryNoProducts_null(){
         // WHEN - there are not products and not a valid query
-        repository = FakeTestRepository(ArrayList())
+        repository = FakeTestRepository()
         sharedViewModel = SharedViewModel(repository)
         sharedViewModel.refreshData()
 
@@ -300,8 +307,9 @@ class SharedViewModelTest{
     @Test
     fun noProductsInDatabase(){
         // WHEN - there are not products in the database
-        repository = FakeTestRepository(emptyList<NetworkProduct>().toMutableList())
+        repository = FakeTestRepository()
         sharedViewModel = SharedViewModel(repository)
+        sharedViewModel.refreshData()
 
         sharedViewModel.products.observeForTesting {
             val localStatus = sharedViewModel.localStatus.getOrAwaitValue()
