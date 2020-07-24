@@ -3,13 +3,14 @@ package com.example.productscanner.repositories
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.productscanner.data.Result
 import com.example.productscanner.data.database.FakeProductLocalSource
-import com.example.productscanner.data.database.IProductLocalSource
 import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.data.network.*
 import com.example.productscanner.domainToNetwork
 import com.example.productscanner.getOrAwaitValue
+import com.example.productscanner.networkToDomain
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.collection.IsEmptyCollection
 import org.hamcrest.core.IsEqual
 import org.junit.Assert.*
@@ -50,7 +51,7 @@ class ProductsRepositoryTest{
     private val productsRemote = listOf(product1, product2)
 
     private lateinit var remoteSource: FakeProductRemoteSource
-    private lateinit var localSource: IProductLocalSource
+    private lateinit var localSource: FakeProductLocalSource
     private lateinit var repository: IProductsRepository
 
     @Before
@@ -132,5 +133,42 @@ class ProductsRepositoryTest{
 
         // Then there are not products in the local source
         assertThat(result.data, IsEmptyCollection())
+    }
+
+    @Test
+    fun getProductBySKU_Success() = runBlockingTest{
+        // GIVEN - Two products in the local source
+        repository.saveProducts(productsRemote)
+
+        // WHEN - Searching by sku code
+        val result = repository.findBySKU("sku-product1")
+        result as Result.Success
+
+        // THEN - The result is the product1
+        assertThat(result.data, IsEqual(networkToDomain(product1)))
+    }
+
+    @Test
+    fun getProductBySKU_Fail() = runBlockingTest{
+        // WHEN - There are not matches in the search
+        localSource.setReturnError(true)
+        val result = repository.findBySKU("sku-product1")
+        result as Result.Error
+
+        // THEN - There is an exception
+        assertThat(result.exception, instanceOf(Exception::class.java))
+    }
+
+    @Test
+    fun getProductByUPC_Success() = runBlockingTest{
+        // GIVEN - Two products in the local source
+        repository.saveProducts(productsRemote)
+
+        // WHEN - Searching by upc code
+        val result = repository.findByUPC("upc-product1")
+        result as Result.Success
+
+        // THEN - The result is the product1
+        assertThat(result.data, IsEqual(networkToDomain(product1)))
     }
 }

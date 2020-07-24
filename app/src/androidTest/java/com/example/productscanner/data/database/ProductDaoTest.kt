@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual
+import org.hamcrest.core.IsNull
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -53,7 +54,7 @@ class ProductDaoTest {
         val productsSaved = database.productDao.getProducts()
 
         // THEN - The saved data contains the expected values.
-        assertThat<DatabaseProduct>(productsSaved.getOrAwaitValueInstrumental()[0], notNullValue())
+        assertThat(productsSaved.getOrAwaitValueInstrumental()[0], notNullValue())
         assertThat(productsSaved.getOrAwaitValueInstrumental()[0], IsEqual(product))
     }
 
@@ -73,7 +74,73 @@ class ProductDaoTest {
         val productsSaved = database.productDao.getProducts()
 
         // THEN - The product has been updated
-        assertThat<DatabaseProduct>(productsSaved.getOrAwaitValueInstrumental()[0], notNullValue())
+        assertThat(productsSaved.getOrAwaitValueInstrumental()[0], notNullValue())
         assertThat(productsSaved.getOrAwaitValueInstrumental()[0], IsEqual(updatedProduct))
+    }
+
+    @Test
+    fun getProductBySKU_productFound() = runBlockingTest{
+        // GIVEN - Two Products.
+        val product1 = DatabaseProduct(
+            1, "Product1", "Description", "Picture", "sku-code1",
+            "upc-code1", 25, 15.0f)
+        val product2 = DatabaseProduct(
+            2, "Product2", "Description", "Picture", "sku-code2",
+            "upc-code2", 25, 15.0f)
+        database.productDao.insertAll(listOf(product1, product2))
+
+        // WHEN - Searching a product by sku code
+        val result = database.productDao.getProductBySKU("sku-code1")
+
+        // THEN - The result is the product1
+        assertThat(result, IsEqual(product1))
+    }
+
+    @Test
+    fun getProductBySKU_productNotFound() = runBlockingTest{
+        // GIVEN - One Products.
+        val product1 = DatabaseProduct(
+            1, "Product1", "Description", "Picture", "sku-code1",
+            "upc-code1", 25, 15.0f)
+        database.productDao.insertAll(listOf(product1))
+
+        // WHEN - Searching a product by sku code
+        val result = database.productDao.getProductBySKU("sku-code2")
+
+        // THEN - The result is the product1
+        assertThat(result, IsNull())
+    }
+
+    @Test
+    fun getProductByUPC_productFound() = runBlockingTest{
+        // GIVEN - Two Products.
+        val product1 = DatabaseProduct(
+            1, "Product1", "Description", "Picture", "sku-code1",
+            "upc-code1", 25, 15.0f)
+        val product2 = DatabaseProduct(
+            2, "Product2", "Description", "Picture", "sku-code2",
+            "upc-code2", 25, 15.0f)
+        database.productDao.insertAll(listOf(product1, product2))
+
+        // WHEN - Searching a product by upc code
+        val result = database.productDao.getProductByUPC("upc-code1")
+
+        // THEN - The result is the product1
+        assertThat(result, IsEqual(product1))
+    }
+
+    @Test
+    fun getProductByUPC_productNotFound() = runBlockingTest{
+        // GIVEN - One Products.
+        val product1 = DatabaseProduct(
+            1, "Product1", "Description", "Picture", "sku-code1",
+            "upc-code1", 25, 15.0f)
+        database.productDao.insertAll(listOf(product1))
+
+        // WHEN - Searching a product by sku code
+        val result = database.productDao.getProductByUPC("upc-code2")
+
+        // THEN - The result is the product1
+        assertThat(result, IsNull())
     }
 }

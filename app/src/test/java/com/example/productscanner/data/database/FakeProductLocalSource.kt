@@ -11,6 +11,13 @@ import com.example.productscanner.data.network.asDatabaseModel
 class FakeProductLocalSource :
     IProductLocalSource{
     private var products = hashMapOf<Int, DatabaseProduct>()
+
+    private var shouldReturnError = false
+
+    fun setReturnError(value: Boolean){
+        shouldReturnError = value
+    }
+
     override suspend fun insertProducts(networkProducts: List<NetworkProduct>) {
         val listProducts = networkProducts.asDatabaseModel()
         for (databaseProduct in listProducts){
@@ -27,5 +34,21 @@ class FakeProductLocalSource :
 
     override suspend fun updateProduct(product: DomainProduct) {
         products[product.id] = product.asDatabaseProduct()
+    }
+
+    override suspend fun getProductBySKU(sku: String): Result<DomainProduct> {
+        return if (shouldReturnError){
+            Result.Error(Exception("Product not found"))
+        }else{
+            Result.Success(products.values.first{it.sku == sku}.asDomainModel())
+        }
+    }
+
+    override suspend fun getProductByUPC(upc: String): Result<DomainProduct> {
+        return if (shouldReturnError){
+            Result.Error(Exception("Product not found"))
+        }else{
+            Result.Success(products.values.first{it.upc == upc}.asDomainModel())
+        }
     }
 }

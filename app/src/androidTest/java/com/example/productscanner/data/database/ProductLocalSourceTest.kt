@@ -11,6 +11,7 @@ import com.example.productscanner.data.Result
 import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.getOrAwaitValueInstrumental
+import com.example.productscanner.networkToDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
@@ -96,5 +97,41 @@ class ProductLocalSourceTest{
 
         // THEN - The updated product is returned
         assertThat(result.data[0], IsEqual(updateProduct))
+    }
+
+    @Test
+    fun getProductByUPC() = runBlockingTest{
+        // GIVEN - Two products
+        val networkProduct1 = NetworkProduct(
+            0, "product1", "description", "picture", "sku-code1",
+            "upc-code1", 0, 25.0f)
+        val networkProduct2 = NetworkProduct(
+            0, "product2", "description", "picture", "sku-code2",
+            "upc-code2", 0, 25.0f)
+        localSource.insertProducts(listOf(networkProduct1, networkProduct2))
+
+        // WHEN - Searching product2 by upc code
+        val result = localSource.getProductByUPC("upc-code2") as Result.Success
+
+        // THEN - The product is product2
+        assertThat(result.data, IsEqual(networkToDomain(networkProduct2)))
+    }
+
+    @Test
+    fun getProductBySKU() = runBlockingTest{
+        // GIVEN - Two products
+        val networkProduct1 = NetworkProduct(
+            0, "product1", "description", "picture", "sku-code1",
+            "upc-code1", 0, 25.0f)
+        val networkProduct2 = NetworkProduct(
+            0, "product2", "description", "picture", "sku-code2",
+            "upc-code2", 0, 25.0f)
+        localSource.insertProducts(listOf(networkProduct1, networkProduct2))
+
+        // WHEN - Searching product2 by sku code
+        val result = localSource.getProductBySKU("sku-code2") as Result.Success
+
+        // THEN - The product is product2
+        assertThat(result.data, IsEqual(networkToDomain(networkProduct2)))
     }
 }

@@ -9,7 +9,6 @@ import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.data.domain.asDatabaseProduct
 import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.data.network.asDatabaseModel
-import javax.inject.Inject
 
 class FakeTestRepository: IProductsRepository {
     private var networkProducts: MutableList<NetworkProduct> = ArrayList()
@@ -45,6 +44,22 @@ class FakeTestRepository: IProductsRepository {
                 databaseProducts[index] = product.asDatabaseProduct()
                 setLocalData()
             }
+        }
+    }
+
+    override suspend fun findBySKU(sku: String): Result<DomainProduct> {
+        return if(shouldReturnError){
+            Result.Error(Exception("Product not found"))
+        }else{
+            Result.Success(databaseProducts.first { it.sku == sku }.asDomainModel())
+        }
+    }
+
+    override suspend fun findByUPC(upc: String): Result<DomainProduct> {
+        return if(shouldReturnError){
+            Result.Error(Exception("Product not found"))
+        }else{
+            Result.Success(databaseProducts.first { it.upc == upc }.asDomainModel())
         }
     }
 
