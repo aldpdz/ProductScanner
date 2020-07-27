@@ -57,7 +57,7 @@ class SharedViewModel @ViewModelInject constructor(
         // true if it's the first time to load the data
         viewModelScope.launch {
             val firstLoad = getFirstLoad(activity)
-            firstLoad?.let {
+            firstLoad.let {
                 if(it){
                     getProducts()
                 }
@@ -98,10 +98,10 @@ class SharedViewModel @ViewModelInject constructor(
             try {
                 repository.getProductsFromRemote()
                 _productsError.value = null
-            }catch (e: Exception){
-                onError("The data couldn't be loaded")
-            }finally {
                 _networkStatus.value = ProductApiStatus.DONE
+            }catch (e: Exception){
+                _networkStatus.value = ProductApiStatus.ERROR
+                onError("The data couldn't be loaded")
             }
         }
     }

@@ -19,8 +19,6 @@
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:id="@+id/rv_products"/>
-<!--            app:productApiStatusRecycler="@{viewModel.status}"-->
-<!--            tools:visibility="gone"/>-->
 
         <ProgressBar
             android:id="@+id/progressBar"
