@@ -9,6 +9,8 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
+import com.example.productscanner.DataBindingIdlingResource
 import com.example.productscanner.R
 import com.example.productscanner.clearSharedPrefs
 import com.example.productscanner.di.ProductsRepositoryModule
@@ -35,6 +37,9 @@ class MainActivityTest{
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
+    // An idling resource that waits for Data Binding to have no pending bindings.
+    private val dataBindingIdlingResource = DataBindingIdlingResource()
+
     @BindValue
     @JvmField
     val repository: IProductsRepository = FakeTestRepository()
@@ -43,6 +48,30 @@ class MainActivityTest{
     fun initRepository(){
         hiltRule.inject()
     }
+
+    @Before
+    fun deletePreferences(){
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        clearSharedPrefs(context)
+    }
+
+//    /***
+//     * Idling resources tell Espresso that the app is idle or busy. This is needed when operations
+//     * are not scheduled in the main Looper (for example when executed on a different thread).
+//     */
+//    @Before
+//    fun registerIdlingResource(){
+//        IdlingRegistry.getInstance().register(dataBindingIdlingResource)
+//    }
+//
+//    /***
+//     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
+//     */
+//    @After
+//    fun unregisterIdlingResource(){
+//        IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
+//    }
+//
     // TODO - Add idle
     @Test
     fun editPriceQuantity(){
@@ -68,10 +97,6 @@ class MainActivityTest{
 
         // Start up Products screen.
         val activityScenario = ActivityScenario.launch(MainActivity::class.java)
-        activityScenario.onActivity { activity ->
-            // Clear preferences
-            clearSharedPrefs(activity)
-        }
 
         // Click on the product on the list and verify that all the data is correct.
         onView(withText("Product1")).perform(click())
