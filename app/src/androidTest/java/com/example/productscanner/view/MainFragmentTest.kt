@@ -18,6 +18,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.example.productscanner.*
 import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.di.ProductsRepositoryModule
@@ -55,6 +56,12 @@ class MainFragmentTest{
         hiltRule.inject()
     }
 
+    @Before
+    fun deletePreferences(){
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        clearSharedPrefs(context)
+    }
+
     // TODO add an extension function for runBlocking
     @Test
     fun displayProduct_whenRepositoryHasData(){
@@ -86,6 +93,72 @@ class MainFragmentTest{
 
         // THEN - Verify that the error image is load
         onView(withId(R.id.statusProducts)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun displayProduct_refresh(){
+        val networkProduct1 = NetworkProduct(
+            1,
+            "Product1",
+            "Description product1",
+            "Path image",
+            "sku-product1",
+            "upc-product1",
+            1,
+            1.0f)
+
+        // WHEN - There is an error connexion
+        runBlocking {
+            repository.saveProducts(listOf(networkProduct1))
+            (repository as FakeTestRepository).setReturnError(true)
+        }
+
+        launchActivity()
+
+        // THEN - The error should be shown
+        onView(withId(R.id.statusProducts)).check(matches(isDisplayed()))
+
+        // WHEN - There connexion is back
+        (repository as FakeTestRepository).setReturnError(false)
+        // Refresh the data
+        openActionBarOverflowOrOptionsMenu(getApplicationContext())
+        onView(withText(R.string.refresh)).perform(click())
+
+        // THEN - There must be product1 displayed
+        onView(withText("Product1")).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun displayProduct_noConnexion_connexionBack(){
+        val networkProduct1 = NetworkProduct(
+            1,
+            "Product1",
+            "Description product1",
+            "Path image",
+            "sku-product1",
+            "upc-product1",
+            1,
+            1.0f)
+
+        // WHEN - There is an error connexion
+        runBlocking {
+            repository.saveProducts(listOf(networkProduct1))
+            (repository as FakeTestRepository).setReturnError(true)
+        }
+
+        val activityScenario = launchActivity()
+
+        // THEN - The error should be shown
+        onView(withId(R.id.statusProducts)).check(matches(isDisplayed()))
+
+        // WHEN - There connexion is back
+        (repository as FakeTestRepository).setReturnError(false)
+
+        // Restart the activity
+        activityScenario?.recreate()
+
+        // THEN - There must be product1 displayed
+        onView(withText("Product1")).check(matches(isDisplayed()))
     }
 
     @Test
@@ -205,8 +278,6 @@ class MainFragmentTest{
         activityScenario.onActivity { activity ->
             // Disable animation in RecyclerView
             (activity.findViewById(R.id.rv_products) as RecyclerView).itemAnimator = null
-            // Clear all preferences
-            clearSharedPrefs(activity)
         }
         return activityScenario
     }

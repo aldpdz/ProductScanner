@@ -1,9 +1,9 @@
 package com.example.productscanner
 
-import android.app.Activity
 import android.content.Context
+import com.example.productscanner.util.SHARE_FILE
 
-fun clearSharedPrefs(activity: Activity){
-    val pref = activity.getPreferences(Context.MODE_PRIVATE)
+fun clearSharedPrefs(context: Context){
+    val pref = context.getSharedPreferences(SHARE_FILE, Context.MODE_PRIVATE)
     pref.edit().clear().commit()
 }
