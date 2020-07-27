@@ -38,7 +38,6 @@ class CameraFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.cameraView.setLifecycleOwner(viewLifecycleOwner)
 
-        viewModel.setProducts(shareViewModel.products)
         binding.viewModel = viewModel
 
         hidePreview()
@@ -73,20 +72,31 @@ class CameraFragment : Fragment() {
         // The scanner was successful
         viewModel.scannerStatusItem.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {scannerStatusItem ->
-                when(scannerStatusItem){
-                    ScannerStatusItem.FOUND -> {
-                        viewModel.productByBarCode?.let { product ->
-                            this.findNavController()
-                                .navigate(CameraFragmentDirections
-                                    .actionCameraxToDetailProduct(product))
-                        }
-                    }
-                    ScannerStatusItem.NOT_FOUND -> {
-                        // TODO add to string resources
-                        Toast.makeText(context, "Item not found",Toast.LENGTH_LONG).show()
-                        hidePreview()
-                    }
-                }
+                // TODO add to string resources
+                Toast.makeText(context, "Item not found",Toast.LENGTH_LONG).show()
+                hidePreview()
+//                when(scannerStatusItem){
+//                    ScannerStatusItem.FOUND -> {
+//                        viewModel.productByCode?.let { product ->
+//                            this.findNavController()
+//                                .navigate(CameraFragmentDirections
+//                                    .actionCameraxToDetailProduct(product))
+//                        }
+//                    }
+//                    ScannerStatusItem.NOT_FOUND -> {
+//                        // TODO add to string resources
+//                        Toast.makeText(context, "Item not found",Toast.LENGTH_LONG).show()
+//                        hidePreview()
+//                    }
+//                }
+            }
+        })
+
+        viewModel.productByCode.observe(viewLifecycleOwner, Observer { it ->
+            it.getContentIfNotHandled()?.let{product ->
+                this.findNavController()
+                    .navigate(CameraFragmentDirections
+                        .actionCameraxToDetailProduct(product))
             }
         })
 

@@ -2,12 +2,18 @@ package com.example.productscanner.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.productscanner.MainCoroutineRule
-import com.example.productscanner.getOrAwaitValue
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.domain.DomainProduct
+import com.example.productscanner.data.network.NetworkProduct
 import com.example.productscanner.repositories.FakeTestRepository
+import com.example.productscanner.domainToNetwork
+import com.example.productscanner.getOrAwaitValue
+import com.example.productscanner.observeForTesting
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.collection.IsEmptyCollection
 import org.hamcrest.core.IsEqual
 import org.junit.Assert.*
 import org.junit.Before
@@ -21,7 +27,7 @@ class SharedViewModelTest{
     private lateinit var repository: FakeTestRepository
     // Subject under test
     private lateinit var sharedViewModel: SharedViewModel
-    private lateinit var listProducts: List<Product>
+    private lateinit var networkProducts: List<NetworkProduct>
 
     // Executes each task synchronously using Architecture Components.
     // Runs all the Architecture Components-related background jobs in the same
@@ -36,52 +42,35 @@ class SharedViewModelTest{
 
     @Before
     fun setupViewModel(){
-        // We initialise the products, with two saved products
-        repository = FakeTestRepository()
         // Fake products
-        val product1 = Product(
+        val product1 = NetworkProduct(
             1,
-            "Product1 query",
+            "Product1",
             "Description product1",
             "Path image",
             "sku-product1",
             "upc-product1",
             1,
-            1.0f,
-            false
+            1.0f
         )
 
-        val product2 = Product(
+        val product2 = NetworkProduct(
             2,
-            "Product2",
+            "Product2 query",
             "Description product2",
             "Path image",
             "sku-product2",
             "upc-product2",
             2,
-            2.0f,
-            true
-        )
+            2.0f)
 
-        val product3 = Product(
-            3,
-            "Product3",
-            "Description product3",
-            "Path image",
-            "sku-product3",
-            "upc-product3",
-            3,
-            3.0f,
-            true
-        )
-        listProducts = listOf(product1, product2, product3)
-        repository.addProducts(product1, product2, product3)
+        networkProducts = listOf(product1, product2)
     }
 
     @Test
     fun displayNavigationToDetail(){
         // GIVEN - a product
-        val product1 = Product(
+        val product1 = DomainProduct(
             1,
             "Product1",
             "Description product1",
@@ -94,6 +83,7 @@ class SharedViewModelTest{
         )
 
         // WHEN - calling displayNavigationToDetail
+        repository = FakeTestRepository()
         sharedViewModel = SharedViewModel(repository)
         sharedViewModel.displayNavigationToDetail(product1)
 
@@ -105,52 +95,74 @@ class SharedViewModelTest{
 
     @Test
     fun callGetProducts_Success(){
-        sharedViewModel =  SharedViewModel(repository)
+        // Pause dispatcher so you can verify initial values
+        mainCoroutineRule.pauseDispatcher()
+
+        repository = FakeTestRepository()
+        runBlocking { repository.saveProducts(networkProducts) }
+        sharedViewModel = SharedViewModel(repository)
+        sharedViewModel.refreshData()
+
+        sharedViewModel.products.observeForTesting {
+            // The operation has an network status LOADING
+            assertThat(sharedViewModel.networkStatus.getOrAwaitValue(), `is`(ProductApiStatus.LOADING))
+        }
+
+        // Execute pending coroutines actions
+        mainCoroutineRule.resumeDispatcher()
 
         // Then the products must be loaded from the repository
         val products = sharedViewModel.products.getOrAwaitValue()
-        val loadPreference = sharedViewModel.loadPreference.getOrAwaitValue()
         val productsError = sharedViewModel.productsError.getOrAwaitValue()
-        val status = sharedViewModel.status.getOrAwaitValue()
+        val networkStatus = sharedViewModel.networkStatus.getOrAwaitValue()
+        val localStatus = sharedViewModel.localStatus.getOrAwaitValue()
 
         // The products are loaded from the repository
-        assertThat(products, IsEqual(listProducts))
-        // The preferences can be loaded
-        assertThat(loadPreference, `is`(true))
+        assertThat(domainToNetwork(products), IsEqual( networkProducts))
         // There is no error
         assertThat(productsError, `is`(nullValue()))
-        // The operation has an status DONE
-        assertThat(status, `is`(ProductApiStatus.DONE))
+        // The operation has an network status DONE
+        assertThat(networkStatus, `is`(ProductApiStatus.DONE))
+        // The status from the local storage is SUCCESS
+        assertThat(localStatus, `is`(LocalStatus.SUCCESS))
     }
 
     @Test
     fun callGetProducts_Failure(){
-        val error = "Error in the connexion"
-        repository.error = error
-        repository.productsServiceData = null
+        // When - There is an error loading de data from the remote source
+        repository = FakeTestRepository()
+        runBlocking { repository.saveProducts(networkProducts) }
+        repository.setReturnError(true)
         sharedViewModel = SharedViewModel(repository)
+        sharedViewModel.refreshData()
 
         // Then the products are not loaded from the repository
         val products = sharedViewModel.products.getOrAwaitValue()
         val productError = sharedViewModel.productsError.getOrAwaitValue()
-        val status = sharedViewModel.status.getOrAwaitValue()
+        val networkStatus = sharedViewModel.networkStatus.getOrAwaitValue()
+        val localStatus = sharedViewModel.localStatus.getOrAwaitValue()
 
         // The products are not loaded
         assertThat(products, IsEqual(emptyList()))
-        // Error message
-        assertThat(productError, IsEqual(error))
-        // With status ERROR
-        assertThat(status, `is`(ProductApiStatus.ERROR))
+        // Error message from the network
+        assertThat(productError, IsEqual("The data couldn't be loaded"))
+        // The Loading has finish
+        assertThat(networkStatus, `is`(ProductApiStatus.DONE))
+        // No data in the local storage send an error
+        assertThat(localStatus, `is`(LocalStatus.ERROR))
     }
 
     @Test
-    fun updateProduct(){
+    fun refresh_Success() = runBlockingTest{
+        repository = FakeTestRepository()
+        runBlocking { repository.saveProducts(networkProducts) }
         sharedViewModel = SharedViewModel(repository)
+        sharedViewModel.refreshData()
 
         // Create a new product to update
-        val productUpdated = Product(
+        val productUpdated = DomainProduct(
             1,
-            "Product1 query",
+            "Product1 updated",
             "Description product1",
             "Path image",
             "sku-product1",
@@ -159,94 +171,150 @@ class SharedViewModelTest{
             25.0f,
             false
         )
-        // Update the product in the view model
-        sharedViewModel.updateProduct(productUpdated)
-
-        // Assert that the product has been updated
-        val products = sharedViewModel.products.getOrAwaitValue()
-        assertThat(products[0], IsEqual(productUpdated))
-    }
-
-    @Test
-    fun refresh(){
-        sharedViewModel = SharedViewModel(repository)
-
-        // Create a new product to update
-        val productUpdated = Product(
-            1,
-            "Product1 query",
-            "Description product1",
-            "Path image",
-            "sku-product1",
-            "upc-product1",
-            25,
-            25.0f,
-            false
-        )
-        // Update the product in the view model
-        sharedViewModel.updateProduct(productUpdated)
+        // Update the product
+        repository.updateProduct(productUpdated)
         // Refresh the data
         sharedViewModel.refreshData()
 
         val products = sharedViewModel.products.getOrAwaitValue()
 
         // THEN - there are not changes in the list
-        assertThat(products, IsEqual(listProducts))
+        assertThat(domainToNetwork(products), IsEqual(networkProducts))
     }
 
     @Test
-    fun queryProducts_nullOrEmptyQuery_allProducts(){
+    fun refresh_Failure() = runBlockingTest{
+        repository = FakeTestRepository()
+        runBlocking { repository.saveProducts(networkProducts) }
         sharedViewModel = SharedViewModel(repository)
-        // WHEN - the query is null or empty
-        val query = ""
-        sharedViewModel.queryProducts(query)
+        sharedViewModel.refreshData()
 
-        val filteredProducts = sharedViewModel.productsFiltered.getOrAwaitValue()
+        // Create a new product to update
+        val productUpdated = DomainProduct(
+            1,
+            "Product1 updated",
+            "Description product1",
+            "Path image",
+            "sku-product1",
+            "upc-product1",
+            25,
+            25.0f,
+            false
+        )
 
-        // THEN - all the products are presented in the list
-        assertThat(filteredProducts, IsEqual(listProducts))
+        // The result must be
+        val resultProduct = DomainProduct(
+            1,
+            "Product1 updated",
+            "Description product1",
+            "Path image",
+            "sku-product1",
+            "upc-product1",
+            25,
+            25.0f,
+            false
+        )
+
+        // Update the product
+        repository.updateProduct(productUpdated)
+        // Refresh the data
+        // When - There is an error in the network
+        repository.setReturnError(true)
+        sharedViewModel.refreshData()
+
+        val products = sharedViewModel.products.getOrAwaitValue()
+        val productError = sharedViewModel.productsError.getOrAwaitValue()
+
+        // THEN - there are not changes in the product
+        assertThat(products.first(), IsEqual(resultProduct))
+        // Error message from the network
+        assertThat(productError, IsEqual("The data couldn't be loaded"))
     }
 
     @Test
-    fun queryProducts_query_productsFiltered(){
+    fun queryProducts_nullOrEmptyQueryListProducts_allProducts(){
+        repository = FakeTestRepository()
+        runBlocking { repository.saveProducts(networkProducts) }
         sharedViewModel = SharedViewModel(repository)
-        // WHEN - there is a valid string query
-        val query = "query"
-        sharedViewModel.queryProducts(query)
+        sharedViewModel.refreshData()
 
-        val filteredProducts = sharedViewModel.productsFiltered.getOrAwaitValue()
-
-        // THEN - the list just contain one product
-        assertThat(filteredProducts, IsEqual(listOf(listProducts[0])))
+        sharedViewModel.products.observeForTesting {
+            // WHEN - the query is null or empty
+            val query = ""
+            sharedViewModel.queryProducts(query)
+            val filteredProducts = sharedViewModel.productsFiltered.getOrAwaitValue()
+            // THEN - all the products are presented in the list
+            assertThat(domainToNetwork(filteredProducts), IsEqual(networkProducts))
+        }
     }
 
     @Test
-    fun queryProducts_nullProducts_null() {
+    fun queryProducts_queryListProducts_productsFiltered(){
+        repository = FakeTestRepository()
+        runBlocking { repository.saveProducts(networkProducts) }
+        sharedViewModel = SharedViewModel(repository)
+        sharedViewModel.refreshData()
+
+        sharedViewModel.products.observeForTesting{
+            // WHEN - there is a valid string query
+            val query = "query"
+            sharedViewModel.queryProducts(query)
+
+            val filteredProducts = sharedViewModel.productsFiltered.getOrAwaitValue()
+
+            // THEN - the list just contain one product
+            assertThat(domainToNetwork(filteredProducts), IsEqual(listOf(networkProducts[1])))
+        }
+    }
+
+    @Test
+    fun queryProducts_queryNoProducts_null() {
         // WHEN - there are not products and a valid string query
-        repository.productsServiceData = null
+        repository = FakeTestRepository()
         sharedViewModel = SharedViewModel(repository)
+        sharedViewModel.refreshData()
 
-        val query = "query_filter"
-        sharedViewModel.queryProducts(query)
+        sharedViewModel.products.observeForTesting{
+            val query = "query"
+            sharedViewModel.queryProducts(query)
 
-        val filteredProducts = sharedViewModel.productsFiltered.value
+            val filteredProducts = sharedViewModel.productsFiltered.getOrAwaitValue()
 
-        // THEN - the filtered products are null
-        assertThat(filteredProducts, `is`(nullValue()))
+            // THEN - the filtered products are null
+            assertThat(filteredProducts, IsEmptyCollection())
+        }
     }
 
     @Test
     fun queryProducts_nullOrEmptyQueryNoProducts_null(){
         // WHEN - there are not products and not a valid query
-        repository.productsServiceData = null
+        repository = FakeTestRepository()
         sharedViewModel = SharedViewModel(repository)
+        sharedViewModel.refreshData()
 
-        val query = null
-        sharedViewModel.queryProducts(query)
+        sharedViewModel.products.observeForTesting {
+            val query = null
+            sharedViewModel.queryProducts(query)
 
-        val filteredProducts = sharedViewModel.productsFiltered.value
+            val filteredProducts = sharedViewModel.productsFiltered.getOrAwaitValue()
 
-        // THEN - the filtered products are null
-        assertThat(filteredProducts, `is`(nullValue()))
+            // THEN - the filtered products are null
+            assertThat(filteredProducts, IsEmptyCollection())
+        }
+    }
+
+    @Test
+    fun noProductsInDatabase(){
+        // WHEN - there are not products in the database
+        repository = FakeTestRepository()
+        sharedViewModel = SharedViewModel(repository)
+        sharedViewModel.refreshData()
+
+        sharedViewModel.products.observeForTesting {
+            val localStatus = sharedViewModel.localStatus.getOrAwaitValue()
+
+            // THEN - The status must be an error
+            assertThat(localStatus, IsEqual(LocalStatus.ERROR))
+        }
     }
 }

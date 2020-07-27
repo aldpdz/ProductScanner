@@ -1,54 +1,68 @@
 package com.example.productscanner.viewmodel
 
-import android.app.Application
 import android.app.NotificationManager
+import android.content.Context
 import android.util.Log
 import androidx.core.content.ContextCompat
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.example.productscanner.R
-import com.example.productscanner.data.network.Product
+import com.example.productscanner.data.domain.DomainProduct
+import com.example.productscanner.repositories.IProductsRepository
 import com.example.productscanner.util.sendNotification
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.launch
 import java.lang.StringBuilder
 
-class DetailProductViewModel(private val app: Application): AndroidViewModel(app) {
-    private val _detailProduct = MutableLiveData<Product>()
+class DetailProductViewModel @ViewModelInject constructor(
+    @ApplicationContext private val appContext: Context,
+    private val repository: IProductsRepository): ViewModel() {
+
+    private val _detailProduct = MutableLiveData<DomainProduct>()
+    val detailProduct: LiveData<DomainProduct> get() = _detailProduct
+
     private val _quantity = MutableLiveData<Int>()
     private val _price = MutableLiveData<Float>()
-    val detailProduct: LiveData<Product> get() = _detailProduct
 
-    fun setDetailProduct(product: Product?){
+    fun setDetailProduct(product: DomainProduct?){
         _detailProduct.value = product
         _quantity.value = product?.quantity
         _price.value = product?.price
     }
 
-    fun sendNotification(oldProduct: Product?){
-        val notificationManager = ContextCompat.getSystemService(app,
+    fun updateProduct(product: DomainProduct){
+        viewModelScope.launch {
+            repository.updateProduct(product)
+        }
+    }
+
+    fun sendNotification(oldProduct: DomainProduct?){
+        val notificationManager = ContextCompat.getSystemService(appContext,
             NotificationManager::class.java) as NotificationManager
 
         // Create expanded text
         val expandedMsgStringBuilder = StringBuilder()
         if(oldProduct?.quantity != _detailProduct.value?.quantity){
-            expandedMsgStringBuilder.append(app.getString(R.string.quantity_updated))
+            expandedMsgStringBuilder.append(appContext.getString(R.string.quantity_updated))
                 .append(_detailProduct.value?.quantity)
-                .append(app.getString(R.string.quantity_update_to))
+                .append(appContext.getString(R.string.quantity_update_to))
                 .append(oldProduct?.quantity)
         }
 
         if(oldProduct?.price != _detailProduct.value?.price){
             if(expandedMsgStringBuilder.isNotEmpty()) expandedMsgStringBuilder.append("\n")
-            expandedMsgStringBuilder.append(app.getString(R.string.price_updated))
+            expandedMsgStringBuilder.append(appContext.getString(R.string.price_updated))
                 .append(_detailProduct.value?.price)
-                .append(app.getString(R.string.price_updated_to))
+                .append(appContext.getString(R.string.price_updated_to))
                 .append(oldProduct?.price)
         }
         Log.d("Notification text", expandedMsgStringBuilder.toString())
 
         _detailProduct.value?.let {
             notificationManager.sendNotification(
-                app.getString(R.string.messageNotification),
+                appContext.getString(R.string.messageNotification),
                 expandedMsgStringBuilder.toString(),
-                app,
+                appContext,
                 it
             )
         }

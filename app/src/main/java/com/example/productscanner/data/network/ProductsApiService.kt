@@ -14,7 +14,7 @@ private val retrofit = Retrofit.Builder()
 
 interface ProductsApiService{
     @GET("aldpdz/productScannerData/master/products.json")
-    suspend fun getProducts(): Response<List<Product>>
+    suspend fun getProducts(): Response<List<NetworkProduct>>
 }
 
 object ProductsApi{

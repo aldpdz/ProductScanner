@@ -46,6 +46,10 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
         binding.rvProducts.adapter = adapter
         binding.lifecycleOwner = viewLifecycleOwner // necessary to update values with bindingAdapter
 
+        this.activity?.let {
+            sharedViewModel.firstDataLoad(it)
+        }
+
         setHasOptionsMenu(true)
         setObservers()
 
@@ -57,12 +61,6 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     private fun setObservers() {
-        sharedViewModel.productsFiltered.observe(viewLifecycleOwner, Observer { productsList ->
-            productsList?.let {
-                Log.d("Change list", "")
-                adapter.submitList(productsList)
-            }
-        })
         sharedViewModel.productsError.observe(viewLifecycleOwner, Observer { error ->
             error?.let{
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
@@ -75,19 +73,30 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
                         .actionMainFragmentToDetailProduct(product))
             }
         })
-        sharedViewModel.status.observe(viewLifecycleOwner, Observer {
+        sharedViewModel.networkStatus.observe(viewLifecycleOwner, Observer {
             it?.let {
                 if(it == ProductApiStatus.DONE){
-                    sharedViewModel.filterProducts()
+                    this.activity?.let { activity -> sharedViewModel.setFirstDataLoad(activity) }
                 }
             }
         })
-
+        // TODO - maybe use flow for loadIdsFromPreferences to filterProducts
+        sharedViewModel.products.observe(viewLifecycleOwner, Observer {
+            it?.let{
+                Log.i("MainFragment", "Product loaded from database")
+                this.activity?.let { activity -> sharedViewModel.loadIdsFromPreferences(activity) }
+            }
+        })
         sharedViewModel.loadPreference.observe(viewLifecycleOwner, Observer {
             it?.let {
-                if(it){
-                    this.activity?.let { it1 -> sharedViewModel.setSavedIds(it1) }
-                }
+                Log.i("MainFragment", "Starting to filter products")
+                sharedViewModel.filterProducts()
+            }
+        })
+        sharedViewModel.productsFiltered.observe(viewLifecycleOwner, Observer { productsList ->
+            productsList?.let {
+                Log.d("Change list", "")
+                adapter.submitList(productsList)
             }
         })
     }

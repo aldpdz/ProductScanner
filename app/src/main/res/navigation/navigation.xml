@@ -25,7 +25,7 @@
         tools:layout="@layout/fragment_detail_product" >
         <argument
             android:name="argProduct"
-            app:argType="com.example.productscanner.data.network.Product" />
+            app:argType="com.example.productscanner.data.domain.DomainProduct" />
         <action
             android:id="@+id/action_detailProduct_to_mainFragment"
             app:destination="@id/mainFragment"

@@ -18,9 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            android:id="@+id/rv_products"
-            app:productApiStatusRecycler="@{viewModel.status}"
-            tools:visibility="gone"/>
+            android:id="@+id/rv_products"/>
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -32,17 +30,18 @@
             app:layout_constraintEnd_toEndOf="@+id/rv_products"
             app:layout_constraintStart_toStartOf="@+id/rv_products"
             app:layout_constraintTop_toTopOf="@+id/rv_products"
-            app:productApiStatusProgress="@{viewModel.status}"
+            app:productApiStatusProgress="@{viewModel.networkStatus}"
             tools:visibility="visible"/>
 
         <ImageView
+            android:id="@+id/statusProducts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="@id/rv_products"
             app:layout_constraintEnd_toEndOf="@id/rv_products"
             app:layout_constraintStart_toStartOf="@id/rv_products"
             app:layout_constraintTop_toTopOf="@id/rv_products"
-            app:productApiStatus="@{viewModel.status}"
+            app:localStatus="@{viewModel.localStatus}"
             tools:visibility="visible"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

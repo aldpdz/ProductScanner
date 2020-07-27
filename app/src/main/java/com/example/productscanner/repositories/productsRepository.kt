@@ -1,24 +1,55 @@
 package com.example.productscanner.repositories
 
-import com.example.productscanner.data.network.Product
-import com.example.productscanner.data.network.ProductsApiService
-import javax.inject.Inject
+import android.util.Log
+import com.example.productscanner.data.Result
+import com.example.productscanner.data.database.*
+import com.example.productscanner.data.domain.DomainProduct
+import com.example.productscanner.data.network.IProductRemoteSource
+import com.example.productscanner.data.network.NetworkProduct
 
-class ProductsRepository @Inject constructor() : IProductsRepository {
+class ProductsRepository (
+    private val productLocalSource: IProductLocalSource,
+    private val productRemoteSource: IProductRemoteSource
+) : IProductsRepository {
 
-    @Inject lateinit var productsApiService: ProductsApiService
-
-    override suspend fun getProducts(): Response<List<Product>?>{
-        val response = productsApiService.getProducts()
-        return if(response.isSuccessful){
-            Response(response.body(), null)
-        }else{
-            Response(null, "The products couldn't be loaded")
+    /***
+     * Getting the data from the remote source and update local cache
+     */
+    override suspend fun getProductsFromRemote(){
+        val response = productRemoteSource.getProducts()
+        if(response is Result.Success){
+            Log.i("Repository", "Data loaded")
+            saveProducts(response.data)
+        }else if (response is Result.Error){
+            Log.i("Repository", "Failed to load data")
+            throw response.exception
         }
     }
 
-    // Just for testing
-    override fun addProducts(vararg products: Product){}
-}
+    /***
+     * Save the products in the database
+     */
+    override suspend fun saveProducts(networkProducts: List<NetworkProduct>){
+        productLocalSource.insertProducts(networkProducts)
+    }
 
-class Response<out T>(val body: T, val errorMessage: String?)
+    /***
+     * Get the products from the local database
+     */
+    override fun getProductsFromLocal() = productLocalSource.getProducts()
+
+    override suspend fun updateProduct(product: DomainProduct) {
+        productLocalSource.updateProduct(product)
+    }
+
+    override suspend fun findBySKU(sku: String): Result<DomainProduct> {
+        return productLocalSource.getProductBySKU(sku)
+    }
+
+    override suspend fun findByUPC(upc: String): Result<DomainProduct> {
+        return productLocalSource.getProductByUPC(upc)
+    }
+
+    // Just for testing
+    override fun addProducts(vararg products: DomainProduct){}
+}

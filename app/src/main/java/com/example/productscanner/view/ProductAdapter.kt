@@ -5,11 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.productscanner.databinding.ProductListBinding
-import com.example.productscanner.data.network.Product
 import androidx.recyclerview.widget.ListAdapter
+import com.example.productscanner.data.domain.DomainProduct
 
 class ProductAdapter(val clickListener: OpenProductListener) :
-    ListAdapter<Product, ProductAdapter.ViewHolder>(ProductDiffCallBack()){
+    ListAdapter<DomainProduct, ProductAdapter.ViewHolder>(ProductDiffCallBack()){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent)
@@ -22,8 +22,8 @@ class ProductAdapter(val clickListener: OpenProductListener) :
 
     class ViewHolder private constructor(val binding: ProductListBinding):
             RecyclerView.ViewHolder(binding.root){
-        fun bind(product: Product, clickListener: OpenProductListener){
-            binding.product = product
+        fun bind(domainProduct: DomainProduct, clickListener: OpenProductListener){
+            binding.product = domainProduct
             binding.clickListener = clickListener
             binding.executePendingBindings()
         }
@@ -41,18 +41,18 @@ class ProductAdapter(val clickListener: OpenProductListener) :
     }
 }
 
-class ProductDiffCallBack : DiffUtil.ItemCallback<Product>(){
-    override fun areItemsTheSame(oldItem: Product, newItem: Product): Boolean {
+class ProductDiffCallBack : DiffUtil.ItemCallback<DomainProduct>(){
+    override fun areItemsTheSame(oldItem: DomainProduct, newItem: DomainProduct): Boolean {
         return oldItem.id == newItem.id && (oldItem.isSaved == newItem.isSaved)
     }
 
-    override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
+    override fun areContentsTheSame(oldItem: DomainProduct, newItem: DomainProduct): Boolean {
         return oldItem == newItem
     }
 }
 
-class OpenProductListener(val clickListener: (product: Product) -> Unit){
-    fun onClick(product: Product){
-        clickListener(product)
+class OpenProductListener(val clickListener: (domainProduct: DomainProduct) -> Unit){
+    fun onClick(domainProduct: DomainProduct){
+        clickListener(domainProduct)
     }
 }

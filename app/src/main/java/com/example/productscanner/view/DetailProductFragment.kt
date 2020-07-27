@@ -11,15 +11,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.productscanner.R
+import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.databinding.FragmentDetailProductBinding
-import com.example.productscanner.data.network.Product
 import com.example.productscanner.viewmodel.DetailProductViewModel
 import com.example.productscanner.viewmodel.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
-/**
- * A simple [Fragment] subclass.
- */
 @AndroidEntryPoint
 class DetailProductFragment : Fragment() {
 
@@ -54,7 +51,7 @@ class DetailProductFragment : Fragment() {
         return binding.root
     }
 
-    private fun setUpdateBtn(detailProduct: Product?) {
+    private fun setUpdateBtn(product: DomainProduct?) {
         binding.btnUpdate.setOnClickListener {
             val price = binding.etPrice.text.toString()
             val quantity = binding.etQuantity.text.toString()
@@ -62,10 +59,10 @@ class DetailProductFragment : Fragment() {
             if (price.isEmpty() || quantity.isEmpty()) {
                 Toast.makeText(context, R.string.invalid_input, Toast.LENGTH_LONG).show()
             } else {
-                val product: Product? = detailProduct?.copy(quantity =  quantity.toInt(), price = price.toFloat())
-                if(product != detailProduct){ // if there are changes in the product
-                    viewModel.sendNotification(product)
-                    shareViewModel.updateProduct(product)
+                val updatedProduct: DomainProduct? = product?.copy(quantity =  quantity.toInt(), price = price.toFloat())
+                if(updatedProduct != product){ // if there are changes in the product
+                    viewModel.sendNotification(updatedProduct)
+                    updatedProduct?.let {viewModel.updateProduct(it)}
                     this.findNavController()
                         .navigate(DetailProductFragmentDirections
                             .actionDetailProductToMainFragment())
