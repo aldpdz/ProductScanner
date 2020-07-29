@@ -13,8 +13,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import com.example.productscanner.R
 import com.example.productscanner.databinding.FragmentMainBinding
+import com.example.productscanner.util.ManageSettings
 import com.example.productscanner.viewmodel.SharedViewModel
 import com.example.productscanner.viewmodel.ProductApiStatus
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,6 +28,7 @@ import java.util.*
 @AndroidEntryPoint
 class MainFragment : Fragment(), SearchView.OnQueryTextListener {
 
+    private lateinit var manageSettings: ManageSettings
     private lateinit var binding : FragmentMainBinding
     private lateinit var adapter: ProductAdapter
     private lateinit var searchView: SearchView
@@ -57,7 +60,25 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
             getString(R.string.product_notification_channel_id),
             getString(R.string.notification_channel_name))
 
+        readSettingPreferences()
+        setSettingsListeners()
+
         return binding.root
+    }
+
+    private fun setSettingsListeners() {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+        sharedViewModel.runWorker(sharedPreferences)
+        manageSettings = ManageSettings(sharedPreferences){
+            sharedViewModel.runWorker(it)
+        }
+        viewLifecycleOwner.lifecycle.addObserver(manageSettings)
+    }
+
+    private fun readSettingPreferences() {
+        Log.d("MainFragment", "reading settings")
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+        sharedViewModel.runWorker(sharedPreferences)
     }
 
     private fun setObservers() {
@@ -120,6 +141,10 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
                 true
             }
             R.id.action_search -> {
+                true
+            }
+            R.id.settings -> {
+                this.findNavController().navigate(MainFragmentDirections.actionMainFragmentToSettingsFragment())
                 true
             }
             else -> return super.onOptionsItemSelected(item)

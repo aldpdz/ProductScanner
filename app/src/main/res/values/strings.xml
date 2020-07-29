@@ -2,10 +2,11 @@
     <string name="app_name">ProductScanner</string>
 
 <!--    menu bar-->
-    <string name="scan">scan</string>
-    <string name="refresh">reset</string>
-    <string name="search">search</string>
+    <string name="scan">Scan</string>
+    <string name="refresh">Reset</string>
+    <string name="search">Search</string>
     <string name="scanner">Scanner</string>
+    <string name="settings">Settings</string>
 
 <!--    Products-->
     <string name="product_detail">Product\'s detail</string>
@@ -27,4 +28,12 @@
     <string name="price_updated_to">\u0020 to: $</string>
     <string name="quantity_updated">The quantity has been updated from:\u0020</string>
     <string name="quantity_update_to">\u0020 to:\u0020</string>
+
+<!--    Settings-->
+    <string name="onceADayTitle">Synchronize once a day</string>
+    <string name="onceADaySummary">Synchronize the data just once a day</string>
+    <string name="syncMinutesTitle">Synchronize data periodically</string>
+    <string name="syncMinutesSummary">Synchronize the data periodically given the minutes provided</string>
+    <string name="syncMinutesMax" translatable="false">120</string>
+    <string name="syncMinutesMin" translatable="false">1</string>
 </resources>

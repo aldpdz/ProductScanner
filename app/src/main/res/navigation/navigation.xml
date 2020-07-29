@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_mainFragment_to_camerax"
             app:destination="@id/camerax" />
+        <action
+            android:id="@+id/action_mainFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/detailProduct"
@@ -47,4 +50,8 @@
     <argument
         android:name="barCode"
         android:defaultValue="defaultBarCode" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.productscanner.view.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>

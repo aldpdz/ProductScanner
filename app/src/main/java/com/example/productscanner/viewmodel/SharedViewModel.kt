@@ -1,14 +1,20 @@
 package com.example.productscanner.viewmodel
 
 import android.app.Activity
+import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.text.isDigitsOnly
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.example.productscanner.data.Result
 import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.repositories.IProductsRepository
 import com.example.productscanner.util.*
+import com.example.productscanner.workers.SyncWorker
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import java.lang.Exception
 import java.util.*
@@ -19,6 +25,7 @@ enum class ProductApiStatus {LOADING, ERROR, DONE}
 enum class LocalStatus {ERROR, SUCCESS}
 
 class SharedViewModel @ViewModelInject constructor(
+    @ApplicationContext private val appContext: Context,
     private val repository: IProductsRepository): ViewModel() {
     private var jobPreference: Job? = null
     private var deferredKeys: Deferred<List<Int>>? = null
@@ -50,6 +57,12 @@ class SharedViewModel @ViewModelInject constructor(
     private var _query: String? = null
     private var idsFromPreferences = listOf<Int>()
 
+    private val workManager = WorkManager.getInstance(appContext)
+
+    fun testWorker(){
+        workManager.enqueue(OneTimeWorkRequest.from(SyncWorker::class.java))
+    }
+
     /***
      * Load the data from the internet if it's the first time to load it
      */
@@ -79,6 +92,16 @@ class SharedViewModel @ViewModelInject constructor(
         Log.i("SharedVM", "First data load")
         jobPreference =  CoroutineScope(Dispatchers.IO).launch {
             writeFirstLoad(activity)
+        }
+    }
+
+    fun runWorker(sharedPreferences: SharedPreferences){
+        // Verify if the data is synchronize just once
+        val oneDaySync = sharedPreferences.getBoolean("onceADay", true)
+        if(oneDaySync){
+            Log.d("SharedViewModel", "One day sync")
+        }else{
+            Log.d("SharedViewModel", "Sync periodically")
         }
     }
 
