@@ -30,10 +30,10 @@
     <string name="quantity_update_to">\u0020 to:\u0020</string>
 
 <!--    Settings-->
-    <string name="onceADayTitle">Synchronize once a day</string>
-    <string name="onceADaySummary">Synchronize the data just once a day</string>
-    <string name="syncMinutesTitle">Synchronize data periodically</string>
+    <string name="onceADayTitle">Synchronize</string>
+    <string name="onceADaySummary">It allows you to synchronize the data with the remote server</string>
+    <string name="syncMinutesTitle">Periodicity</string>
     <string name="syncMinutesSummary">Synchronize the data periodically given the minutes provided</string>
     <string name="syncMinutesMax" translatable="false">120</string>
-    <string name="syncMinutesMin" translatable="false">1</string>
+    <string name="syncMinutesMin" translatable="false">15</string>
 </resources>

@@ -2,15 +2,18 @@ package com.example.productscanner.util
 
 import android.app.Activity
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.example.productscanner.R
 import com.example.productscanner.data.domain.DomainProduct
+import com.example.productscanner.view.MainActivity
 
-private val NOTIFICATION_ID = 0
+private const val NOTIFICATION_ID = 0
 const val IS_FIRST_INSTALLATION = "FIRST_INSTALLATION"
 const val SHARE_FILE = "ShredFile"
 
@@ -83,5 +86,25 @@ fun NotificationManager.sendNotification(
         .setPriority(NotificationCompat.PRIORITY_DEFAULT) // Support devices running API 25 or lower
 
     // Send the notification
+    notify(NOTIFICATION_ID, builder.build())
+}
+
+fun NotificationManager.sendSimpleNotification(applicationContext: Context){
+    val contentIntent = Intent(applicationContext, MainActivity::class.java)
+    val contentPendingIntent = PendingIntent.getActivity(
+        applicationContext,
+        NOTIFICATION_ID,
+        contentIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT
+    )
+
+    val builder = NotificationCompat.Builder(
+        applicationContext,
+        applicationContext.getString(R.string.product_notification_channel_id))
+        .setSmallIcon(R.mipmap.ic_launcher)
+        .setContentTitle("background work")
+        .setContentIntent(contentPendingIntent)
+        .setAutoCancel(true)
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
     notify(NOTIFICATION_ID, builder.build())
 }

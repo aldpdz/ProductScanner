@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <SwitchPreferenceCompat
+        android:defaultValue="false"
+        app:iconSpaceReserved="false"
         app:key="onceADay"
-        app:title="@string/onceADayTitle"
         app:summary="@string/onceADaySummary"
-        android:defaultValue="true"/>
+        app:title="@string/onceADayTitle" />
     <SeekBarPreference
-        app:key="syncMinutes"
-        app:title="@string/syncMinutesTitle"
-        app:summary="@string/syncMinutesSummary"
-        android:max="@string/syncMinutesMax"
-        app:min="@string/syncMinutesMin"
         android:defaultValue="50"
-        app:showSeekBarValue="true"/>
+        android:max="@string/syncMinutesMax"
+        app:iconSpaceReserved="false"
+        app:key="syncMinutes"
+        app:min="@string/syncMinutesMin"
+        app:showSeekBarValue="true"
+        app:summary="@string/syncMinutesSummary"
+        app:title="@string/syncMinutesTitle" />
 </PreferenceScreen>

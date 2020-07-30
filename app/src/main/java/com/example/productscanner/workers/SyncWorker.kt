@@ -1,13 +1,23 @@
 package com.example.productscanner.workers
 
+import android.app.NotificationManager
 import android.content.Context
 import android.util.Log
-import androidx.work.Worker
+import androidx.core.content.ContextCompat
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.productscanner.util.sendSimpleNotification
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-class SyncWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
-    override fun doWork(): Result {
+class SyncWorker(private val ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO){
         Log.d("SyncWorker", "Background work")
-        return Result.success()
+        val notificationManager = ContextCompat.getSystemService(ctx,
+        NotificationManager::class.java) as NotificationManager
+
+        notificationManager.sendSimpleNotification(ctx)
+
+        return@withContext Result.success()
     }
 }
