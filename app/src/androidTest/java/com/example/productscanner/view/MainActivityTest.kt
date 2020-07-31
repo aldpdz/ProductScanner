@@ -2,6 +2,7 @@ package com.example.productscanner.view
 
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
@@ -114,6 +115,58 @@ class MainActivityTest{
         // Verify previous quantity and price is not displayed
         onView(withText(prefixPrice.plus("1.0"))).check(doesNotExist())
         onView(withText(prefixQuantity.plus("1"))).check(doesNotExist())
+
+        // Important when you're working with a database
+        activityScenario.close()
+    }
+
+    @Test
+    fun keepSearch(){
+        val product1 = NetworkProduct(
+            1,
+            "Product1",
+            "Description product1",
+            "https://raw.githubusercontent.com/aldpdz/productScannerData/master/mouse.jpg",
+            "sku-product1",
+            "upc-product1",
+            1,
+            1.0f)
+
+        val product2 = NetworkProduct(
+            2,
+            "Product2",
+            "Description product2",
+            "https://raw.githubusercontent.com/aldpdz/productScannerData/master/mouse.jpg",
+            "sku-product2",
+            "upc-product2",
+            2,
+            2.0f)
+
+        // Set initial state
+        // The initial state must be set before calling launch
+        runBlocking {
+            repository.saveProducts(listOf(product1, product2))
+        }
+
+        // Start up Products screen.
+        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+
+        // WHEN - Search a product and enter in the product's detail view
+        onView(withId(R.id.action_search)).perform(click())
+        onView(withId(androidx.appcompat.R.id.search_src_text))
+            .perform(replaceText("roduct1"))
+        onView(withText("Product1")).perform(click())
+
+        // TODO - Add extension function to get the content of the up button instead of the
+        // TODO - back button, do this add a toolbar
+        // And going back
+        pressBack()
+
+        // THEN - the search is not refresh
+        // The product1 is displayed
+        onView(withText("Product1")).check(matches(isDisplayed()))
+        // The product2 is not displayed because of the search
+        onView(withText("Product2")).check(doesNotExist())
 
         // Important when you're working with a database
         activityScenario.close()
