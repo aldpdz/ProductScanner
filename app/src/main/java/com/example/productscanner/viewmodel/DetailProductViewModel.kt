@@ -10,8 +10,11 @@ import com.example.productscanner.R
 import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.repositories.IProductsRepository
 import com.example.productscanner.util.sendNotification
+import com.example.productscanner.util.writeOnPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.lang.StringBuilder
 
 class DetailProductViewModel @ViewModelInject constructor(
@@ -33,6 +36,20 @@ class DetailProductViewModel @ViewModelInject constructor(
     fun updateProduct(product: DomainProduct){
         viewModelScope.launch {
             repository.updateProduct(product)
+        }
+    }
+
+    // TODO Unit test instrumental
+    /***
+     * Saves the product in the preferences file
+     * @param idProduct: id of the product
+     */
+    fun saveIdProduct(idProduct: Int){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                writeOnPreferences(appContext, idProduct)
+
+            }
         }
     }
 

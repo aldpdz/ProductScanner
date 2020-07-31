@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.productscanner.R
 import com.example.productscanner.viewmodel.LocalStatus
-import com.example.productscanner.viewmodel.ProductApiStatus
+import com.example.productscanner.viewmodel.RemoteStatus
 
 @BindingAdapter("picture")
 fun bindImage(imgView: ImageView, imgUrl: String?){
@@ -25,7 +25,6 @@ fun bindImage(imgView: ImageView, imgUrl: String?){
     }
 }
 
-// TODO - maybe change to empty list
 @BindingAdapter("localStatus")
 fun bindLocalStatus(statusImageView: ImageView, localStatus: LocalStatus?){
     when(localStatus){
@@ -40,9 +39,9 @@ fun bindLocalStatus(statusImageView: ImageView, localStatus: LocalStatus?){
 }
 
 @BindingAdapter( "productApiStatusProgress")
-fun bindStatusProgress(statusProgressBar: ProgressBar, status: ProductApiStatus?){
+fun bindStatusProgress(statusProgressBar: ProgressBar, status: RemoteStatus?){
     when(status){
-        ProductApiStatus.LOADING -> {
+        RemoteStatus.LOADING -> {
             statusProgressBar.visibility = View.VISIBLE
         }
         else -> {
@@ -52,13 +51,13 @@ fun bindStatusProgress(statusProgressBar: ProgressBar, status: ProductApiStatus?
 }
 
 @BindingAdapter("productApiStatusRecycler")
-fun bindStatusRecycler(statusRecyclerView: RecyclerView, status: ProductApiStatus?){
-    when(status){
-        ProductApiStatus.DONE -> {
-            statusRecyclerView.visibility = View.VISIBLE
-        }
-        else -> {
-            statusRecyclerView.visibility = View.GONE
-        }
-    }
+fun bindStatusRecycler(statusRecyclerView: RecyclerView, status: RemoteStatus?){
+//    when(status){
+//        RemoteStatus.DONE -> {
+//            statusRecyclerView.visibility = View.VISIBLE
+//        }
+//        else -> {
+//            statusRecyclerView.visibility = View.GONE
+//        }
+//    }
 }

@@ -1,6 +1,5 @@
 package com.example.productscanner.util
 
-import android.app.Activity
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -20,8 +19,8 @@ const val SHARE_FILE = "ShredFile"
 /***
  * Write on the preferences the product's id
  */
-fun writeOnPreferences(activity: Activity, id: Int){
-    val sharedPref = activity.getSharedPreferences(SHARE_FILE, Context.MODE_PRIVATE) ?: return
+fun writeOnPreferences(context: Context, id: Int){
+    val sharedPref = context.getSharedPreferences(SHARE_FILE, Context.MODE_PRIVATE) ?: return
     with(sharedPref.edit()){
         putInt(id.toString(), id)
         commit()
@@ -31,9 +30,9 @@ fun writeOnPreferences(activity: Activity, id: Int){
 /***
  * Write on preferences the first time the data is loaded
  */
-fun writeFirstLoad(activity: Activity){
+fun writeFirstLoad(context: Context){
     Log.i("Utils", "Preference first data loaded")
-    val sharedPref = activity.getSharedPreferences(SHARE_FILE, Context.MODE_PRIVATE) ?: return
+    val sharedPref = context.getSharedPreferences(SHARE_FILE, Context.MODE_PRIVATE) ?: return
     with(sharedPref.edit()){
         putBoolean(IS_FIRST_INSTALLATION, false)
         commit()
@@ -43,16 +42,16 @@ fun writeFirstLoad(activity: Activity){
 /***
  * Check if the data has been loaded previously
  */
-fun readFirstLoad(activity: Activity) : Boolean{
-    val sharedPref = activity.getSharedPreferences(SHARE_FILE, Context.MODE_PRIVATE)
+fun readFirstLoad(context: Context) : Boolean{
+    val sharedPref = context.getSharedPreferences(SHARE_FILE, Context.MODE_PRIVATE)
     return sharedPref.getBoolean(IS_FIRST_INSTALLATION, true)
 }
 
 /***
  * Get all the products' keys from the preferences
  */
-fun getAllKeys(activity: Activity): MutableSet<String> {
-    return activity.getSharedPreferences(SHARE_FILE, Context.MODE_PRIVATE).all.keys
+fun getAllKeys(context: Context): MutableSet<String> {
+    return context.getSharedPreferences(SHARE_FILE, Context.MODE_PRIVATE).all.keys
 }
 
 /***

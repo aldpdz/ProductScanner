@@ -7,22 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.productscanner.R
 import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.databinding.FragmentDetailProductBinding
 import com.example.productscanner.viewmodel.DetailProductViewModel
-import com.example.productscanner.viewmodel.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class DetailProductFragment : Fragment() {
 
     private val viewModel by viewModels<DetailProductViewModel>()
-    private val shareViewModel by activityViewModels<SharedViewModel>()
-
     private lateinit var binding: FragmentDetailProductBinding
 
     override fun onCreateView(
@@ -36,8 +32,8 @@ class DetailProductFragment : Fragment() {
         viewModel.setDetailProduct(detailProduct)
 
         detailProduct?.let {
-            if(!detailProduct.isSaved){
-                activity?.let { it1 -> shareViewModel.saveIdProduct(it1, it.id) }
+            if(!it.isSaved){
+                viewModel.saveIdProduct(it.id)
             }
         }
 
