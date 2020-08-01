@@ -17,20 +17,6 @@ class MainViewModel @ViewModelInject constructor(
     @ApplicationContext private val appContext: Context,
     private val repository: IProductsRepository) : ViewModel() {
 
-    private var workRequest : WorkRequest
-
-    init{
-        Log.d("MainViewModel", "create shared VM")
-        // Create the Constrains
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        workRequest = OneTimeWorkRequestBuilder<SyncWorker>()
-            .setConstraints(constraints)
-            .build()
-    }
-
     fun runWorker(sharedPreferences: SharedPreferences, isSettingsChanged: Boolean){
         // Verify to synchronize the data
         val oneDaySync = sharedPreferences.getBoolean("onceADay", false)
@@ -55,8 +41,14 @@ class MainViewModel @ViewModelInject constructor(
      * Sync the local data with the remote data
      */
     private fun sync(existingPeriodicWorkPolicy: ExistingPeriodicWorkPolicy, minutes: Long){
+        // Create the Constrains
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
         val syncWorker = PeriodicWorkRequestBuilder<SyncWorker>(
-            minutes, TimeUnit.MINUTES)
+            minutes, TimeUnit.MINUTES) // We can add a flexible interval, min 5 minutes
+            .setConstraints(constraints)
             .build()
 
         WorkManager.getInstance(appContext).enqueueUniquePeriodicWork(

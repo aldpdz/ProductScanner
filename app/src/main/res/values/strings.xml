@@ -20,7 +20,8 @@
 
 <!--    Notifications-->
     <string name="product_notification_channel_id" translatable="false">product_channel</string>
-    <string name="notification_title">Product updated</string>
+    <string name="notification_update_title">Product updated</string>
+    <string name="notification_sync_title">Data successfully synchronized</string>
     <string name="messageNotification">The product has been updated.</string>
     <string name="notification_channel_description">Item Updated</string>
     <string name="notification_channel_name">Product</string>
@@ -36,4 +37,8 @@
     <string name="syncMinutesSummary">Synchronize the data periodically given the minutes provided</string>
     <string name="syncMinutesMax" translatable="false">120</string>
     <string name="syncMinutesMin" translatable="false">15</string>
+
+<!--    BroadcastReceiver-->
+    <string name="accept">Accept</string>
+    <string name="cancel">Cancel</string>
 </resources>

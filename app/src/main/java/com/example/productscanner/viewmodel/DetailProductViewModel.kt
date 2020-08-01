@@ -27,6 +27,7 @@ class DetailProductViewModel @ViewModelInject constructor(
     private val _quantity = MutableLiveData<Int>()
     private val _price = MutableLiveData<Float>()
 
+    // TODO - Receive id and get the product with the repository instead of setting the values
     fun setDetailProduct(product: DomainProduct?){
         _detailProduct.value = product
         _quantity.value = product?.quantity
@@ -76,12 +77,14 @@ class DetailProductViewModel @ViewModelInject constructor(
         Log.d("Notification text", expandedMsgStringBuilder.toString())
 
         _detailProduct.value?.let {
-            notificationManager.sendNotification(
-                appContext.getString(R.string.messageNotification),
-                expandedMsgStringBuilder.toString(),
-                appContext,
-                it
-            )
+            oldProduct?.let{
+                notificationManager.sendNotification(
+                    appContext.getString(R.string.messageNotification),
+                    expandedMsgStringBuilder.toString(),
+                    appContext,
+                    oldProduct
+                )
+            }
         }
     }
 

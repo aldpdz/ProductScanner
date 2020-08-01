@@ -118,7 +118,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
             val notificationChannel = NotificationChannel(
                 channelId,
                 channelName,
-                NotificationManager.IMPORTANCE_LOW)
+                NotificationManager.IMPORTANCE_DEFAULT)
                 .apply {
                     setShowBadge(false)
                 }

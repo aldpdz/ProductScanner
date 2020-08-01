@@ -15,7 +15,7 @@ class SyncWorker(private val ctx: Context, params: WorkerParameters) : Coroutine
         Log.d("SyncWorker", "Background work")
         val notificationManager = ContextCompat.getSystemService(ctx,
         NotificationManager::class.java) as NotificationManager
-
+        notificationManager.cancelAll()
         notificationManager.sendSimpleNotification(ctx)
 
         return@withContext Result.success()
