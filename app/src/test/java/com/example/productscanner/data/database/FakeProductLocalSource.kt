@@ -25,11 +25,24 @@ class FakeProductLocalSource :
         }
     }
 
+    override suspend fun insertTemp(product: DomainProduct) {
+        products[-1] = product.asDatabaseProduct()
+    }
+
     override fun getProducts(): LiveData<Result<List<DomainProduct>>> {
         val liveData = MutableLiveData<Result<List<DomainProduct>>>()
         val result = Result.Success(products.values.toList().asDomainModel())
         liveData.value = result
         return liveData
+    }
+
+    override suspend fun getTempProduct(): Result<DomainProduct> {
+        val tempProduct = products[-1]
+        return if(tempProduct != null){
+            Result.Success(tempProduct.asDomainModel())
+        }else{
+            Result.Error(Exception("Product not found"))
+        }
     }
 
     override suspend fun updateProduct(product: DomainProduct) {

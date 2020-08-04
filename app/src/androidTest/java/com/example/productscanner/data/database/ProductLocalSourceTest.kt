@@ -15,6 +15,7 @@ import com.example.productscanner.networkToDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.core.IsEqual
 import org.junit.After
 import org.junit.Before
@@ -80,6 +81,24 @@ class ProductLocalSourceTest{
     }
 
     @Test
+    fun insertTempProduct() = runBlockingTest {
+        // GIVEN - A product
+        val product = DomainProduct(
+            0, "temp product", "Temporal product", "picture",
+            "sku-code", "upc-code", 1, 1.0f, false)
+
+        // WHEN - Insert the product
+        localSource.insertTemp(product)
+
+        // THEN - The product's id is -1
+        val result = localSource.getProducts().getOrAwaitValueInstrumental()
+        result as Result.Success
+
+        // THEN - The updated product is returned
+        assertThat(result.data[0].id, `is`(TEMP_ID))
+    }
+
+    @Test
     fun updateProduct() = runBlockingTest {
         // GIVEN - A new product added to the database and an updated product
         val networkProduct = NetworkProduct(
@@ -133,5 +152,23 @@ class ProductLocalSourceTest{
 
         // THEN - The product is product2
         assertThat(result.data, IsEqual(networkToDomain(networkProduct2)))
+    }
+
+    @Test
+    fun getProductByID() = runBlockingTest{
+        // GIVEN - Two products
+        val networkProduct1 = NetworkProduct(
+            -1, "product1", "description", "picture", "sku-code1",
+            "upc-code1", 0, 25.0f)
+        val networkProduct2 = NetworkProduct(
+            0, "product2", "description", "picture", "sku-code2",
+            "upc-code2", 0, 25.0f)
+        localSource.insertProducts(listOf(networkProduct1, networkProduct2))
+
+        // WHEN - Getting the temp product
+        val result = localSource.getTempProduct() as Result.Success
+
+        // THEN - The product is product2
+        assertThat(result.data.id, `is`(TEMP_ID))
     }
 }

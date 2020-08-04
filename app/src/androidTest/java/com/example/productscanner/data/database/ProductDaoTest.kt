@@ -48,7 +48,29 @@ class ProductDaoTest {
             1, "Product1", "Description", "Picture", "sku-code",
             "upc-code", 25, 15.0f
         )
-        database.productDao.insertAll(listOf(product))
+        val tempProduct = DatabaseProduct(
+            -1, "TempProduct", "Description", "Picture", "sku-code",
+            "upc-code", 0, 0.0f
+        )
+
+        database.productDao.insertAll(listOf(product, tempProduct))
+
+        // WHEN - Get all the products from the database.
+        val productsSaved = database.productDao.getProducts()
+
+        // THEN - The saved data contains the expected values.
+        assertThat(productsSaved.getOrAwaitValueInstrumental().first(), notNullValue())
+        assertThat(productsSaved.getOrAwaitValueInstrumental().first(), IsEqual(product))
+    }
+
+    @Test
+    fun insertProduct() = runBlockingTest {
+        // GIVEN - Insert a product
+        val product = DatabaseProduct(
+            1, "Product1", "Description", "Picture", "sku-code",
+            "upc-code", 25, 15.0f
+        )
+        database.productDao.insert(product)
 
         // WHEN - Get all the products from the database.
         val productsSaved = database.productDao.getProducts()
@@ -91,6 +113,24 @@ class ProductDaoTest {
 
         // WHEN - Searching a product by sku code
         val result = database.productDao.getProductBySKU("sku-code1")
+
+        // THEN - The result is the product1
+        assertThat(result, IsEqual(product1))
+    }
+
+    @Test
+    fun getProductByID() = runBlockingTest{
+        // GIVEN - Two Products.
+        val product1 = DatabaseProduct(
+            1, "Product1", "Description", "Picture", "sku-code1",
+            "upc-code1", 25, 15.0f)
+        val product2 = DatabaseProduct(
+            2, "Product2", "Description", "Picture", "sku-code2",
+            "upc-code2", 25, 15.0f)
+        database.productDao.insertAll(listOf(product1, product2))
+
+        // WHEN - Searching product by id
+        val result = database.productDao.getProduct(1)
 
         // THEN - The result is the product1
         assertThat(result, IsEqual(product1))

@@ -38,6 +38,8 @@ class FakeTestRepository: IProductsRepository {
         return liveDataDBProduct
     }
 
+    override suspend fun insertTempProduct(product: DomainProduct) {}
+
     override suspend fun updateProduct(product: DomainProduct) {
         for((index, databaseProduct) in databaseProducts.withIndex()){
             if(databaseProduct.id == product.id){
@@ -62,6 +64,8 @@ class FakeTestRepository: IProductsRepository {
             Result.Success(databaseProducts.first { it.upc == upc }.asDomainModel())
         }
     }
+
+    override suspend fun revertProduct(id: Int) {}
 
     private fun setLocalData(){
         val result = Result.Success(databaseProducts.asDomainModel())

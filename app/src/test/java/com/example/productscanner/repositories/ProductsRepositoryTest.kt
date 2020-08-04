@@ -10,6 +10,7 @@ import com.example.productscanner.getOrAwaitValue
 import com.example.productscanner.networkToDomain
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.collection.IsEmptyCollection
 import org.hamcrest.core.IsEqual
@@ -72,6 +73,32 @@ class ProductsRepositoryTest{
 
         // Then the products are the same into the database
         assertThat(domainToNetwork(result.data), IsEqual(productsRemote))
+    }
+
+    @Test
+    fun insertTempProduct() = runBlockingTest {
+        // GIVEN - Two products
+        repository.saveProducts(productsRemote)
+
+        val tempProduct = DomainProduct(
+            1,
+            "Product1",
+            "Description product1",
+            "Path image",
+            "sku-product1",
+            "upc-product1",
+            1,
+            1.0f,
+            false)
+
+        // WHEN - Inserting a temporal product
+        repository.insertTempProduct(tempProduct)
+
+        val result = repository.getProductsFromLocal().getOrAwaitValue()
+        result as Result.Success
+
+        // THEN - The temp product was inserted
+        assertThat(result.data.size, `is`(3))
     }
 
     @Test
@@ -170,5 +197,47 @@ class ProductsRepositoryTest{
 
         // THEN - The result is the product1
         assertThat(result.data, IsEqual(networkToDomain(product1)))
+    }
+
+    @Test
+    fun revertProduct() = runBlockingTest {
+        // GIVEN - Two products
+        repository.saveProducts(productsRemote)
+
+        val tempProduct = DomainProduct(
+            1,
+            "Product1",
+            "Description product1",
+            "Path image",
+            "sku-product1",
+            "upc-product1",
+            1,
+            1.0f,
+            false)
+
+        val updatedProduct = DomainProduct(
+            1,
+            "Product1",
+            "Description product1",
+            "Path image",
+            "sku-product1",
+            "upc-product1",
+            10,
+            10.0f,
+            false
+        )
+
+        // Inserting a temporal product
+        repository.insertTempProduct(tempProduct)
+        // Updating the product
+        repository.updateProduct(updatedProduct)
+
+        // WHEN - Reverting the product
+        repository.revertProduct(1)
+
+        val result = repository.getProductsFromLocal().getOrAwaitValue() as Result.Success
+
+        // THEN - The product saved as temp is not modified
+        assertThat(result.data.first{it.id == 1}, IsEqual(tempProduct))
     }
 }
