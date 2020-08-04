@@ -273,6 +273,28 @@ class MainFragmentTest{
         )
     }
 
+    @Test
+    fun clickSettings_navigateToSettingsFragment(){
+        // GIVEN - On the home screen
+        val context: Context = getApplicationContext<Context>()
+        val addMenuItem = ActionMenuItem(context, 0, R.id.scan, 0, 0, null)
+
+        val navController = mock(NavController::class.java)
+        launchFragmentInHiltContainer<MainFragment>(Bundle(), R.style.AppTheme){
+            Navigation.setViewNavController(this.view!!, navController)
+            onOptionsItemSelected(addMenuItem)
+        }
+
+        // WHEN - Click on the menu settings
+        openActionBarOverflowOrOptionsMenu(getApplicationContext())
+        onView(withText(R.string.settings)).perform(click())
+
+        // THEN - Verify that we navigate to the camera screen
+        verify(navController, times(1)).navigate(
+            MainFragmentDirections.actionMainFragmentToSettingsFragment()
+        )
+    }
+
     private fun launchActivity(): ActivityScenario<MainActivity>?{
         val activityScenario = launch(MainActivity::class.java)
         activityScenario.onActivity { activity ->
