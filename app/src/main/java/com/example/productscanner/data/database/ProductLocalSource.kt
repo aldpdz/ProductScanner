@@ -11,6 +11,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.lang.Exception
 
+const val TEMP_ID = -1
+
 class ProductLocalSource internal constructor(
     private val productDao: ProductDao,
     private val ioDispatcher: CoroutineDispatcher
@@ -19,9 +21,23 @@ class ProductLocalSource internal constructor(
         productDao.insertAll(networkProducts.asDatabaseModel())
     }
 
+    override suspend fun insertTemp(product: DomainProduct) = withContext(ioDispatcher){
+        product.id = TEMP_ID
+        productDao.insert(product.asDatabaseProduct())
+    }
+
     override fun getProducts(): LiveData<Result<List<DomainProduct>>> {
         return productDao.getProducts().map {
             Result.Success(it.asDomainModel())
+        }
+    }
+
+    override suspend fun getTempProduct(): Result<DomainProduct> = withContext(ioDispatcher){
+        val tempProduct = productDao.getProduct(TEMP_ID)
+        return@withContext if(tempProduct != null){
+            Result.Success(tempProduct.asDomainModel())
+        }else{
+            Result.Error(Exception("No temp product"))
         }
     }
 

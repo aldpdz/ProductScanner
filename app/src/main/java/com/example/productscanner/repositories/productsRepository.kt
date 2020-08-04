@@ -38,6 +38,10 @@ class ProductsRepository (
      */
     override fun getProductsFromLocal() = productLocalSource.getProducts()
 
+    override suspend fun insertTempProduct(product: DomainProduct) {
+        productLocalSource.insertTemp(product)
+    }
+
     override suspend fun updateProduct(product: DomainProduct) {
         productLocalSource.updateProduct(product)
     }
@@ -48,6 +52,17 @@ class ProductsRepository (
 
     override suspend fun findByUPC(upc: String): Result<DomainProduct> {
         return productLocalSource.getProductByUPC(upc)
+    }
+
+    override suspend fun revertProduct(id: Int) {
+        // old product saved as a temp product
+        val tempProduct = productLocalSource.getTempProduct()
+        if(tempProduct is Result.Success){
+            // revert to previous values
+            val product = tempProduct.data
+            product.id = id
+            productLocalSource.updateProduct(product)
+        }
     }
 
     // Just for testing

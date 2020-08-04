@@ -13,6 +13,7 @@ import com.example.productscanner.R
 import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.receiver.DataChangedReceiver
 import com.example.productscanner.receiver.IS_CANCEL
+import com.example.productscanner.receiver.PRODUCT_ID
 import com.example.productscanner.view.MainActivity
 
 const val ID_NOTIFICATION_PRODUCT_UPDATED = 0
@@ -68,11 +69,10 @@ fun NotificationManager.sendNotification(
     messageBody: String,
     expandedMessage: String,
     applicationContext: Context,
-    domainProduct: DomainProduct
-)
+    updateProduct: DomainProduct)
 {
     val bundle = Bundle()
-    bundle.putParcelable("argProduct", domainProduct)
+    bundle.putParcelable("argProduct", updateProduct)
 
     // Action when clicking the notification
     val pendingIntent = NavDeepLinkBuilder(applicationContext)
@@ -90,6 +90,7 @@ fun NotificationManager.sendNotification(
 
     val dataChangeIntentCancel = Intent(applicationContext, DataChangedReceiver::class.java).apply {
         putExtra(IS_CANCEL, true)
+        putExtra(PRODUCT_ID, updateProduct.id)
     }
     val cancelPendingIntent = PendingIntent.getBroadcast(
         applicationContext, REQUEST_CODE_CANCEL, dataChangeIntentCancel, 0)

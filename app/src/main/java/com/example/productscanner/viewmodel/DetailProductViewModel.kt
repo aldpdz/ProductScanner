@@ -54,36 +54,43 @@ class DetailProductViewModel @ViewModelInject constructor(
         }
     }
 
-    fun sendNotification(oldProduct: DomainProduct?){
+    fun sendNotification(updatedProduct: DomainProduct?){
         val notificationManager = ContextCompat.getSystemService(appContext,
             NotificationManager::class.java) as NotificationManager
 
         // Create expanded text
         val expandedMsgStringBuilder = StringBuilder()
-        if(oldProduct?.quantity != _detailProduct.value?.quantity){
+        if(updatedProduct?.quantity != _detailProduct.value?.quantity){
             expandedMsgStringBuilder.append(appContext.getString(R.string.quantity_updated))
                 .append(_detailProduct.value?.quantity)
                 .append(appContext.getString(R.string.quantity_update_to))
-                .append(oldProduct?.quantity)
+                .append(updatedProduct?.quantity)
         }
 
-        if(oldProduct?.price != _detailProduct.value?.price){
+        if(updatedProduct?.price != _detailProduct.value?.price){
             if(expandedMsgStringBuilder.isNotEmpty()) expandedMsgStringBuilder.append("\n")
             expandedMsgStringBuilder.append(appContext.getString(R.string.price_updated))
                 .append(_detailProduct.value?.price)
                 .append(appContext.getString(R.string.price_updated_to))
-                .append(oldProduct?.price)
+                .append(updatedProduct?.price)
         }
+
         Log.d("Notification text", expandedMsgStringBuilder.toString())
 
-        _detailProduct.value?.let {
-            oldProduct?.let{
+        viewModelScope.launch {
+            // Saving old product as a temp product
+            _detailProduct.value?.let {
+                repository.insertTempProduct(it)
+            }
+        }
+
+        _detailProduct.value?.let { oldProduct ->
+            updatedProduct?.let{
                 notificationManager.sendNotification(
                     appContext.getString(R.string.messageNotification),
                     expandedMsgStringBuilder.toString(),
                     appContext,
-                    oldProduct
-                )
+                    updatedProduct)
             }
         }
     }
