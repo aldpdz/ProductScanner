@@ -29,11 +29,6 @@
         <argument
             android:name="argProduct"
             app:argType="com.example.productscanner.data.domain.DomainProduct" />
-        <action
-            android:id="@+id/action_detailProduct_to_mainFragment"
-            app:destination="@id/mainFragment"
-            app:popUpTo="@id/detailProduct"
-            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment

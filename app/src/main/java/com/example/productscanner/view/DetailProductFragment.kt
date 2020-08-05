@@ -59,9 +59,7 @@ class DetailProductFragment : Fragment() {
                 if(updatedProduct != product){ // if there are changes in the product
                     viewModel.sendNotification(updatedProduct)
                     updatedProduct?.let {viewModel.updateProduct(it)}
-                    this.findNavController()
-                        .navigate(DetailProductFragmentDirections
-                            .actionDetailProductToMainFragment())
+                    this.findNavController().popBackStack(R.id.mainFragment, false)
                 }
             }
         }
