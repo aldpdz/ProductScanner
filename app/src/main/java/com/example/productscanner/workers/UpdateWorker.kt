@@ -19,10 +19,9 @@ class UpdateWorker @WorkerInject constructor(
     : CoroutineWorker(ctx, params) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        Log.d("UpdateWorker", "Data has been revert")
-
         // Get the product id
         val productId = inputData.getInt(PRODUCT_ID, NO_ID_SET)
+        Log.d("UpdateWorker", "Data has been revert, id:".plus(productId.toString()))
 
         if(productId != NO_ID_SET){
             repository.revertProduct(productId)

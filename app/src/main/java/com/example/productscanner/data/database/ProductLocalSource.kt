@@ -11,7 +11,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.lang.Exception
 
-const val TEMP_ID = -1
+const val TEMP_ID = 0
 
 class ProductLocalSource internal constructor(
     private val productDao: ProductDao,

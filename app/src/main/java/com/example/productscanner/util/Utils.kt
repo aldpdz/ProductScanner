@@ -82,18 +82,23 @@ fun NotificationManager.sendNotification(
         .createPendingIntent()
 
     // Action when clicking the notification buttons
-    val dataChangeIntentAccept = Intent(applicationContext, DataChangedReceiver::class.java).apply {
-        putExtra(IS_CANCEL, false)
+    val dataChangeIntentAccept = Intent(applicationContext, DataChangedReceiver::class.java)
+        .apply {
+            putExtra(IS_CANCEL, PendingIntent.FLAG_UPDATE_CURRENT) // update the extra data
     }
     val acceptPendingIntent = PendingIntent.getBroadcast(
-        applicationContext, REQUEST_CODE_ACCEPT, dataChangeIntentAccept, 0)
+        applicationContext, REQUEST_CODE_ACCEPT, dataChangeIntentAccept,
+        PendingIntent.FLAG_UPDATE_CURRENT)
 
-    val dataChangeIntentCancel = Intent(applicationContext, DataChangedReceiver::class.java).apply {
-        putExtra(IS_CANCEL, true)
-        putExtra(PRODUCT_ID, updateProduct.id)
+    val dataChangeIntentCancel = Intent(applicationContext, DataChangedReceiver::class.java)
+        .apply {
+            putExtra(IS_CANCEL, true)
+            putExtra(PRODUCT_ID, updateProduct.id)
     }
     val cancelPendingIntent = PendingIntent.getBroadcast(
-        applicationContext, REQUEST_CODE_CANCEL, dataChangeIntentCancel, 0)
+        applicationContext, REQUEST_CODE_CANCEL, dataChangeIntentCancel,
+        PendingIntent.FLAG_UPDATE_CURRENT
+    )
 
     val soundUri = getSoundResource(R.raw.flick, applicationContext)
 
@@ -114,6 +119,7 @@ fun NotificationManager.sendNotification(
         .addAction(0,
             applicationContext.getString(R.string.cancel), cancelPendingIntent)
 
+    cancel(ID_NOTIFICATION_PRODUCT_UPDATED)
     // Send the notification
     notify(ID_NOTIFICATION_PRODUCT_UPDATED, builder.build())
 }

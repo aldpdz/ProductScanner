@@ -10,7 +10,7 @@ interface ProductDao {
      * Observes list of products
      * @return all products
      */
-    @Query("SELECT * from products WHERE id != -1")
+    @Query("SELECT * from products WHERE id != 0")
     fun getProducts(): LiveData<List<DatabaseProduct>>
 
     /***

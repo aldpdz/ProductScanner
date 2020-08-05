@@ -60,6 +60,7 @@ class DetailProductViewModel @ViewModelInject constructor(
 
         // Create expanded text
         val expandedMsgStringBuilder = StringBuilder()
+            .append(updatedProduct?.name?.plus("\n"))
         if(updatedProduct?.quantity != _detailProduct.value?.quantity){
             expandedMsgStringBuilder.append(appContext.getString(R.string.quantity_updated))
                 .append(_detailProduct.value?.quantity)
