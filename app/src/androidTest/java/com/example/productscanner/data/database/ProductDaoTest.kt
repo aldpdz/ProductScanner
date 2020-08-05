@@ -49,7 +49,7 @@ class ProductDaoTest {
             "upc-code", 25, 15.0f
         )
         val tempProduct = DatabaseProduct(
-            -1, "TempProduct", "Description", "Picture", "sku-code",
+            TEMP_ID, "TempProduct", "Description", "Picture", "sku-code",
             "upc-code", 0, 0.0f
         )
 

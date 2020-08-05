@@ -26,7 +26,7 @@ class FakeProductLocalSource :
     }
 
     override suspend fun insertTemp(product: DomainProduct) {
-        products[-1] = product.asDatabaseProduct()
+        products[TEMP_ID] = product.asDatabaseProduct()
     }
 
     override fun getProducts(): LiveData<Result<List<DomainProduct>>> {
@@ -37,7 +37,7 @@ class FakeProductLocalSource :
     }
 
     override suspend fun getTempProduct(): Result<DomainProduct> {
-        val tempProduct = products[-1]
+        val tempProduct = products[TEMP_ID]
         return if(tempProduct != null){
             Result.Success(tempProduct.asDomainModel())
         }else{

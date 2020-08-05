@@ -1,6 +1,9 @@
 package com.example.productscanner.view
 
+import android.content.Context
+import android.util.Log
 import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.action.ViewActions.click
@@ -11,6 +14,8 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.Configuration
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.example.productscanner.DataBindingIdlingResource
 import com.example.productscanner.R
 import com.example.productscanner.clearSharedPrefs
@@ -35,6 +40,9 @@ import org.junit.runner.RunWith
 @UninstallModules(ProductsRepositoryModule::class) // Ignore production module
 @HiltAndroidTest
 class MainActivityTest{
+
+    private lateinit var context: Context
+
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
@@ -54,6 +62,18 @@ class MainActivityTest{
     fun deletePreferences(){
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         clearSharedPrefs(context)
+    }
+
+    @Before
+    fun setup(){
+        context = ApplicationProvider.getApplicationContext()
+        val config = Configuration.Builder()
+            // Set log level to Log.DEBUG to make it easier to debug
+            .setMinimumLoggingLevel(Log.DEBUG)
+            .build()
+
+        // Initialize WorkManager for instrumentation test.
+        WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
     }
 
 //    /***
