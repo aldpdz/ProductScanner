@@ -93,7 +93,6 @@ class MainActivityTest{
 //        IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
 //    }
 //
-    // TODO - Add idle
     @Test
     fun editPriceQuantity(){
         val product1 = NetworkProduct(

@@ -45,9 +45,13 @@ class SharedViewModel @ViewModelInject constructor(
     private val _localStatus = MutableLiveData<LocalStatus>()
     val localStatus : LiveData<LocalStatus> get() = _localStatus
 
-    val products = repository.getProductsFromLocal().map { getData(it) }
+    val products = repository.getProductsFromLocal().map {
+        Log.d("ShareVM", "Data loaded from local source")
+        getData(it)
+    }
 
     private var _query: String? = null
+    private var _savedQuery: String? = null // Save query when changing views
 
     init {
         firstDataLoad()
@@ -149,11 +153,22 @@ class SharedViewModel @ViewModelInject constructor(
         filterProducts()
     }
 
+    fun saveQuery(){
+        _savedQuery = _query
+    }
+
     // TODO - maybe add a switchmap
     /***
      * Filter the products base on the name with a query
      */
     fun filterProducts(){
+
+        if(_savedQuery != null){
+            _query = _savedQuery
+        }
+        _savedQuery = null
+
+        Log.d("ShareVM", "Filter:".plus(_query))
         viewModelScope.launch {
             val idsFromPreferences = getIdsFromPreferences()
             products.value?.let {
@@ -161,6 +176,7 @@ class SharedViewModel @ViewModelInject constructor(
                     _productsFiltered.value = setSavedIds(products.value, idsFromPreferences)
                 }else{
                     val filteredProducts = ArrayList<DomainProduct>()
+                    // TODO - Use filter function
                     for(product in it){
                         if(product.name.toLowerCase(Locale.getDefault()).contains(_query!!)){
                             filteredProducts.add(product)

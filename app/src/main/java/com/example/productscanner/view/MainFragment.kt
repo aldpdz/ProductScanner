@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
@@ -63,6 +62,8 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
         })
         sharedViewModel.navigationToDetail.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {product ->
+                // Save query otherwise is set to "" when changing the views (shared same toolbar)
+                sharedViewModel.saveQuery()
                 this.findNavController()
                     .navigate(MainFragmentDirections
                         .actionMainFragmentToDetailProduct(product))
@@ -71,13 +72,11 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
         // TODO - maybe use flow for loadIdsFromPreferences to filterProducts
         sharedViewModel.products.observe(viewLifecycleOwner, Observer {
             it?.let{
-                Log.i("MainFragment", "Product loaded from database")
                 sharedViewModel.filterProducts()
             }
         })
         sharedViewModel.productsFiltered.observe(viewLifecycleOwner, Observer { productsList ->
             productsList?.let {
-                Log.d("Change list", "")
                 adapter.submitList(productsList)
             }
         })
