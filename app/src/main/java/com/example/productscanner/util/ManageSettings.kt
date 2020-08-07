@@ -12,7 +12,7 @@ class ManageSettings(
 )
     : LifecycleObserver{
 
-    val listener: SharedPreferences.OnSharedPreferenceChangeListener =
+    private val listener: SharedPreferences.OnSharedPreferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, s -> 
             callback(sharedPreferences)
         }

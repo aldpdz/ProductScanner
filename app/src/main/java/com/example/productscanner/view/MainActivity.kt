@@ -1,9 +1,7 @@
 package com.example.productscanner.view
 
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavController
@@ -19,19 +17,18 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
-    private lateinit var sharedPreferences: SharedPreferences
     private val mainViewModel by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Set theme
+        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
-        val binding = DataBindingUtil.setContentView<ActivityMainBinding>(
-            this, R.layout.activity_main)
+        DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
 
         // nav manages the up button
         navController = this.findNavController(R.id.navHostFragment)
         NavigationUI.setupActionBarWithNavController(this, navController)
 
-        readSettingPreferences()
         setSettingsListeners()
     }
 
@@ -39,18 +36,13 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp()
     }
 
-    private fun readSettingPreferences() {
-        Log.d("MainFragment", "reading settings")
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        mainViewModel.runWorker(sharedPreferences, false)
-    }
-
     private fun setSettingsListeners() {
         // Use the MainActivity to listen to changes in the settings
         // The fragments are killed when moving between them using navigation
         // causing the listeners never be called
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val manageSettings = ManageSettings(sharedPreferences){
-            mainViewModel.runWorker(it, true)
+            mainViewModel.runWorker(it)
         }
         lifecycle.addObserver(manageSettings)
     }

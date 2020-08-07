@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -43,6 +44,8 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
 
         binding.rvProducts.adapter = adapter
         binding.lifecycleOwner = viewLifecycleOwner // necessary to update values with bindingAdapter
+
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.app_name)
 
         setHasOptionsMenu(true)
         setObservers()
