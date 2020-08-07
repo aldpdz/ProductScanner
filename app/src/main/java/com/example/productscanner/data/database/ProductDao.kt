@@ -10,8 +10,14 @@ interface ProductDao {
      * Observes list of products
      * @return all products
      */
-    @Query("SELECT * from products")
+    @Query("SELECT * from products WHERE id != 0")
     fun getProducts(): LiveData<List<DatabaseProduct>>
+
+    /***
+     * Get the product by the id
+     */
+    @Query("SELECT * from products WHERE id = :id")
+    suspend fun getProduct(id: Int): DatabaseProduct?
 
     /***
      * Get the product by the sku code
@@ -31,6 +37,12 @@ interface ProductDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Overwrite if already exists
     suspend fun insertAll(products: List<DatabaseProduct>)
+
+    /***
+     * Insert a product
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(product: DatabaseProduct)
 
     /***
      * Update a product

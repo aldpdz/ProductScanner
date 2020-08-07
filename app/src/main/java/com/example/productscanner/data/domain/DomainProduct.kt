@@ -6,7 +6,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class DomainProduct(
-    val id: Int,
+    var id: Int,
     val name: String,
     val description: String,
     val picture: String,

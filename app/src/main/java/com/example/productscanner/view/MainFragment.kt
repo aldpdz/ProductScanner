@@ -5,18 +5,17 @@ import android.app.NotificationManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.example.productscanner.R
 import com.example.productscanner.databinding.FragmentMainBinding
 import com.example.productscanner.viewmodel.SharedViewModel
-import com.example.productscanner.viewmodel.ProductApiStatus
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
@@ -29,7 +28,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
     private lateinit var binding : FragmentMainBinding
     private lateinit var adapter: ProductAdapter
     private lateinit var searchView: SearchView
-    private val sharedViewModel by activityViewModels<SharedViewModel>()
+    private val sharedViewModel by viewModels<SharedViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,9 +45,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
         binding.rvProducts.adapter = adapter
         binding.lifecycleOwner = viewLifecycleOwner // necessary to update values with bindingAdapter
 
-        this.activity?.let {
-            sharedViewModel.firstDataLoad(it)
-        }
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.app_name)
 
         setHasOptionsMenu(true)
         setObservers()
@@ -62,40 +59,27 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private fun setObservers() {
         sharedViewModel.productsError.observe(viewLifecycleOwner, Observer { error ->
-            error?.let{
+            error.getContentIfNotHandled()?.let{
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             }
         })
         sharedViewModel.navigationToDetail.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {product ->
+                // Save query otherwise is set to "" when changing the views (shared same toolbar)
+                sharedViewModel.saveQuery()
                 this.findNavController()
                     .navigate(MainFragmentDirections
                         .actionMainFragmentToDetailProduct(product))
             }
         })
-        sharedViewModel.networkStatus.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                if(it == ProductApiStatus.DONE){
-                    this.activity?.let { activity -> sharedViewModel.setFirstDataLoad(activity) }
-                }
-            }
-        })
         // TODO - maybe use flow for loadIdsFromPreferences to filterProducts
         sharedViewModel.products.observe(viewLifecycleOwner, Observer {
             it?.let{
-                Log.i("MainFragment", "Product loaded from database")
-                this.activity?.let { activity -> sharedViewModel.loadIdsFromPreferences(activity) }
-            }
-        })
-        sharedViewModel.loadPreference.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                Log.i("MainFragment", "Starting to filter products")
                 sharedViewModel.filterProducts()
             }
         })
         sharedViewModel.productsFiltered.observe(viewLifecycleOwner, Observer { productsList ->
             productsList?.let {
-                Log.d("Change list", "")
                 adapter.submitList(productsList)
             }
         })
@@ -122,6 +106,10 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
             R.id.action_search -> {
                 true
             }
+            R.id.settings -> {
+                this.findNavController().navigate(MainFragmentDirections.actionMainFragmentToSettingsFragment())
+                true
+            }
             else -> return super.onOptionsItemSelected(item)
         }
 
@@ -132,7 +120,7 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
             val notificationChannel = NotificationChannel(
                 channelId,
                 channelName,
-                NotificationManager.IMPORTANCE_LOW)
+                NotificationManager.IMPORTANCE_DEFAULT)
                 .apply {
                     setShowBadge(false)
                 }

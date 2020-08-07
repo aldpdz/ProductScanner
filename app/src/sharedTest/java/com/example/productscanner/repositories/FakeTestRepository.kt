@@ -16,6 +16,7 @@ class FakeTestRepository: IProductsRepository {
     private var shouldReturnError = false
     private var _liveDataDBProducts = MutableLiveData<Result<List<DomainProduct>>>()
     private val liveDataDBProduct : LiveData<Result<List<DomainProduct>>> get() = _liveDataDBProducts
+    private var tempProduct: DatabaseProduct? = null
 
     fun setReturnError(value: Boolean){
         shouldReturnError = value
@@ -36,6 +37,10 @@ class FakeTestRepository: IProductsRepository {
 
     override fun getProductsFromLocal(): LiveData<Result<List<DomainProduct>>> {
         return liveDataDBProduct
+    }
+
+    override suspend fun insertTempProduct(product: DomainProduct) {
+        tempProduct = product.asDatabaseProduct()
     }
 
     override suspend fun updateProduct(product: DomainProduct) {
@@ -60,6 +65,14 @@ class FakeTestRepository: IProductsRepository {
             Result.Error(Exception("Product not found"))
         }else{
             Result.Success(databaseProducts.first { it.upc == upc }.asDomainModel())
+        }
+    }
+
+    override suspend fun revertProduct(id: Int) {
+        val tempProductDomain = tempProduct?.asDomainModel()
+        tempProductDomain?.let {
+            it.id = id
+            updateProduct(tempProductDomain)
         }
     }
 

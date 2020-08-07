@@ -15,6 +15,7 @@ import com.example.productscanner.networkToDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.core.IsEqual
 import org.junit.After
 import org.junit.Before
@@ -64,11 +65,11 @@ class ProductLocalSourceTest{
     fun insertProducts_getProducts() = runBlockingTest{
         // GIVEN - A new product added to the database
         val networkProduct = NetworkProduct(
-            0, "product", "description", "picture", "sku-code",
+            1, "product", "description", "picture", "sku-code",
             "upc-code", 0, 25.0f)
         localSource.insertProducts(listOf(networkProduct))
         val resultProduct = DomainProduct(
-            0, "product", "description", "picture", "sku-code",
+            1, "product", "description", "picture", "sku-code",
             "upc-code", 0, 25.0f, false)
 
         // WHEN - Retrieve all the tasks
@@ -76,18 +77,36 @@ class ProductLocalSourceTest{
         result as Result.Success
 
         // THEN - Same product is returned
-        assertThat(result.data[0], IsEqual(resultProduct))
+        assertThat(result.data.first(), IsEqual(resultProduct))
+    }
+
+    @Test
+    fun insertTempProduct() = runBlockingTest {
+        // GIVEN - A product
+        val product = DomainProduct(
+            1, "temp product", "Temporal product", "picture",
+            "sku-code", "upc-code", 1, 1.0f, false)
+
+        // WHEN - Insert the product
+        localSource.insertTemp(product)
+
+        // THEN - The product's id is 0
+        val result = localSource.getTempProduct()
+        result as Result.Success
+
+        // THEN - The updated product is returned with id 0
+        assertThat(result.data.id, `is`(TEMP_ID))
     }
 
     @Test
     fun updateProduct() = runBlockingTest {
         // GIVEN - A new product added to the database and an updated product
         val networkProduct = NetworkProduct(
-            0, "product", "description", "picture", "sku-code",
+            1, "product", "description", "picture", "sku-code",
             "upc-code", 0, 25.0f)
         localSource.insertProducts(listOf(networkProduct))
         val updateProduct = DomainProduct(
-            0, "product", "description", "picture", "sku-code",
+            1, "product", "description", "picture", "sku-code",
             "upc-code", 1, 50.0f, false)
 
         // WHEN - Update the product
@@ -96,17 +115,17 @@ class ProductLocalSourceTest{
         result as Result.Success
 
         // THEN - The updated product is returned
-        assertThat(result.data[0], IsEqual(updateProduct))
+        assertThat(result.data.first(), IsEqual(updateProduct))
     }
 
     @Test
     fun getProductByUPC() = runBlockingTest{
         // GIVEN - Two products
         val networkProduct1 = NetworkProduct(
-            0, "product1", "description", "picture", "sku-code1",
+            1, "product1", "description", "picture", "sku-code1",
             "upc-code1", 0, 25.0f)
         val networkProduct2 = NetworkProduct(
-            0, "product2", "description", "picture", "sku-code2",
+            2, "product2", "description", "picture", "sku-code2",
             "upc-code2", 0, 25.0f)
         localSource.insertProducts(listOf(networkProduct1, networkProduct2))
 
@@ -121,10 +140,10 @@ class ProductLocalSourceTest{
     fun getProductBySKU() = runBlockingTest{
         // GIVEN - Two products
         val networkProduct1 = NetworkProduct(
-            0, "product1", "description", "picture", "sku-code1",
+            1, "product1", "description", "picture", "sku-code1",
             "upc-code1", 0, 25.0f)
         val networkProduct2 = NetworkProduct(
-            0, "product2", "description", "picture", "sku-code2",
+            2, "product2", "description", "picture", "sku-code2",
             "upc-code2", 0, 25.0f)
         localSource.insertProducts(listOf(networkProduct1, networkProduct2))
 
@@ -133,5 +152,24 @@ class ProductLocalSourceTest{
 
         // THEN - The product is product2
         assertThat(result.data, IsEqual(networkToDomain(networkProduct2)))
+    }
+
+    @Test
+    fun getTempProduct() = runBlockingTest{
+        // GIVEN - Two products
+        val networkProduct1 = NetworkProduct(
+            1, "product1", "description", "picture", "sku-code1",
+            "upc-code1", 0, 25.0f)
+        val networkProduct2 = NetworkProduct(
+            2, "product2", "description", "picture", "sku-code2",
+            "upc-code2", 0, 25.0f)
+        localSource.insertProducts(listOf(networkProduct1, networkProduct2))
+        localSource.insertTemp(networkToDomain(networkProduct1))
+
+        // WHEN - Getting the temp product
+        val result = localSource.getTempProduct() as Result.Success
+
+        // THEN - The product is product2
+        assertThat(result.data, IsEqual(networkToDomain(networkProduct1).apply { id = 0 }))
     }
 }
