@@ -106,7 +106,7 @@ fun NotificationManager.sendNotification(
     val builder = NotificationCompat.Builder(
         applicationContext,
         applicationContext.getString(R.string.product_notification_channel_id))
-        .setSmallIcon(R.mipmap.ic_launcher)
+        .setSmallIcon(R.drawable.ic_notification)
         .setContentTitle(applicationContext.getString(R.string.notification_update_title))
         .setContentText(messageBody)
         .setStyle(NotificationCompat.BigTextStyle().bigText(expandedMessage))
@@ -138,7 +138,7 @@ fun NotificationManager.sendSimpleNotification(applicationContext: Context){
     val builder = NotificationCompat.Builder(
         applicationContext,
         applicationContext.getString(R.string.product_notification_channel_id))
-        .setSmallIcon(R.mipmap.ic_launcher)
+        .setSmallIcon(R.drawable.ic_notification)
         .setContentTitle(applicationContext.getString(R.string.notification_sync_title))
         .setSound(uriSound)
         .setContentIntent(contentPendingIntent)
@@ -148,7 +148,7 @@ fun NotificationManager.sendSimpleNotification(applicationContext: Context){
 }
 
 /***
- * Get the ringtone form the android resources
+ * Get the ringtone from the android resources
  */
 fun getSoundResource(resourceId: Int, context: Context): Uri{
     return Uri.parse("android.resource://"
