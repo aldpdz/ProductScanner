@@ -14,56 +14,60 @@
         android:layout_height="match_parent"
         tools:context=".view.CameraFragment">
 
-        <ImageView
-            android:id="@+id/imagePreview"
+        <androidx.camera.view.PreviewView
+            android:id="@+id/viewFinder"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="match_parent"/>
+<!--        <ImageView-->
+<!--            android:id="@+id/imagePreview"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:scaleType="centerCrop"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
 
-        <Button
-            android:id="@+id/btn_scan_upc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:text="scan upc"
-            android:visibility="@{viewModel.btnVisibility}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/guideline"
-            app:layout_constraintStart_toStartOf="parent" />
+<!--        <Button-->
+<!--            android:id="@+id/btn_scan_upc"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginBottom="24dp"-->
+<!--            android:text="scan upc"-->
+<!--            android:visibility="@{viewModel.btnVisibility}"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toStartOf="@+id/guideline"-->
+<!--            app:layout_constraintStart_toStartOf="parent" />-->
 
-        <com.otaliastudios.cameraview.CameraView
-            android:id="@+id/cameraView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:cameraAudio="off"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintTop_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:visibility="gone">
+<!--        <com.otaliastudios.cameraview.CameraView-->
+<!--            android:id="@+id/cameraView"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            app:cameraAudio="off"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            tools:visibility="gone">-->
 
-        </com.otaliastudios.cameraview.CameraView>
+<!--        </com.otaliastudios.cameraview.CameraView>-->
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent=".5"/>
+<!--        <androidx.constraintlayout.widget.Guideline-->
+<!--            android:id="@+id/guideline"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical"-->
+<!--            app:layout_constraintGuide_percent=".5"/>-->
 
-        <Button
-            android:id="@+id/btn_scan_sku"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="@{viewModel.btnVisibility}"
-            android:text="scan sku"
-            app:layout_constraintBottom_toBottomOf="@+id/btn_scan_upc"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/guideline" />
+<!--        <Button-->
+<!--            android:id="@+id/btn_scan_sku"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:visibility="@{viewModel.btnVisibility}"-->
+<!--            android:text="scan sku"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/btn_scan_upc"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/guideline" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

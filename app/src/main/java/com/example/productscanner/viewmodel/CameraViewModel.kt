@@ -4,10 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.view.View
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.productscanner.data.Result
 import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.repositories.IProductsRepository
@@ -26,6 +23,7 @@ import kotlinx.coroutines.tasks.await
 enum class ScannerStatusItem {FOUND}
 enum class ScannerStatus{TRY_AGAIN, FAIL}
 enum class TypeScanner {UPC, SKU}
+enum class CameraStatus {STOP, START}
 
 class CameraViewModel @ViewModelInject constructor(
     private val repository: IProductsRepository
@@ -41,139 +39,137 @@ class CameraViewModel @ViewModelInject constructor(
     private val _scannerStatus = MutableLiveData<Event<ScannerStatus>>()
     val scannerStatus: LiveData<Event<ScannerStatus>> get() = _scannerStatus
 
-    private val _btnVisibility = MutableLiveData<Int>()
-    val btnVisibility: LiveData<Int> get() = _btnVisibility
+    val cameraStatus = MutableLiveData<Event<CameraStatus>>()
 
-    private val _bitMap = MutableLiveData<Bitmap>()
-    val bitMap: LiveData<Bitmap> get() = _bitMap
+    val sku = MutableLiveData<String>()
+    val productSKU = sku.switchMap { getProduct(it, TypeScanner.SKU) }
+
+    val upc = MutableLiveData<String>()
+    val productUPC = upc.switchMap { getProduct(it, TypeScanner.UPC) }
+
+//    private val _btnVisibility = MutableLiveData<Int>()
+//    val btnVisibility: LiveData<Int> get() = _btnVisibility
+
+//    private val _bitMap = MutableLiveData<Bitmap>()
+//    val bitMap: LiveData<Bitmap> get() = _bitMap
 
     private val _productByCode = MutableLiveData<Event<DomainProduct>>()
     val productByCode: LiveData<Event<DomainProduct>> get() = _productByCode
 
-    var typeScanner: TypeScanner? = null
+//    var typeScanner: TypeScanner? = null
 
-    init {
-        _btnVisibility.value = View.VISIBLE
-    }
+//    init {
+//        _btnVisibility.value = View.VISIBLE
+//    }
 
     // TODO instrumental test
-    fun processInputImage(byteArray: ByteArray){
-        val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-        _bitMap.value = bitmap
+//    fun processInputImage(inputImage: InputImage){
+////        val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+////        _bitMap.value = bitmap
+//        runBarcodeScanner(inputImage)
+//        runTextRecognition(inputImage)
+////        when(typeScanner){
+////            TypeScanner.UPC -> {
+////                runBarcodeScanner(bitmap)
+////            }
+////            TypeScanner.SKU -> {
+////                textRecognition(bitmap)
+////            }
+////        }
+//    }
 
-        when(typeScanner){
-            TypeScanner.UPC -> {
-                runBarcodeScanner(bitmap)
-            }
-            TypeScanner.SKU -> {
-                textRecognition(bitmap)
-            }
-        }
-    }
+//    private fun runBarcodeScanner(inputImage: InputImage){
+//        viewModelScope.launch {
+////            val image = InputImage.fromBitmap(bitmap, 0)
+//
+//            val options = BarcodeScannerOptions.Builder()
+//                .setBarcodeFormats(Barcode.FORMAT_UPC_A, Barcode.FORMAT_UPC_E)
+//                .build()
+//
+//            val scanner = BarcodeScanning.getClient(options)
+//
+//            try{
+//                val barCodes = processImageBarCode(inputImage, scanner)
+//                processBarCodes(barCodes)
+//            }catch (e: Exception){
+//                _scannerStatus.value = Event(ScannerStatus.FAIL)
+//            }
+//        }
+//    }
 
-    private fun runBarcodeScanner(bitmap: Bitmap){
-        viewModelScope.launch {
-            val image = InputImage.fromBitmap(bitmap, 0)
+//    private fun runTextRecognition(inputImage: InputImage){
+//        viewModelScope.launch {
+////            val image = InputImage.fromBitmap(i, 0)
+//            val recognizer = TextRecognition.getClient()
+//            try {
+//                val text = processImageText(inputImage, recognizer)
+//                processTextRecognitionResult(text)
+//            }catch (e: Exception){
+//                _scannerStatus.value = Event(ScannerStatus.FAIL)
+//            }
+//        }
+//    }
 
-            val options = BarcodeScannerOptions.Builder()
-                .setBarcodeFormats(Barcode.FORMAT_UPC_A, Barcode.FORMAT_UPC_E)
-                .build()
+//    private suspend fun processImageBarCode(inputImage: InputImage, scanner: BarcodeScanner):
+//            List<Barcode> = withContext(Dispatchers.Default){
+//        return@withContext scanner.process(inputImage).await()
+//    }
+//
+//    private suspend fun processImageText(inputImage: InputImage, recognizer: TextRecognizer):
+//            Text = withContext(Dispatchers.Default) {
+//        return@withContext recognizer.process(inputImage).await()
+//    }
+//
+//    private fun processBarCodes(barCodes: List<Barcode>){
+//        if(barCodes.isEmpty()){
+//            _scannerStatus.value = Event(ScannerStatus.TRY_AGAIN)
+//        }else{
+//            val barCode: String? = barCodes[0].displayValue
+//            barCode?.let {
+//                getProduct(it, TypeScanner.UPC)
+//            }
+//        }
+//    }
 
-            val scanner = BarcodeScanning.getClient(options)
-
-            try{
-                val barCodes = processImageBarCode(image, scanner)
-                processBarCodes(barCodes)
-            }catch (e: Exception){
-                _scannerStatus.value = Event(ScannerStatus.FAIL)
-            }
-        }
-    }
-
-    private fun textRecognition(bitmap: Bitmap){
-        viewModelScope.launch {
-            val image = InputImage.fromBitmap(bitmap, 0)
-            val recognizer = TextRecognition.getClient()
-            try {
-                val text = processImageText(image, recognizer)
-                processTextRecognitionResult(text)
-            }catch (e: Exception){
-                _scannerStatus.value = Event(ScannerStatus.FAIL)
-            }
-        }
-    }
-
-    private suspend fun processImageBarCode(inputImage: InputImage, scanner: BarcodeScanner):
-            List<Barcode> = withContext(Dispatchers.Default){
-        return@withContext scanner.process(inputImage).await()
-    }
-
-    private suspend fun processImageText(inputImage: InputImage, recognizer: TextRecognizer):
-            Text = withContext(Dispatchers.Default) {
-        return@withContext recognizer.process(inputImage).await()
-    }
-
-    private fun processBarCodes(barCodes: List<Barcode>){
-        if(barCodes.isEmpty()){
-            _scannerStatus.value = Event(ScannerStatus.TRY_AGAIN)
-        }else{
-            val barCode: String? = barCodes[0].displayValue
-            barCode?.let {
-                getProduct(it)
-            }
-        }
-    }
-
-    private fun processTextRecognitionResult(texts: Text){
-        val blocks = texts.textBlocks
-        if(blocks.isEmpty()){
-            _scannerStatus.value = Event(ScannerStatus.TRY_AGAIN)
-        }else{
-            val skuCode = findSKUCode(texts.text)
-            if (skuCode == null){
-                _scannerStatus.value = Event(ScannerStatus.TRY_AGAIN)
-            }else{
-                getProduct(skuCode)
-            }
-        }
-    }
+//    private fun processTextRecognitionResult(texts: Text){
+//        val blocks = texts.textBlocks
+//        if(blocks.isEmpty()){
+//            _scannerStatus.value = Event(ScannerStatus.TRY_AGAIN)
+//        }else{
+//            val skuCode = findSKUCode(texts.text)
+//            if (skuCode == null){
+//                _scannerStatus.value = Event(ScannerStatus.TRY_AGAIN)
+//            }else{
+//                getProduct(skuCode, TypeScanner.SKU)
+//            }
+//        }
+//    }
 
 
-    private fun getProduct(code: String){
+    private fun getProduct(code: String, typeScanner: TypeScanner) : LiveData<DomainProduct>{
+        // TODO - Use live data builder
+        val result = MutableLiveData<DomainProduct>()
         viewModelScope.launch {
             when(typeScanner){
                 TypeScanner.SKU -> {
-                    val result = repository.findBySKU(code)
-                    checkResult(result)
+                    val findResult = repository.findBySKU(code)
+                    if(findResult is Result.Success){
+                        result.value = findResult.data
+                    }else{
+                        result.value = null
+                    }
                 }
                 TypeScanner.UPC -> {
-                    val result = repository.findByUPC(code)
-                    checkResult(result)
+                    val findResult = repository.findByUPC(code)
+                    if(findResult is Result.Success){
+                        result.value = findResult.data
+                    }else{
+                        result.value = null
+                    }
                 }
             }
         }
-//        var found = false
-//        for(product in products?.value!!){
-//            when(typeScanner){
-//                TypeScanner.UPC -> {
-//                    if(product.upc == code){
-//                        productByBarCode = product
-//                        found = true
-//                    }
-//                }
-//                TypeScanner.SKU -> {
-//                    if(product.sku == code){
-//                        productByBarCode = product
-//                        found = true
-//                    }
-//                }
-//            }
-//        }
-//        if(found){
-//            _scannerStatusItem.value = Event(ScannerStatusItem.FOUND)
-//        }else{
-//            _scannerStatusItem.value = Event(ScannerStatusItem.NOT_FOUND)
-//        }
+        return result
     }
 
     private fun checkResult(result: Result<DomainProduct>){
@@ -184,11 +180,11 @@ class CameraViewModel @ViewModelInject constructor(
         }
     }
 
-    fun hideButtons(){
-        _btnVisibility.value = View.GONE
-    }
-
-    fun showButtons(){
-        _btnVisibility.value = View.VISIBLE
-    }
+//    fun hideButtons(){
+//        _btnVisibility.value = View.GONE
+//    }
+//
+//    fun showButtons(){
+//        _btnVisibility.value = View.VISIBLE
+//    }
 }
