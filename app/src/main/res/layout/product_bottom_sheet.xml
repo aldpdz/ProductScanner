@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/AppTheme">
+
+    <ImageView
+        android:id="@+id/image_view_bs"
+        android:layout_width="@dimen/productImageBottomSheet"
+        android:layout_height="@dimen/productImageBottomSheet"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+    <TextView
+        android:id="@+id/tv_price_bs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/money"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/image_view_bs"
+        app:layout_constraintStart_toStartOf="@+id/tv_quantity_text_bs"
+        app:layout_constraintTop_toBottomOf="@+id/tv_quantity_text_bs"
+        tools:text="$150.00" />
+
+    <TextView
+        android:id="@+id/tv_quantity_bs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textSize="24sp"
+        app:layout_constraintStart_toEndOf="@+id/tv_quantity_text_bs"
+        app:layout_constraintTop_toTopOf="@+id/tv_quantity_text_bs"
+        tools:text="5" />
+
+    <TextView
+        android:id="@+id/tv_quantity_text_bs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/quantity"
+        android:textSize="24sp"
+        app:layout_constraintStart_toEndOf="@+id/image_view_bs"
+        app:layout_constraintTop_toTopOf="@+id/image_view_bs" />
+
+    <TextView
+        android:id="@+id/tv_name_bs"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/image_view_bs"
+        app:layout_constraintTop_toBottomOf="@+id/image_view_bs"
+        tools:text="Product name" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_bs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@color/colorAccent"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toTopOf="@+id/tv_name_bs"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_baseline_arrow_forward_24" />
+</androidx.constraintlayout.widget.ConstraintLayout>

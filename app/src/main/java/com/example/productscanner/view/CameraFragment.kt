@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.util.Size
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,24 +13,20 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageCapture
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 
 import com.example.productscanner.R
+import com.example.productscanner.data.domain.DomainProduct
 import com.example.productscanner.databinding.CameraFragmentBinding
 import com.example.productscanner.viewmodel.*
-//import com.otaliastudios.cameraview.CameraListener
-//import com.otaliastudios.cameraview.PictureResult
+import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.camera_fragment.*
-import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -37,14 +34,13 @@ import java.util.concurrent.Executors
 class CameraFragment : Fragment() {
 
     private val viewModel by viewModels<CameraViewModel>()
-    private val shareViewModel by activityViewModels<SharedViewModel>()
     private lateinit var binding: CameraFragmentBinding
 
-    private var imageCapture: ImageCapture? = null
+    private lateinit var cameraProviderFuture : ListenableFuture<ProcessCameraProvider>
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var cameraProvider: ProcessCameraProvider
-    private lateinit var preview: Preview
     private lateinit var imageAnalyzer: ImageAnalysis
+
+    private var productBottomDialogFragment: ProductBottomDialogFragment? = null
 
     companion object {
         private const val TAG = "CameraXBasic"
@@ -61,12 +57,12 @@ class CameraFragment : Fragment() {
 
         binding = CameraFragmentBinding.inflate(inflater)
         binding.lifecycleOwner = viewLifecycleOwner
-//        binding.cameraView.setLifecycleOwner(viewLifecycleOwner)
 
         binding.viewModel = viewModel
 
         // Request camera permissions
         if (allPermissionsGranted()){
+            cameraProviderFuture = ProcessCameraProvider.getInstance(activity as MainActivity)
             startCamera()
         }else{
             ActivityCompat.requestPermissions(activity as MainActivity,
@@ -74,30 +70,6 @@ class CameraFragment : Fragment() {
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
-
-//        hidePreview()
-
-//        binding.btnScanUpc.setOnClickListener {
-//            viewModel.typeScanner = TypeScanner.UPC
-//            binding.cameraView.takePicture()
-//            viewModel.hideButtons()
-//        }
-//
-//        binding.btnScanSku.setOnClickListener {
-//            viewModel.typeScanner = TypeScanner.SKU
-//            binding.cameraView.takePicture()
-//            viewModel.hideButtons()
-//        }
-//
-//        binding.cameraView.addCameraListener(object: CameraListener(){
-//            @Override
-//            override fun onPictureTaken(result: PictureResult) {
-//                Log.d("Camera View", "Picture taken")
-//                viewModel.processInputImage(result.data)
-//
-//            }
-//        })
-
         setObservers()
 
         return binding.root
@@ -112,7 +84,14 @@ class CameraFragment : Fragment() {
 
         viewModel.productSKU.observe(viewLifecycleOwner, Observer {
             it?.let {
-                Toast.makeText(context, it.name, Toast.LENGTH_SHORT).show()
+                cameraProviderFuture.get().unbindAll()
+                if (productBottomDialogFragment == null){
+                    newBottomSheet(it)
+                } else{
+                    if (!productBottomDialogFragment!!.isVisible){
+                        newBottomSheet(it)
+                    }
+                }
             }
         })
 
@@ -122,59 +101,21 @@ class CameraFragment : Fragment() {
             }
         })
 
-//        viewModel.cameraStatus.observe(viewLifecycleOwner, Observer {
-//            it.getContentIfNotHandled()?.let {cameraStatus ->
-//                when(cameraStatus){
-//                    CameraStatus.START -> {
-//                        Log.d(TAG, "Restart processing")
-//                        reBind()
-//                    }
-//                    CameraStatus.STOP -> {
-//                        Log.d(TAG, "Stop processing")
-//                        cameraProvider.unbind(imageAnalyzer)
-//                        cameraProvider.unbind(preview)
-//                    }
-//                }
-//            }
-//        })
+        viewModel.bottomSheetPaused.observe(viewLifecycleOwner, Observer {
+            it.getContentIfNotHandled()?.let { isPaused ->
+                if(isPaused){
+                    startCamera()
+                }
+            }
+        })
+    }
 
-        // The scanner was successful
-//        viewModel.scannerStatusItem.observe(viewLifecycleOwner, Observer {
-//            it.getContentIfNotHandled()?.let {scannerStatusItem ->
-//                // TODO add to string resources
-//                Toast.makeText(context, "Item not found",Toast.LENGTH_LONG).show()
-////                hidePreview()
-//            }
-//        })
-
-//        viewModel.productByCode.observe(viewLifecycleOwner, Observer { it ->
-//            it.getContentIfNotHandled()?.let{product ->
-//                this.findNavController()
-//                    .navigate(CameraFragmentDirections
-//                        .actionCameraxToDetailProduct(product))
-//            }
-//        })
-
-        // If the scanner fail
-//        viewModel.scannerStatus.observe(viewLifecycleOwner, Observer {
-//            it.getContentIfNotHandled()?.let { scannerStatus ->
-//                when(scannerStatus){
-//                    ScannerStatus.TRY_AGAIN -> {
-//                        tryAgain()
-//                    }
-//                    ScannerStatus.FAIL -> {
-//                        onFail()
-//                    }
-//                }
-//            }
-//        })
-
-//        viewModel.bitMap.observe(viewLifecycleOwner, Observer {
-//            it?.let {
-//                binding.imagePreview.setImageBitmap(it)
-//                showPreview()
-//            }
-//        })
+    private fun newBottomSheet(product: DomainProduct) {
+        productBottomDialogFragment =
+            ProductBottomDialogFragment(viewModel.bottomSheetPaused, product)
+        productBottomDialogFragment?.let {
+            it.show((activity as MainActivity).supportFragmentManager, it.tag)
+        }
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
@@ -183,24 +124,22 @@ class CameraFragment : Fragment() {
     }
 
     private fun startCamera() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance((activity as MainActivity))
+        cameraProviderFuture = ProcessCameraProvider.getInstance((activity as MainActivity))
 
         cameraProviderFuture.addListener(Runnable {
             // Used to bind the lifecycle of camera to the lifecycle owner
-            cameraProvider = cameraProviderFuture.get()
+            val cameraProvider = cameraProviderFuture.get()
 
             // Preview
-            preview = Preview.Builder()
+            val preview = Preview.Builder()
                 .build()
                 .also {
                     it.setSurfaceProvider(viewFinder.createSurfaceProvider())
                 }
 
-//            imageCapture = ImageCapture.Builder()
-//                .build()
-
             imageAnalyzer = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .setTargetResolution(Size(480, 640))
                 .build()
                 .also {
                     it.setAnalyzer(cameraExecutor, ScannerAnalyzer(
@@ -223,11 +162,6 @@ class CameraFragment : Fragment() {
         }, ContextCompat.getMainExecutor(activity))
     }
 
-    private fun reBind(){
-        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-        cameraProvider.bindToLifecycle(viewLifecycleOwner, cameraSelector, preview)
-    }
-
     private fun onFail() {
         // TODO add to string resources
         Toast.makeText(
@@ -235,7 +169,6 @@ class CameraFragment : Fragment() {
             "Sorry, something went wrong!",
             Toast.LENGTH_LONG
         ).show()
-//        hidePreview()
     }
 
     private fun tryAgain() {
@@ -243,7 +176,6 @@ class CameraFragment : Fragment() {
         Toast.makeText(
             activity, "Try again", Toast.LENGTH_SHORT
         ).show()
-//        hidePreview()
     }
 
     override fun onRequestPermissionsResult(
@@ -262,15 +194,4 @@ class CameraFragment : Fragment() {
             }
         }
     }
-
-    //    private fun showPreview() {
-//        binding.imagePreview.visibility = View.VISIBLE
-//        binding.cameraView.visibility = View.GONE
-//    }
-//
-//    private fun hidePreview() {
-//        binding.imagePreview.visibility = View.GONE
-//        binding.cameraView.visibility = View.VISIBLE
-//        viewModel.showButtons()
-//    }
 }
