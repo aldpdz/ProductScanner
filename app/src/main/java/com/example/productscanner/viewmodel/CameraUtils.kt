@@ -33,19 +33,20 @@ class ScannerAnalyzer(
     private val upc: MutableLiveData<String>)
     : ImageAnalysis.Analyzer {
 
+    var imageProxy : ImageProxy? = null
+
     companion object {
         private const val TAG = "ScannerAnalyzer"
     }
 
     @SuppressLint("UnsafeExperimentalUsageError")
     override fun analyze(imageProxy: ImageProxy) {
+        this.imageProxy = imageProxy
         val mediaImage = imageProxy.image
         if(mediaImage != null){
             val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
 //            runBarcodeScanner(image)
-            runTextRecognition(image).addOnCompleteListener {
-                imageProxy.close()
-            }
+            runTextRecognition(image)
         }
     }
 
@@ -73,6 +74,7 @@ class ScannerAnalyzer(
             }
             .addOnFailureListener { exception ->
                 Log.e(TAG, "text recognition error", exception)
+                imageProxy?.close()
             }
     }
 
@@ -92,10 +94,15 @@ class ScannerAnalyzer(
         val blocks = texts.textBlocks
         if(blocks.isEmpty()){
             Log.d(TAG, "Empty list Text Recognition")
+            imageProxy?.close()
         }else{
             Log.d(TAG, texts.text)
             val skuCode = findSKUCode(texts.text)
-            skuCode?.let { sku.value = it }
+            if(skuCode == null){
+                imageProxy?.close()
+            }else{
+                sku.value = skuCode
+            }
         }
     }
 }

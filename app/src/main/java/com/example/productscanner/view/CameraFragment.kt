@@ -26,7 +26,6 @@ import com.example.productscanner.databinding.CameraFragmentBinding
 import com.example.productscanner.viewmodel.*
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.camera_fragment.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -39,6 +38,7 @@ class CameraFragment : Fragment() {
     private lateinit var cameraProviderFuture : ListenableFuture<ProcessCameraProvider>
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var imageAnalyzer: ImageAnalysis
+    private var scannerAnalyzer: ScannerAnalyzer? = null
 
     private var productBottomDialogFragment: ProductBottomDialogFragment? = null
 
@@ -75,6 +75,13 @@ class CameraFragment : Fragment() {
         return binding.root
     }
 
+    override fun onPause() {
+        super.onPause()
+        // Dismiss dialog to avoid issues with configuration changes
+        // when restoring the dialog fragment
+        productBottomDialogFragment?.dismiss()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
@@ -83,21 +90,16 @@ class CameraFragment : Fragment() {
     private fun setObservers(){
 
         viewModel.productSKU.observe(viewLifecycleOwner, Observer {
-            it?.let {
+            it?.getContentIfNotHandled()?.let { product ->
                 cameraProviderFuture.get().unbindAll()
-                if (productBottomDialogFragment == null){
-                    newBottomSheet(it)
-                } else{
-                    if (!productBottomDialogFragment!!.isVisible){
-                        newBottomSheet(it)
-                    }
-                }
+                newBottomSheet(product)
             }
+            scannerAnalyzer?.imageProxy?.close()
         })
 
         viewModel.productUPC.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                Toast.makeText(context, it.name, Toast.LENGTH_SHORT).show()
+            it?.getContentIfNotHandled()?.let {product ->
+                Toast.makeText(context, product.name, Toast.LENGTH_SHORT).show()
             }
         })
 
@@ -134,7 +136,7 @@ class CameraFragment : Fragment() {
             val preview = Preview.Builder()
                 .build()
                 .also {
-                    it.setSurfaceProvider(viewFinder.createSurfaceProvider())
+                    it.setSurfaceProvider(binding.viewFinder.createSurfaceProvider())
                 }
 
             imageAnalyzer = ImageAnalysis.Builder()
@@ -142,8 +144,9 @@ class CameraFragment : Fragment() {
                 .setTargetResolution(Size(480, 640))
                 .build()
                 .also {
-                    it.setAnalyzer(cameraExecutor, ScannerAnalyzer(
-                        viewModel.cameraStatus, viewModel.sku, viewModel.upc))
+                    scannerAnalyzer = ScannerAnalyzer(
+                        viewModel.cameraStatus, viewModel.sku, viewModel.upc)
+                    it.setAnalyzer(cameraExecutor, scannerAnalyzer!!)
                 }
 
             // Select back camera as a default

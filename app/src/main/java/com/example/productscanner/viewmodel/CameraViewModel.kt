@@ -36,15 +36,15 @@ class CameraViewModel @ViewModelInject constructor(
     val upc = MutableLiveData<String>()
     val productUPC = upc.switchMap { getProduct(it, TypeScanner.UPC) }
 
-    private fun getProduct(code: String, typeScanner: TypeScanner) : LiveData<DomainProduct>{
+    private fun getProduct(code: String, typeScanner: TypeScanner) : LiveData<Event<DomainProduct>>{
         // TODO - Use live data builder
-        val result = MutableLiveData<DomainProduct>()
+        val result = MutableLiveData<Event<DomainProduct>>()
         viewModelScope.launch {
             when(typeScanner){
                 TypeScanner.SKU -> {
                     val findResult = repository.findBySKU(code)
                     if(findResult is Result.Success){
-                        result.value = findResult.data
+                        result.value = Event(findResult.data)
                     }else{
                         result.value = null
                     }
@@ -52,7 +52,7 @@ class CameraViewModel @ViewModelInject constructor(
                 TypeScanner.UPC -> {
                     val findResult = repository.findByUPC(code)
                     if(findResult is Result.Success){
-                        result.value = findResult.data
+                        result.value = Event(findResult.data)
                     }else{
                         result.value = null
                     }
