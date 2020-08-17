@@ -1,14 +1,10 @@
 package com.example.productscanner.viewmodel
 
-import android.view.View
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import com.example.productscanner.getOrAwaitValue
 import com.example.productscanner.repositories.FakeTestRepository
-import org.hamcrest.CoreMatchers.`is`
 
 class CameraViewModelTest{
 
@@ -24,13 +20,6 @@ class CameraViewModelTest{
     fun setupViewModel(){
         repository = FakeTestRepository()
         cameraViewModel = CameraViewModel(repository)
-    }
-
-    @Test
-    fun atStart_buttonsAreVisible(){
-        // Then the buttons are visible
-        val value = cameraViewModel.btnVisibility.getOrAwaitValue()
-        assertThat(value, `is`(View.VISIBLE))
     }
 
     @Test
@@ -66,7 +55,7 @@ class CameraViewModelTest{
 //        cameraViewModel.setProducts(listProducts)
 //
 //        // WHEN - scanning an image
-//        // TODO not working
+//        not working
 //        val image = CameraViewModelTest::class.java.getResource("/fish-bike.jpg")!!.readBytes()
 //        cameraViewModel.typeScanner = TypeScanner.UPC
 //        cameraViewModel.processInputImage(image)
@@ -78,30 +67,5 @@ class CameraViewModelTest{
 //        assertThat(product, IsEqual(product1))
 //        // The status is FOUND
 //        assertThat(statusScannerStatusItem.getContentIfNotHandled(), `is`(ScannerStatusItem.FOUND))
-    }
-
-    @Test
-    fun getProduct_upc_productNotFound(){
-        // TODO - Implement test
-    }
-
-    @Test
-    fun getProduct_sku_productFound(){
-        // TODO - Implement test
-    }
-
-    @Test
-    fun getProduct_sku_productNotFound(){
-        // TODO - Implement test
-    }
-
-    @Test
-    fun processInputImage_upc_tryAgain(){
-        // TODO - Implement test
-    }
-
-    @Test
-    fun processInputImage_sku_tryAgain(){
-        // TODO - Implement test
     }
 }
