@@ -72,7 +72,6 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
                         .actionMainFragmentToDetailProduct(product))
             }
         })
-        // TODO - maybe use flow for loadIdsFromPreferences to filterProducts
         sharedViewModel.products.observe(viewLifecycleOwner, Observer {
             it?.let{
                 sharedViewModel.filterProducts()

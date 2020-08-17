@@ -41,4 +41,7 @@
 <!--    BroadcastReceiver-->
     <string name="accept">Accept</string>
     <string name="cancel">Cancel</string>
+
+    <!-- Permissions-->
+    <string name="camera_permissions">Camera permissions not granted by the user.</string>
 </resources>
