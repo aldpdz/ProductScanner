@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 
 import com.example.productscanner.R
 import com.example.productscanner.data.domain.DomainProduct
@@ -99,7 +100,16 @@ class CameraFragment : Fragment() {
 
         viewModel.productUPC.observe(viewLifecycleOwner, Observer {
             it?.getContentIfNotHandled()?.let {product ->
-                Toast.makeText(context, product.name, Toast.LENGTH_SHORT).show()
+                cameraProviderFuture.get().unbindAll()
+                newBottomSheet(product)
+            }
+            scannerAnalyzer?.imageProxy?.close()
+        })
+
+        viewModel.product.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                this.findNavController()
+                    .navigate(CameraFragmentDirections.actionCameraxToDetailProduct(it))
             }
         })
 
@@ -114,7 +124,7 @@ class CameraFragment : Fragment() {
 
     private fun newBottomSheet(product: DomainProduct) {
         productBottomDialogFragment =
-            ProductBottomDialogFragment(viewModel.bottomSheetPaused, product)
+            ProductBottomDialogFragment(viewModel.bottomSheetPaused, product, viewModel.product)
         productBottomDialogFragment?.let {
             it.show((activity as MainActivity).supportFragmentManager, it.tag)
         }
@@ -144,8 +154,7 @@ class CameraFragment : Fragment() {
                 .setTargetResolution(Size(480, 640))
                 .build()
                 .also {
-                    scannerAnalyzer = ScannerAnalyzer(
-                        viewModel.cameraStatus, viewModel.sku, viewModel.upc)
+                    scannerAnalyzer = ScannerAnalyzer(viewModel.sku, viewModel.upc)
                     it.setAnalyzer(cameraExecutor, scannerAnalyzer!!)
                 }
 
@@ -160,25 +169,9 @@ class CameraFragment : Fragment() {
                 cameraProvider.bindToLifecycle(
                     viewLifecycleOwner, cameraSelector, preview, imageAnalyzer)
             }catch (e: Exception){
-                Log.e(TAG, "Use case binding filed", e)
+                Log.e(TAG, "Use case binding failed", e)
             }
         }, ContextCompat.getMainExecutor(activity))
-    }
-
-    private fun onFail() {
-        // TODO add to string resources
-        Toast.makeText(
-            context,
-            "Sorry, something went wrong!",
-            Toast.LENGTH_LONG
-        ).show()
-    }
-
-    private fun tryAgain() {
-        // TODO add to string resources
-        Toast.makeText(
-            activity, "Try again", Toast.LENGTH_SHORT
-        ).show()
     }
 
     override fun onRequestPermissionsResult(
@@ -191,8 +184,7 @@ class CameraFragment : Fragment() {
             if (allPermissionsGranted()){
                 startCamera()
             }else {
-                Toast.makeText(context,
-                "Permissions not granted by the user.",
+                Toast.makeText(context, getString(R.string.camera_permissions),
                 Toast.LENGTH_SHORT).show()
             }
         }

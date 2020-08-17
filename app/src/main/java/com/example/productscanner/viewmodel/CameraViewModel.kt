@@ -8,26 +8,12 @@ import com.example.productscanner.repositories.IProductsRepository
 import com.example.productscanner.util.Event
 import kotlinx.coroutines.*
 
-enum class ScannerStatusItem {FOUND}
-enum class ScannerStatus{TRY_AGAIN, FAIL}
 enum class TypeScanner {UPC, SKU}
-enum class CameraStatus {STOP, START}
 
 class CameraViewModel @ViewModelInject constructor(
     private val repository: IProductsRepository
 ): ViewModel() {
 
-    // TODO method to listen permissions from the shared model
-
-    // Status when the product is found
-    private val _scannerStatusItem = MutableLiveData<Event<ScannerStatusItem>>()
-    val scannerStatusItem: LiveData<Event<ScannerStatusItem>> get() = _scannerStatusItem
-
-    // Status for the mlkit library
-    private val _scannerStatus = MutableLiveData<Event<ScannerStatus>>()
-    val scannerStatus: LiveData<Event<ScannerStatus>> get() = _scannerStatus
-
-    val cameraStatus = MutableLiveData<Event<CameraStatus>>()
     val bottomSheetPaused = MutableLiveData<Event<Boolean>>()
 
     val sku = MutableLiveData<String>()
@@ -35,6 +21,8 @@ class CameraViewModel @ViewModelInject constructor(
 
     val upc = MutableLiveData<String>()
     val productUPC = upc.switchMap { getProduct(it, TypeScanner.UPC) }
+
+    val product = MutableLiveData<DomainProduct>()
 
     private fun getProduct(code: String, typeScanner: TypeScanner) : LiveData<Event<DomainProduct>>{
         // TODO - Use live data builder

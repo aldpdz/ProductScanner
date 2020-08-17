@@ -28,7 +28,6 @@ fun findSKUCode(texts: String):String?{
  * Class to process the camera frames
  */
 class ScannerAnalyzer(
-    private val cameraStatus: MutableLiveData<Event<CameraStatus>>,
     private val sku: MutableLiveData<String>,
     private val upc: MutableLiveData<String>)
     : ImageAnalysis.Analyzer {
@@ -45,7 +44,6 @@ class ScannerAnalyzer(
         val mediaImage = imageProxy.image
         if(mediaImage != null){
             val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-//            runBarcodeScanner(image)
             runTextRecognition(image)
         }
     }
@@ -62,7 +60,8 @@ class ScannerAnalyzer(
                 processBarCodes(it)
             }
             .addOnFailureListener { exception ->
-                Log.e(TAG, "barcode scanner error", exception)
+                imageProxy?.close()
+                Log.e(TAG, "Barcode scanner error", exception)
             }
     }
 
@@ -70,17 +69,18 @@ class ScannerAnalyzer(
         val recognizer = TextRecognition.getClient()
         return recognizer.process(inputImage)
             .addOnSuccessListener {
-                processTextRecognitionResult(it)
+                processTextRecognitionResult(it, inputImage)
             }
             .addOnFailureListener { exception ->
                 Log.e(TAG, "text recognition error", exception)
-                imageProxy?.close()
+                runBarcodeScanner(inputImage)
             }
     }
 
     private fun processBarCodes(barCodes: List<Barcode>){
         if(barCodes.isEmpty()){
             Log.d(TAG, "Empty list BarCodes")
+            imageProxy?.close()
         }else{
             val barCode: String? = barCodes[0].displayValue
             barCode?.let {
@@ -90,16 +90,16 @@ class ScannerAnalyzer(
         }
     }
 
-    private fun processTextRecognitionResult(texts: Text){
+    private fun processTextRecognitionResult(texts: Text, inputImage: InputImage){
         val blocks = texts.textBlocks
         if(blocks.isEmpty()){
             Log.d(TAG, "Empty list Text Recognition")
-            imageProxy?.close()
+            runBarcodeScanner(inputImage)
         }else{
             Log.d(TAG, texts.text)
             val skuCode = findSKUCode(texts.text)
             if(skuCode == null){
-                imageProxy?.close()
+                runBarcodeScanner(inputImage)
             }else{
                 sku.value = skuCode
             }
